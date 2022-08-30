@@ -44,7 +44,7 @@ def csv_to_array_full_objects(fpath):
 def main():
 	data = csv_to_array_full_objects(_TAG_LIST_FILE)
 	# keys = list(data[0].keys())
-	devices = list()
+	devices = {"devices": []}
 	names = set()
 	while True:
 		row = next(data, None)
@@ -60,7 +60,7 @@ def main():
 			tags.append({"name": tag.name, "label": tag.label, "checks": tag.checks})
 			row = next(data, None)
 		device.tags = tags
-		devices.append({"name": device.name, "label": device.label, "tags": device.tags})
+		devices["devices"].append({"name": device.name, "label": device.label, "tags": device.tags})
 
 	# print(devices)
 
