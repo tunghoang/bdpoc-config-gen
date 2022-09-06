@@ -1,2 +1,2 @@
 #! /bin/bash
-python -m pip install pyyaml
+python -m pip install -r requirements.txt
