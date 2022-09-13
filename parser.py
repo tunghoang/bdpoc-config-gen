@@ -20,7 +20,7 @@ _TAG_LIST_FILE = "tag_list.csv"
 
 # PARAMETER NAME CONSTANTS ###
 __OVERANGE_CHECK_PARAM_NAMES = ["low", "high"]
-__IRV_CHECK_PARAM_NAMES = ["low_low", "low", "high", "high_high"]
+__IRV_CHECK_PARAM_NAMES = ["low3", "low2", "low", "high", "high2", "high3"]
 
 def usage():
 	print("Usage:")
@@ -74,7 +74,7 @@ def process_overange_check(tagObject, tagInfor):
 
 def process_irv_check(tagObject, tagInfor):
 	params = tagInfor[__IRV_CHECK_NAME[0]].split(",")
-	if len(params) != 4:
+	if len(params) != 6:
 		return
 	paramsHash = {}
 	for idx, param in enumerate(params):
