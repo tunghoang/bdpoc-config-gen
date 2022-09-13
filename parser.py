@@ -3,11 +3,7 @@ import sys
 import yaml
 from operator import itemgetter
 
-from device import Device
-from tag import Tag
-from check import Check
-
-from config_gen import csv_to_array_full_objects, calculate_check, get_deviation_check_num
+from config_gen import csv_to_array_full_objects
 
 # HEADER NAME CONSTANTS ###
 __OVERANGE_CHECK_NAME = ["overange_check", "overange_check"]
