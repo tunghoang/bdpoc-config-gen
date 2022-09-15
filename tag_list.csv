@@ -1,6 +1,6 @@
 No.,Group,TAG NO.,PHD Tag,MEASURING POINT,"CONTROL LOGIC CHECK
  Number","CROSS REF.  (DEVIATION CHECK)
- Number",NaN Check,Overange Check,"Instrument Range Validation",Frozen check (5 min configurable),Rate of Change check,Travelling Check,"CROSS REF. (DEVIATION CHECK)
+ Number",NaN Check,Overange Check,Instrument Range Validation,Frozen check (5 min configurable),Rate of Change check,Travelling Check,"CROSS REF. (DEVIATION CHECK)
  Tagname","CONTROL LOGIC CHECK
  Tagname",Remark (Điều kiện bình thường),Not now
 1,G6,FIT_2180,HT_FI_2180.PV,RD COMP. SUCTION,1,,Y,"0, 1000",,Y,Pressure,,,FCV-2180/FIT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,
@@ -30,7 +30,7 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,"CONTROL LOGIC CHECK
 113,Other,BDV_2182,HT_BDV_2182.PV,BLOW DOWN VALVE,6,,Y,,,Y,,,,PT-2182,BDV-2182 open but PT-2182 not zero,x
 105,G4,LZT_2171,HT_LI_2171.PV,SUCTION SCRUBBER,7,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,Check LCV-2170 Open but LZT-2170 not decrease,y
 117,G4,LT_2170,HT_LT_2170.PV,Level Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,7,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,LCV-2170,"Check LCV-2170 Open but LZT-2170 not decrease, LZT-2170 decrease but LCV-2170 close",x
-120,,FT_3011,HT_FI_3011.DACA_1.PV,,8,,,,,Y,Pressure,,,FT-3011/PCV-3011,PCV-3011 Open but FT-3011 not increase,y
+120,Unknown,FT_3011,HT_FI_3011.DACA_1.PV,,8,,,,,Y,Pressure,,,FT-3011/PCV-3011,PCV-3011 Open but FT-3011 not increase,y
 125,G1,PT_3011,HT_PIC_3011.DACA.PV,Pressure Transmitter 2nd Stage Separator HT-V-3010,9,23,Y,Y,,Y,Pressure,,PT-3011/PZT-3010,PT-3011/PCV-3011,PCV-3011 Open but PT-3011 not decrease,y
 138,Other,TCV_2163,HT_TCV_2163.PV,Temperature Control Valve,10,,Y,Y,,Y,Temperature,,,TT-2163/TCV-2163,TCV-2163 Open but TT-2163 not decrease,x
 104,G4,LZT_2170,HT_LZI_2170.PV,SUCTION SCRUBBER,11,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x
@@ -128,16 +128,9 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,"CONTROL LOGIC CHECK
 121,Other,PDT_2170,HT_PDI_2170.DACA.PV,Pressure Differential Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,,,Y,Y,,Y,Pressure,,,,,y
 122,G1,PT_2161,HT_PI_2161.DACA.PV,Pressure Transmitter Mp Flash Gas Compressor Inlet Cooler HT-E-2160,,21,Y,Y,,Y,Pressure,,PT-2161/PZT-2160,,,y
 123,G1,PT_2171,HT_PI_2171.DACA.PV,Pressure Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,,,Y,Y,,Y,Pressure,,,,,y
-124,,PZT_3010,HT_PZI_3010.PV,2ND Stage Seperator,,23,,,,Y,Pressure,,PT-3011/PZT-3010,,,y
+124,Unknown,PZT_3010,HT_PZI_3010.PV,2ND Stage Seperator,,23,,,,Y,Pressure,,PT-3011/PZT-3010,,,y
 128,Other,SDV_2161_GSC,HT_SDV_2161_GSC.PV,SHUTDOWN VALVE,,,Y,Y,,Y,,2,,X,,x
 129,Other,SDV_2161_GSO,HT_SDV_2161_GSO.PV,SHUTDOWN VALVE,,,Y,Y,,Y,,2,,X,,x
 136,Other,SDV_2183_GSC,HT_SDV_2183_GSC.PV,SHUTDOWN VALVE,,,Y,Y,,Y,,6,,X,,x
 137,Other,SDV_2183_GSO,HT_SDV_2183_GSO.PV,SHUTDOWN VALVE,,,Y,Y,,Y,,6,,X,,x
 139,G7,TT_2160,HT_TI_2160.DACA.PV,Temperature Transmitter Mp Flash Gas Compressor Inlet Cooler,,,Y,Y,,Y,Temperature,,,,,y
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,65,
