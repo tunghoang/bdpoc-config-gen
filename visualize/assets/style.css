@@ -1,4 +1,4 @@
-button {
+button:not([title="View fullscreen"]) {
 	width: 100% !important;
 }
 
