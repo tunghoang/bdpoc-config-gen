@@ -1,7 +1,7 @@
 button:not([title="View fullscreen"]) {
 	width: 100% !important;
 }
-
+/*
 #MainMenu {
 	visibility: hidden;
 }
@@ -13,3 +13,4 @@ footer {
 header {
 	visibility: hidden;
 }
+*/

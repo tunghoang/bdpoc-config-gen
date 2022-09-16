@@ -26,7 +26,7 @@ def get_data_by_device_name(data, devices, device_name):
 		return data[device['label']]
 
 @st.cache
-def load_data():
+def load_tag_config():
 	with open("tags.yaml", "r") as yaml_file:
 		control_logic_checks, deviation_checks, devices = itemgetter("control_logic_checks", "deviation_checks", "devices")(yaml.safe_load(yaml_file))
 		devices.sort(key=lambda device: device["label"])
