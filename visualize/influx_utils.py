@@ -1,14 +1,5 @@
-from datetime import datetime
-import streamlit as st
-
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
-import json
-from pandas import DataFrame
-import asyncio
-
-import warnings
-from influxdb_client.client.warnings import MissingPivotFunction
+from module_loader import *
+from Query import Query
 
 warnings.simplefilter("ignore", MissingPivotFunction)
 
@@ -19,28 +10,37 @@ org = "BDPOC"
 def get_influx_client():
     return InfluxDBClient.from_config_file("config.ini")
 
-def query_data(time, device, tags=[], windowPeriod='10s', interpolated=False, missing_data="NaN"):
+def query_data(time, device, tags=[], interpolated=False, missing_data="NaN", table_mode="thin"):
     if (not device) or (len(tags) == 0):
         return DataFrame()
     client = get_influx_client()
-    query = f'''import "interpolate"
-        from(bucket: "datahub")
-            |> range(start: -{time})
-            |> filter(fn: (r) => r._measurement == {json.dumps(device)})
-            |> filter(fn: (r) => contains(value: r._field, set: {json.dumps(tags)}))
-            |> keep(columns: ["_time", "_value", "_field"])
-            {"|> interpolate.linear(every: 1s)" if interpolated else ""}
-            |> aggregateWindow(every: 1s, fn: mean, createEmpty: {"true" if missing_data=="NaN" else "false"})
-            |> yield(name: "mean")
-                        //|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-'''
-    query1 = f'''
-        from(bucket: "datahub")
-            |> range(start: -{time})
-            |> filter(fn: (r) => r._measurement == {json.dumps(device)})
-            |> filter(fn: (r) => contains(value: r._field, set: {json.dumps(tags)}))
-            |> keep(columns: ["_time", "_value", "_field"])
-                        //|> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-'''
-    tables = client.query_api().query_data_frame(query, org=org)
-    return tables
+    query = Query().from_bucket(bucket).range(time).filter_measurement(device).filter_fields(tags).keep_columns("_time", "_value", "_field")
+    if interpolated:
+        query = query.interpolate()
+    query = query.aggregate_window(True if missing_data == "NaN" else False).to_str()
+    # print(query)
+    pivot_query = Query().from_bucket(bucket).range(time).filter_measurement(device).filter_fields(tags).keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
+    table = None
+    if table_mode == "thin":
+        table = client.query_api().query_data_frame(query, org=org)
+        if not table.empty:
+            # FORMAT TABLE
+            # Add missing tags
+            no_data_tags = [tag for tag in st.session_state["tags"] if tag not in table["_field"].values]
+            missing_tags_df = pd.DataFrame({"_field": no_data_tags, "_time": [table["_time"][0] for _ in no_data_tags]})
+            table = pd.concat([missing_tags_df, table], join="outer")
+    elif table_mode == "fat":
+        table = client.query_api().query_data_frame(pivot_query, org=org)
+        if not table.empty:
+            # FORMAT TABLE
+            # Add missing tags
+            no_data_tags = [tag for tag in st.session_state["tags"] if tag not in table.columns]
+            has_data_tags = [tag for tag in st.session_state["tags"] if tag in table.columns]
+            for tag in no_data_tags:
+                table[tag] = table[has_data_tags[0]] = np.nan
+    else:
+        raise Exception("Unknown table mode")
+    if "_time" in table:
+        table["_time"] = table["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+    # print(table)
+    return table

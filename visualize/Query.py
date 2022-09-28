@@ -24,29 +24,20 @@ class Query:
         return self(f'|> filter(fn: (r) => r._measurement == "{measurement}")')
 
     def filter_fields(self, fields):
-        return self(f'|> filter(fn: (r) => contains(value: r._fields, set: {json.dumps(fields)}))')
+        return self(f'|> filter(fn: (r) => contains(value: r._field, set: {json.dumps(fields)}))')
 
     def keep_columns(self, *columns):
         return self(f'|> keep(columns: {json.dumps(columns)})')
 
     def interpolate(self):
-        self.query = "import interpolate\n" + self.query
+        self.query = 'import "interpolate"\n' + self.query
         return self(f'|> interpolate.linear(every: 1s)')
 
-    def aggregate_window(self, create_empty):
-        return self(f'|> aggregateWindow(every: 1s, fn: mean, createEmpty: {create_empty}')
+    def aggregate_window(self, create_empty=False):
+        return self(f'|> aggregateWindow(every: 1s, fn: mean, createEmpty: {"true" if create_empty else "false"})')
 
     def yield_(self, name):
         return self(f'|> yield(name: "{name}")')
 
-bucket = "datahub"
-time = "10m"
-device = "G1"
-interpolated = True
-missing_data = "NaN"
-tags = ["123", "456"]
-query = Query().from_bucket(bucket).range(time).filter_measurement(device).filter_fields(tags).keep_columns("_time", "_value", "_field")
-if interpolated:
-    query = query.interpolate()
-query = query.aggregate_window("true" if missing_data == "NaN" else "false").yield_("mean").to_str()
-print(query)
+    def pivot(self, row_key, column_key, value_column):
+        return self(f'|> pivot(rowKey: ["{row_key}"], columnKey: ["{column_key}"], valueColumn: "{value_column}")')

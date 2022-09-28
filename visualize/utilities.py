@@ -1,16 +1,28 @@
-from operator import itemgetter
+from module_loader import *
+from influx_utils import *
+from constants import *
 
-import numpy as np
-import pandas as pd
-import streamlit as st
-import yaml
-from influx_utils import query_data
+def update_interpolated_calldb():
+    st.session_state["interpolated"] = not st.session_state["interpolated"]
+    st.session_state["call_influx"] = True
 
-def select_tag(tag_number):
-    if tag_number in st.session_state.tags:
-        st.session_state.tags.remove(tag_number)
+def update_calldb():
+    st.session_state["call_influx"] = True
+
+def update_pivot_calldb():
+    st.session_state["pivot_state"] = False if st.session_state["table_mode"] == "thin" else True
+    st.session_state["call_influx"] = True
+
+def cal_different_time_range():
+    # Calculate different time range
+    return (st.session_state["end_time"] - st.session_state["start_time"]).total_seconds()
+
+def select_tag_update_calldb(tag_number):
+    if tag_number in st.session_state["tags"]:
+        st.session_state["tags"].remove(tag_number)
     else:
-        st.session_state.tags.append(tag_number)
+        st.session_state["tags"].append(tag_number)
+    st.session_state["call_influx"] = True if len(st.session_state["tags"]) > 0 else False
 
 def get_device_by_name(devices, device_name):
     for device in devices:
@@ -19,7 +31,7 @@ def get_device_by_name(devices, device_name):
 
 def select_device(device):
     st.session_state["selected_device_name"] = device['label']
-    st.session_state.tags[:] = []
+    st.session_state["tags"][:] = []
 
 def get_data_by_device_name(data, devices, device_name):
     device = get_device_by_name(devices, device_name)
@@ -29,12 +41,10 @@ def get_data_by_device_name(data, devices, device_name):
 def call_db():
     st.session_state["call_influx"] = True
 
-@st.cache
-def load_tag_config():
-    with open("tags.yaml", "r") as yaml_file:
-        control_logic_checks, deviation_checks, devices = itemgetter("control_logic_checks", "deviation_checks", "devices")(yaml.safe_load(yaml_file))
-        devices.sort(key=lambda device: device["label"])
-        return (control_logic_checks, deviation_checks, devices)
+def load_data():
+    with st.spinner('Loading ...'):
+        time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[str(st.session_state["time_range"])]
+        st.session_state["data"] = query_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"], table_mode=st.session_state["table_mode"])
 
 @st.cache
 def random(devices):
