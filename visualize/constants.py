@@ -9,3 +9,4 @@ TIME_STRINGS = {'10': '10s', '30': '30s', '60': '1m', '120': '2m', '300': '5m', 
 DATE_NOW = lambda: dt.datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))
 # CHECKS LIST
 CHECKS_LIST = {"NaN-Check": "nan", "Overange-Check": "overange", "Instrument-Range-Validation-Check": "irv"}
+CHECK_PERIOD = 1
