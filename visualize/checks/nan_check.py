@@ -1,6 +1,6 @@
 from module_loader import *
 
-def nan_check_multi(df, tags=[], pivot=False):
+def nan_check(df, tags=[], pivot=False):
     if df is None or df.empty or len(tags) == 0:
         return
     res = copy.deepcopy(df)

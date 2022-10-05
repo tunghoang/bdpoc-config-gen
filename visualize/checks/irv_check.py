@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 
 def find_low_high_irv(col):
+    if col.size == 0:
+        return None, None, None, None, None, None
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         col = list({value for value in col if pd.notna(value)})
@@ -24,7 +26,6 @@ def irv_check(df, tags=[], pivot=False):
     if pivot:
         for tag in tags:
             max3, max2, max1, min1, min2, min3 = find_low_high_irv(df[tag].values)
-            # print(max3, max2, max1, min1, min2, min3)
             res[tag] = [
                 np.nan if math.isnan(value) else 3 if value >= max3 else 2 if value >= max2 and value < max3 else 1 if value >= max1 and value < max2 else 0 if value >= min1 and value < max1 else -1 if value >= min2 and value < min1 else -2 if value >= min3 and value < min2 else -3
                 for value in res[tag].values
@@ -32,10 +33,10 @@ def irv_check(df, tags=[], pivot=False):
         return res
     for tag in tags:
         max3, max2, max1, min1, min2, min3 = find_low_high_irv(df[df["_field"] == tag]["_value"].values)
-        # print(max3, max2, max1, min1, min2, min3)
-        res["_value"] = [
-            row["_value"] if row["_field"] != tag else np.nan if math.isnan(row["_value"]) else 3 if row["_value"] >= max3 else 2
-            if row["_value"] >= max2 and row["_value"] < max3 else 1 if row["_value"] >= max1 and row["_value"] < max2 else 0 if row["_value"] >= min1 and row["_value"] < max1 else -1 if row["_value"] >= min2 and row["_value"] < min1 else -2 if row["_value"] >= min3 and row["_value"] < min2 else -3
-            for _, row in res.iterrows()
-        ]
+        if (max3 and max2 and max1 and min1 and min2 and min3):
+            res["_value"] = [
+                row["_value"] if row["_field"] != tag else np.nan if math.isnan(row["_value"]) else 3 if row["_value"] >= max3 else 2
+                if row["_value"] >= max2 and row["_value"] < max3 else 1 if row["_value"] >= max1 and row["_value"] < max2 else 0 if row["_value"] >= min1 and row["_value"] < max1 else -1 if row["_value"] >= min2 and row["_value"] < min1 else -2 if row["_value"] >= min3 and row["_value"] < min2 else -3
+                for _, row in res.iterrows()
+            ]
     return res
