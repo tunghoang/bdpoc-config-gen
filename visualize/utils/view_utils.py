@@ -1,17 +1,6 @@
-from module_loader import *
-from influx_utils import *
-from constants import *
-
-def update_interpolated_calldb():
-    st.session_state["interpolated"] = not st.session_state["interpolated"]
-    st.session_state["call_influx"] = True
-
-def update_calldb():
-    st.session_state["call_influx"] = True
-
-def update_pivot_calldb():
-    st.session_state["pivot_state"] = False if st.session_state["table_mode"] == "thin" else True
-    st.session_state["call_influx"] = True
+from configs.constants import TIME_STRINGS
+from configs.module_loader import *
+from utils.influx_utils import *
 
 def cal_different_time_range():
     # Calculate different time range
@@ -37,9 +26,6 @@ def get_data_by_device_name(data, devices, device_name):
     device = get_device_by_name(devices, device_name)
     if device is not None:
         return data[device['label']]
-
-def call_db():
-    st.session_state["call_influx"] = True
 
 def load_data():
     with st.spinner('Loading ...'):

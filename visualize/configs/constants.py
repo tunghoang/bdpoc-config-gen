@@ -10,3 +10,6 @@ DATE_NOW = lambda: dt.datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))
 # CHECKS LIST
 CHECKS_LIST = {"NaN-Check": "nan", "Overange-Check": "overange", "Instrument-Range-Validation-Check": "irv"}
 CHECK_PERIOD = 1
+# INFLUX
+BUCKET = "datahub"
+ORG = "BDPOC"
