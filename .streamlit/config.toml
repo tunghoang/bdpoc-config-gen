@@ -7,7 +7,6 @@ font="sans serif"
 
 [server]
 runOnSave=true
-# fileWatcherType="none"
 
 [runner]
 fastReruns=true

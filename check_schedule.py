@@ -1,20 +1,23 @@
-import sys
-from os import path
-import schedule
-import pandas as pd
 import math
-import numpy as np
+import sys
+import warnings
+from os import path
 
-sys.path.append(path.join(path.dirname(__file__), ".."))
-from checks import nan_check, overange_check, irv_check
-from configs.constants import CHECK_PERIOD
-from Query import Query
-from utils.tag_utils import load_tag_config
-from configs.constants import BUCKET, ORG
-from configs.influx_client import write_api, query_api
+import numpy as np
+import pandas as pd
+import schedule
+from influxdb_client.client.warnings import MissingPivotFunction
+
+sys.path.append(path.join(path.dirname(__file__), "visualize"))
+from visualize.configs.checks import irv_check, nan_check, overange_check
+from visualize.configs.constants import BUCKET, CHECK_PERIOD, ORG
+from visualize.configs.influx_client import query_api, write_api
+from visualize.configs.Query import Query
+from visualize.utils.tag_utils import load_tag_config
 
 control_logic_checks, deviation_checks, devices = load_tag_config()
 tags = [tag["tag_number"] for d in devices for tag in d["tags"]]
+warnings.simplefilter("ignore", MissingPivotFunction)
 
 def formater(df, measurement):
     df["_time"] = pd.to_datetime(df['_time'], errors='coerce').astype(np.int64)
@@ -30,9 +33,9 @@ def job():
     write_api.write("check-datahub", ORG, record=nan_checks)
     write_api.write("check-datahub", ORG, record=overange_checks)
     write_api.write("check-datahub", ORG, record=irv_checks)
-    return table
 
-schedule.every(CHECK_PERIOD).minute.do(job)
+# schedule.every(CHECK_PERIOD).minute.do(job)
 
-while True:
-    schedule.run_pending()
+# while True:
+#     schedule.run_pending()
+job()
