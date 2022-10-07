@@ -1,7 +1,9 @@
+import copy
 import math
 import sys
 import warnings
 from os import path
+from threading import Thread
 
 import numpy as np
 import pandas as pd
@@ -9,9 +11,9 @@ import schedule
 from influxdb_client.client.warnings import MissingPivotFunction
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
-from visualize.configs.checks import irv_check, nan_check, overange_check
+from visualize.configs.checks import (do_deviation_check, do_irv_check, do_nan_check, do_overange_check, do_roc_check)
 from visualize.configs.constants import BUCKET, CHECK_PERIOD, ORG
-from visualize.configs.influx_client import query_api, write_api
+from visualize.configs.influx_client import query_api
 from visualize.configs.Query import Query
 from visualize.utils.tag_utils import load_tag_config
 
@@ -19,20 +21,34 @@ control_logic_checks, deviation_checks, devices = load_tag_config()
 tags = [tag["tag_number"] for d in devices for tag in d["tags"]]
 warnings.simplefilter("ignore", MissingPivotFunction)
 
-def formater(df, measurement):
-    df["_time"] = pd.to_datetime(df['_time'], errors='coerce').astype(np.int64)
-    lines = [{"measurement": f"{measurement}", "tags": {"device": row["_measurement"]}, "fields": {row["_field"]: float(row["_value"])}, "time": row["_time"]} for _, row in df.iterrows() if row["_value"] != 0 and not math.isnan(row["_value"])]
-    return lines
 
 def job():
-    query = Query().from_bucket(BUCKET).range(f"{2 * CHECK_PERIOD}m").keep_columns("_time", "_value", "_field", "_measurement").aggregate_window(True).to_str()
-    table = query_api.query_data_frame(query, org=ORG)
-    nan_checks = nan_check(table, tags).drop(columns=["_start", "_stop", "result", "table"]).pipe(formater, "nan_check")
-    overange_checks = overange_check(table, tags).drop(columns=["_start", "_stop", "result", "table"]).pipe(formater, "overange_checks")
-    irv_checks = irv_check(table, tags).drop(columns=["_start", "_stop", "result", "table"]).pipe(formater, "irv_checks")
-    write_api.write("check-datahub", ORG, record=nan_checks)
-    write_api.write("check-datahub", ORG, record=overange_checks)
-    write_api.write("check-datahub", ORG, record=irv_checks)
+    print("Querying ...")
+    query = Query().from_bucket(BUCKET).range(f"{2 * CHECK_PERIOD}m").keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
+    print(query)
+    table = query_api.query_data_frame(query, org=ORG).assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
+
+    t1 = Thread(target=do_nan_check, args=(table, tags))
+    interpolated_table = table.interpolate(method="linear", axis=0, limit_direction="both")
+    t2 = Thread(target=do_overange_check, args=(interpolated_table, tags))
+    t3 = Thread(target=do_irv_check, args=(interpolated_table, tags))
+    t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks))
+    t5 = Thread(target=do_roc_check, args=(interpolated_table, devices))
+
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+    t5.start()
+
+    # t1.join()
+    # t2.join()
+    # t3.join()
+    # t4.join()
+    t5.join()
+
+    print("All Done")
+
 
 # schedule.every(CHECK_PERIOD).minute.do(job)
 

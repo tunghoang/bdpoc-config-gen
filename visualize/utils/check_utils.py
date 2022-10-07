@@ -1,6 +1,17 @@
 import warnings
+
 import numpy as np
 import pandas as pd
+
+
+def check_gen(type: str, checks: pd.DataFrame):
+    for time, row in checks.iterrows():
+        points = []
+        for col in checks.columns:
+            if row[col] != 0:
+                points.append({"measurement": f"{type}", "time": time, "fields": {col: row[col]}})
+        yield points
+
 
 def find_low_high_oc(col: pd.Series) -> tuple:
     if col.size == 0:
@@ -10,6 +21,7 @@ def find_low_high_oc(col: pd.Series) -> tuple:
         max = np.nanmax(col)
         min = np.nanmin(col)
         return max, min
+
 
 def find_low_high_irv(col: pd.Series) -> tuple:
     if col.size == 0:
@@ -25,3 +37,11 @@ def find_low_high_irv(col: pd.Series) -> tuple:
         min2 = col[-2] if len(col) > 4 else 0
         min1 = col[-3] if len(col) > 5 else 0
         return max3, max2, max1, min1, min2, min3
+
+
+def get_roc_check_by_tag(tag_check: str, devices: list):
+    for device in devices:
+        for tag in device["tags"]:
+            if tag["tag_number"] == tag_check:
+                if "roc_check" in tag["checks"]:
+                    return tag["checks"]["roc_check"]

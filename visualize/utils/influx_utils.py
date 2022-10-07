@@ -1,7 +1,7 @@
+from configs.constants import BUCKET, ORG
+from configs.influx_client import client
 from configs.module_loader import *
 from configs.Query import Query
-from configs.influx_client import client
-from configs.constants import BUCKET, ORG
 from services.influx_services import get_database_by_table_mode
 
 warnings.simplefilter("ignore", MissingPivotFunction)
@@ -19,3 +19,8 @@ def query_data(time: int, device: str, tags: list = [], interpolated: bool = Fal
     if "_time" in table:
         table["_time"] = table["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
     return table
+
+def dataframe_to_dictionary(df, measurement):
+    df["_time"] = pd.to_datetime(df['_time'], errors='coerce').astype(np.int64)
+    lines = [{"measurement": f"{measurement}", "tags": {"device": row["_measurement"]}, "fields": {row["_field"]: float(row["_value"])}, "time": row["_time"]} for _, row in df.iterrows() if row["_value"] != 0 and not math.isnan(row["_value"])]
+    return lines
