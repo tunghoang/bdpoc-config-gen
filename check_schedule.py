@@ -41,10 +41,10 @@ def job():
     t4.start()
     t5.start()
 
-    # t1.join()
-    # t2.join()
-    # t3.join()
-    # t4.join()
+    t1.join()
+    t2.join()
+    t3.join()
+    t4.join()
     t5.join()
 
     print("All Done")
