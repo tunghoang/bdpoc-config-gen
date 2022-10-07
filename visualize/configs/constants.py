@@ -1,4 +1,5 @@
 import datetime as dt
+
 import pytz
 
 # DEFAULT CHART STYLE
@@ -12,4 +13,5 @@ CHECKS_LIST = {"NaN-Check": "nan", "Overange-Check": "overange", "Instrument-Ran
 CHECK_PERIOD = 1
 # INFLUX
 BUCKET = "datahub"
+CHECK_BUCKET = "check-datahub"
 ORG = "BDPOC"
