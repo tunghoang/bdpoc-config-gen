@@ -3,10 +3,9 @@ import math
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (check_gen, find_low_high_irv, find_low_high_oc, get_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv, find_low_high_oc, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
 
-from configs.constants import CHECK_BUCKET, CHECK_PERIOD, ORG
-from configs.influx_client import write_api
+from configs.constants import CHECK_PERIOD
 
 
 def overange_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.DataFrame:
@@ -74,30 +73,6 @@ def irv_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
     return res
 
 
-def roc_check(table: pd.DataFrame, devices):
-    res = copy.deepcopy(table)
-    roc_checks_with_data = []
-    for col in table.columns:
-        max, min = find_low_high_oc(table[col].values)
-        numerator = 2 * (max - min)
-        denominator = (max + min) * (60 * CHECK_PERIOD * 2)
-        if denominator == 0:
-            res[col] = 0
-        else:
-            rroc = abs(numerator / denominator)
-        roc_check_type = get_roc_check_by_tag(col, devices)
-        if roc_check_type == "Pressure":
-            if rroc > 0.05:
-                roc_checks_with_data.append({"measurement": "roc_checks", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
-        elif roc_check_type == "Temperature":
-            if rroc > 0.1:
-                roc_checks_with_data.append({"measurement": "roc_checks", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
-        elif roc_check_type == "Validation":
-            if rroc > 0.2:
-                roc_checks_with_data.append({"measurement": "roc_checks", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
-    return roc_checks_with_data
-
-
 def deviation_check(table, deviation_checks):
     deviation_checks_with_data = []
     for key, tags in deviation_checks.items():
@@ -112,31 +87,50 @@ def deviation_check(table, deviation_checks):
     return deviation_checks_with_data
 
 
-def do_roc_check(table, devices):
-    roc_checks = roc_check(table, devices)
-    for point in roc_checks:
-        write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
+def roc_check(table: pd.DataFrame, devices):
+    res = copy.deepcopy(table)
+    roc_checks_with_data = []
+    for col in table.columns:
+        max, min = find_low_high_oc(table[col].values)
+        numerator = 2 * (max - min)
+        denominator = (max + min) * (60 * CHECK_PERIOD * 2)
+        if denominator == 0:
+            res[col] = 0
+        else:
+            rroc = abs(numerator / denominator)
+        roc_check_type = get_roc_check_by_tag(col, devices)
+        if roc_check_type == "Pressure":
+            if rroc > 0.05:
+                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+        elif roc_check_type == "Temperature":
+            if rroc > 0.1:
+                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
+        elif roc_check_type == "Validation":
+            if rroc > 0.2:
+                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
+    return roc_checks_with_data
 
 
-def do_deviation_check(table, deviation_checks_detail):
-    deviation_checks = deviation_check(table, deviation_checks_detail)
-    for point in deviation_checks:
-        write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-
-
-def do_irv_check(table, tags):
-    irv_checks = irv_check(table, tags, True)
-    for point in check_gen("irv_check", irv_checks):
-        write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-
-
-def do_overange_check(table, tags):
-    overange_checks = overange_check(table, tags, True)
-    for point in check_gen("overange_check", overange_checks):
-        write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-
-
-def do_nan_check(table, tags):
-    nan_checks = nan_check(table, tags, True)
-    for point in check_gen("nan_check", nan_checks):
-        write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
+def frozen_check(table: pd.DataFrame, devices):
+    res = copy.deepcopy(table)
+    frozen_checks_with_data = []
+    for col in table.columns:
+        max, min = find_low_high_oc(table[col].values)
+        numerator = 2 * (max - min)
+        denominator = (max + min) * (60 * CHECK_PERIOD * 2)
+        if denominator == 0:
+            res[col] = 0
+        else:
+            rroc = abs(numerator / denominator)
+        roc_check_type, is_frozen_check = get_frozen_check_roc_check_by_tag(col, devices)
+        if is_frozen_check:
+            if roc_check_type == "Pressure":
+                if rroc < 0.05:
+                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+            elif roc_check_type == "Temperature":
+                if rroc < 0.1:
+                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
+            elif roc_check_type == "Validation":
+                if rroc < 0.2:
+                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
+    return frozen_checks_with_data

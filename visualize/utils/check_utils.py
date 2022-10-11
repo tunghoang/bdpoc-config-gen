@@ -45,3 +45,13 @@ def get_roc_check_by_tag(tag_check: str, devices: list):
             if tag["tag_number"] == tag_check:
                 if "roc_check" in tag["checks"]:
                     return tag["checks"]["roc_check"]
+    return None
+
+
+def get_frozen_check_roc_check_by_tag(tag_check: str, devices: list):
+    for device in devices:
+        for tag in device["tags"]:
+            if tag["tag_number"] == tag_check:
+                if "roc_check" in tag["checks"] and "frozen_check" in tag["checks"]:
+                    return tag["checks"]["roc_check"], tag["checks"]["frozen_check"]
+    return None, None
