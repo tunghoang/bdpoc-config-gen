@@ -2,6 +2,7 @@ import datetime as dt
 
 import pytz
 
+SECOND = 60
 # DEFAULT CHART STYLE
 LINE_SHAPE = 'hv'
 # LINE_SHAPE = 'linear'
@@ -15,3 +16,5 @@ CHECK_PERIOD = 1
 BUCKET = "datahub"
 CHECK_BUCKET = "check-datahub"
 ORG = "BDPOC"
+# MIN NUMBER OF NAN VALUE ALLOWED
+MINIMUM_RATIO_NAN_ALLOW = 90 / (CHECK_PERIOD * 2 * SECOND)

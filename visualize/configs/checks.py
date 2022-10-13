@@ -3,24 +3,25 @@ import math
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (find_low_high_irv, find_low_high_oc, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
 
-from configs.constants import CHECK_PERIOD
+from configs.constants import CHECK_PERIOD, MINIMUM_RATIO_NAN_ALLOW
 
 
-def overange_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def overange_check(df: pd.DataFrame, devices: list, tags: list = [], pivot: bool = False) -> pd.DataFrame:
     if df is None or df.empty or len(tags) == 0:
         return
     res = copy.deepcopy(df)
     if pivot:
         for tag in tags:
             if tag in df.columns:
-                max, min = find_low_high_oc(df[tag].values)
-                res[tag] = [np.nan if math.isnan(value) else 1 if value >= max else 0 if value < max and value > min else -1 for value in res[tag].values]
+                max, min = find_low_high_oc_by_devices(devices, tag)
+                if max and min:
+                    res[tag] = [np.nan if math.isnan(value) else 1 if value >= max else 0 if value < max and value > min else -1 for value in res[tag].values]
         return res
     for tag in tags:
-        max, min = find_low_high_oc(df[df["_field"] == tag]["_value"].values)
-        if (max and min):
+        max, min = find_low_high_oc_by_devices(devices, tag)
+        if max and min:
             # SHORTHAND version
             res["_value"] = [np.nan if math.isnan(row["_value"]) else 1 if row["_value"] >= max else 0 if row["_value"] < max and row["_value"] > min else -1 for _, row in res.iterrows()]
             # EASY TO READ version
@@ -41,11 +42,16 @@ def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
     if df is None or df.empty or len(tags) == 0:
         return
     res = copy.deepcopy(df)
+    nan_check_with_data = []
     if pivot:
         for tag in tags:
             if (tag in res.columns):
-                res[tag] = [1 if math.isnan(row[tag]) else 0 for _, row in df.iterrows()]
-        return res
+                count_nan = res[tag].isnull().sum()
+                count_total = len(res.index)
+                if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
+                    nan_check_with_data.append({"measurement": "nan_check", "fields": {tag: 1}, "tags": {"tag": tag}})
+                    # res[tag] = [1 if math.isnan(row[tag]) else 0 for _, row in df.iterrows()]
+        return nan_check_with_data
     res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
     return res
 
@@ -73,11 +79,12 @@ def irv_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
     return res
 
 
-def deviation_check(table, deviation_checks):
+def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: list):
     deviation_checks_with_data = []
     for key, tags in deviation_checks.items():
         if len(tags) == 2:
             if pd.Series(tags).isin(table.columns).all():
+                max, min = find_low_high_oc_by_devices(devices, tags[0])
                 values = table[tags[0]] - table[tags[1]]
                 for value in values:
                     _tags = {}
@@ -91,23 +98,23 @@ def roc_check(table: pd.DataFrame, devices):
     res = copy.deepcopy(table)
     roc_checks_with_data = []
     for col in table.columns:
-        max, min = find_low_high_oc(table[col].values)
+        max, min = find_low_high_oc_by_devices(devices, col)
         numerator = 2 * (max - min)
         denominator = (max + min) * (60 * CHECK_PERIOD * 2)
         if denominator == 0:
             res[col] = 0
         else:
             rroc = abs(numerator / denominator)
-        roc_check_type = get_roc_check_by_tag(col, devices)
-        if roc_check_type == "Pressure":
-            if rroc > 0.05:
-                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
-        elif roc_check_type == "Temperature":
-            if rroc > 0.1:
-                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
-        elif roc_check_type == "Validation":
-            if rroc > 0.2:
-                roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
+        # roc_check_type = get_roc_check_by_tag(col, devices)
+        # if roc_check_type == "Pressure":
+        if rroc > 0.05:
+            roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+        # elif roc_check_type == "Temperature":
+        #     if rroc > 0.1:
+        #         roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
+        # elif roc_check_type == "Validation":
+        #     if rroc > 0.2:
+        #         roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
     return roc_checks_with_data
 
 
@@ -115,22 +122,22 @@ def frozen_check(table: pd.DataFrame, devices):
     res = copy.deepcopy(table)
     frozen_checks_with_data = []
     for col in table.columns:
-        max, min = find_low_high_oc(table[col].values)
+        max, min = find_low_high_oc_by_devices(devices, col)
         numerator = 2 * (max - min)
         denominator = (max + min) * (60 * CHECK_PERIOD * 2)
         if denominator == 0:
             res[col] = 0
         else:
             rroc = abs(numerator / denominator)
-        roc_check_type, is_frozen_check = get_frozen_check_roc_check_by_tag(col, devices)
+        _, is_frozen_check = get_frozen_check_roc_check_by_tag(col, devices)
         if is_frozen_check:
-            if roc_check_type == "Pressure":
-                if rroc < 0.05:
-                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
-            elif roc_check_type == "Temperature":
-                if rroc < 0.1:
-                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
-            elif roc_check_type == "Validation":
-                if rroc < 0.2:
-                    frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
+            # if roc_check_type == "Pressure":
+            if rroc < 0.05:
+                frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+            # elif roc_check_type == "Temperature":
+            #     if rroc < 0.1:
+            #         frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Temperature"}, "time": table.index[-1]})
+            # elif roc_check_type == "Validation":
+            #     if rroc < 0.2:
+            #         frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Validation"}, "time": table.index[-1]})
     return frozen_checks_with_data

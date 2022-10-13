@@ -13,7 +13,7 @@ def check_gen(type: str, checks: pd.DataFrame):
         yield points
 
 
-def find_low_high_oc(col: pd.Series) -> tuple:
+def find_low_high_oc_by_series(col: pd.Series) -> tuple:
     if col.size == 0:
         return None, None
     with warnings.catch_warnings():
@@ -21,6 +21,14 @@ def find_low_high_oc(col: pd.Series) -> tuple:
         max = np.nanmax(col)
         min = np.nanmin(col)
         return max, min
+
+
+def find_low_high_oc_by_devices(devices: list, tag: str) -> tuple:
+    for device in devices:
+        for t in device["tags"]:
+            if t["tag_number"] == tag and "overange_check" in t["checks"]:
+                return t["checks"]["overange_check"]["high"], t["checks"]["overange_check"]["low"]
+    return None, None
 
 
 def find_low_high_irv(col: pd.Series) -> tuple:
