@@ -30,7 +30,7 @@ def job():
   t1 = Thread(target=do_nan_check, args=(table, tags))
   interpolated_table = table.interpolate(method="linear", axis=0, limit_direction="both")
   t2 = Thread(target=do_overange_check, args=(interpolated_table, tags, devices))
-  t3 = Thread(target=do_irv_check, args=(interpolated_table, tags))
+  t3 = Thread(target=do_irv_check, args=(interpolated_table, devices, tags))
   t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks, devices))
   t5 = Thread(target=do_roc_check, args=(interpolated_table, devices))
   t6 = Thread(target=do_frozen_check, args=(interpolated_table, devices))

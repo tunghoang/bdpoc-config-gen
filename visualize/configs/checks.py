@@ -3,7 +3,7 @@ import math
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (find_low_high_irv, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
 
 from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, MINIMUM_RATIO_NAN_ALLOW, SECOND)
 
@@ -50,27 +50,26 @@ def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
         count_total = len(res.index)
         if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
           nan_check_with_data.append({"measurement": "nan_check", "fields": {tag: 1}, "tags": {"tag": tag}, "time": res.index[-1]})
-          # res[tag] = [1 if math.isnan(row[tag]) else 0 for _, row in df.iterrows()]
     return nan_check_with_data
   res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
   return res
 
 
-def irv_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def irv_check(df: pd.DataFrame, devices, tags: list = [], pivot: bool = False) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
   if pivot:
     for tag in tags:
       if tag in df.columns:
-        max3, max2, max1, min1, min2, min3 = find_low_high_irv(df[tag].values)
+        max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
         res[tag] = [
             np.nan if math.isnan(value) else 3 if value >= max3 else 2 if value >= max2 and value < max3 else 1 if value >= max1 and value < max2 else 0 if value >= min1 and value < max1 else -1 if value >= min2 and value < min1 else -2 if value >= min3 and value < min2 else -3
             for value in res[tag].values
         ]
     return res
   for tag in tags:
-    max3, max2, max1, min1, min2, min3 = find_low_high_irv(df[df["_field"] == tag]["_value"].values)
+    max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
     if (max3 and max2 and max1 and min1 and min2 and min3):
       res["_value"] = [
           row["_value"] if row["_field"] != tag else np.nan if math.isnan(row["_value"]) else 3 if row["_value"] >= max3 else
