@@ -1,14 +1,15 @@
 import copy
 import math
+from typing import List
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag, get_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, MINIMUM_RATIO_NAN_ALLOW, SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE, SECOND)
 
 
-def overange_check(df: pd.DataFrame, devices: list, tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
@@ -55,7 +56,7 @@ def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
   return res
 
 
-def irv_check(df: pd.DataFrame, devices, tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
@@ -80,7 +81,7 @@ def irv_check(df: pd.DataFrame, devices, tags: list = [], pivot: bool = False) -
   return res
 
 
-def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: list):
+def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[dict]):
   deviation_checks_with_data = []
   for key, tags in deviation_checks.items():
     # CHECK IF DEVIATION CHECK AVAILABLE
@@ -88,16 +89,16 @@ def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: list):
       max, min = find_low_high_oc_by_devices(devices, tags[0])
       if max and min:
         values = abs(table[tags[0]] - table[tags[1]]) / (max - min)
-        for value in values:
-          if value > 0.05:
-            _tags = {}
+        for idx, value in enumerate(values):
+          if value > DEVIATION_CHECK_VALUE:
+            _tags = {"max": max, "min": min}
             for idx, tag in enumerate(tags):
               _tags[f"tag_{idx}"] = tag
-            deviation_checks_with_data.append({"measurement": "deviation_checks", "fields": {key: value}, "tags": _tags})
+            deviation_checks_with_data.append({"measurement": "deviation_checks", "fields": {key: value}, "tags": _tags, "time": table.index[idx]})
   return deviation_checks_with_data
 
 
-def roc_check(table: pd.DataFrame, devices):
+def roc_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)
   roc_checks_with_data = []
   for col in table.columns:
@@ -109,25 +110,25 @@ def roc_check(table: pd.DataFrame, devices):
         res[col] = 0
       else:
         rroc = abs(numerator / denominator)
-      if rroc > 0.05:
+      if rroc > ROC_CHECK_VALUE:
         roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
   return roc_checks_with_data
 
 
-def frozen_check(table: pd.DataFrame, devices):
+def frozen_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)
   frozen_checks_with_data = []
   for col in table.columns:
     max, min = find_low_high_oc_by_devices(devices, col)
     if max and min:
       numerator = 2 * (max - min)
-      denominator = (max + min) * (60 * CHECK_PERIOD * 2)
+      denominator = (max + min) * (SECOND * CHECK_PERIOD * 2)
       if denominator == 0:
         res[col] = 0
       else:
         rroc = abs(numerator / denominator)
       _, is_frozen_check = get_frozen_check_roc_check_by_tag(col, devices)
       if is_frozen_check:
-        if rroc < 0.05:
+        if rroc < FROZEN_CHECK_VALUE:
           frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
   return frozen_checks_with_data
