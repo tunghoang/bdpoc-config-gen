@@ -4,9 +4,14 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv_by_devices,
+                               find_low_high_oc_by_devices,
+                               get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE, SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD,
+                               DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE,
+                               MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE,
+                               SECOND)
 
 
 def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
@@ -14,15 +19,16 @@ def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot
     return
   res = copy.deepcopy(df)
   if pivot:
-    for tag in tags:
-      if tag in df.columns:
-        max, min = find_low_high_oc_by_devices(devices, tag)
-        if max and min:
-          res[tag] = [np.nan if math.isnan(value) else 1 if value >= max else 0 if value < max and value > min else -1 for value in res[tag].values]
+    for tag in df.columns:
+      max, min = find_low_high_oc_by_devices(devices, tag)
+      if max is not None and min is not None:
+        res[tag] = [np.nan if math.isnan(value) else 1 if value >= max else 0 if value < max and value > min else -1 for value in res[tag].values]
+      else:
+        res.drop(columns=tag)
     return res
   for tag in tags:
     max, min = find_low_high_oc_by_devices(devices, tag)
-    if max and min:
+    if [max, min].count() == 0:
       # SHORTHAND version
       res["_value"] = [np.nan if math.isnan(row["_value"]) else 1 if row["_value"] >= max else 0 if row["_value"] < max and row["_value"] > min else -1 for _, row in res.iterrows()]
       # EASY TO READ version
@@ -45,12 +51,11 @@ def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
   res = copy.deepcopy(df)
   nan_check_with_data = []
   if pivot:
-    for tag in tags:
-      if (tag in res.columns):
-        count_nan = res[tag].isnull().sum()
-        count_total = len(res.index)
-        if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
-          nan_check_with_data.append({"measurement": "nan_check", "fields": {tag: 1}, "tags": {"tag": tag}, "time": res.index[-1]})
+    for tag in res.columns:
+      count_nan = res[tag].isnull().sum()
+      count_total = len(res.index)
+      if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
+        nan_check_with_data.append({"measurement": "nan_check", "fields": {tag: 1}, "tags": {"tag": tag}, "time": res.index[-1]})
     return nan_check_with_data
   res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
   return res
@@ -61,18 +66,19 @@ def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: boo
     return
   res = copy.deepcopy(df)
   if pivot:
-    for tag in tags:
-      if tag in df.columns:
-        max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
-        if max3 and max2 and max1 and min1 and min2 and min3:
-          res[tag] = [
-              np.nan if math.isnan(value) else 3 if value >= max3 else 2 if value >= max2 and value < max3 else 1 if value >= max1 and value < max2 else 0 if value >= min1 and value < max1 else -1 if value >= min2 and value < min1 else -2 if value >= min3 and value < min2 else -3
-              for value in res[tag].values
-          ]
+    for tag in res.columns:
+      max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
+      if [max3, max2, max1, min1, min2, min3].count(None) == 0:
+        res[tag] = [
+            np.nan if math.isnan(value) else 3 if value >= max3 else 2 if value >= max2 and value < max3 else 1 if value >= max1 and value < max2 else 0 if value >= min1 and value < max1 else -1 if value >= min2 and value < min1 else -2 if value >= min3 and value < min2 else -3
+            for value in res[tag].values
+        ]
+      else:
+        res.drop(columns=tag)
     return res
   for tag in tags:
     max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
-    if max3 and max2 and max1 and min1 and min2 and min3:
+    if [max3, max2, max1, min1, min2, min3].count(None) == 0:
       res["_value"] = [
           row["_value"] if row["_field"] != tag else np.nan if math.isnan(row["_value"]) else 3 if row["_value"] >= max3 else
           2 if row["_value"] >= max2 and row["_value"] < max3 else 1 if row["_value"] >= max1 and row["_value"] < max2 else 0 if row["_value"] >= min1 and row["_value"] < max1 else -1 if row["_value"] >= min2 and row["_value"] < min1 else -2 if row["_value"] >= min3 and row["_value"] < min2 else -3
@@ -87,7 +93,7 @@ def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[d
     # CHECK IF DEVIATION CHECK AVAILABLE
     if len(tags) == AVAILABLE_DEVIATION and pd.Series(tags).isin(table.columns).all():
       max, min = find_low_high_oc_by_devices(devices, tags[0])
-      if max and min:
+      if max is not None and min is not None:
         values = abs(table[tags[0]] - table[tags[1]]) / (max - min)
         for idx, value in enumerate(values):
           if value > DEVIATION_CHECK_VALUE:
@@ -103,7 +109,7 @@ def roc_check(table: pd.DataFrame, devices: List[dict]):
   roc_checks_with_data = []
   for col in table.columns:
     max, min = find_low_high_oc_by_devices(devices, col)
-    if max and min:
+    if max is not None and min is not None:
       numerator = 2 * (max - min)
       denominator = (max + min) * (SECOND * CHECK_PERIOD * 2)
       if denominator == 0:
@@ -120,7 +126,7 @@ def frozen_check(table: pd.DataFrame, devices: List[dict]):
   frozen_checks_with_data = []
   for col in table.columns:
     max, min = find_low_high_oc_by_devices(devices, col)
-    if max and min:
+    if max is not None and min is not None:
       numerator = 2 * (max - min)
       denominator = (max + min) * (SECOND * CHECK_PERIOD * 2)
       if denominator == 0:

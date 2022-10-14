@@ -6,11 +6,11 @@ SECOND = 60
 # DEFAULT CHART STYLE
 LINE_SHAPE = 'hv'
 # LINE_SHAPE = 'linear'
-TIME_STRINGS = {'10': '10s', '30': '30s', '60': '1m', '120': '2m', '300': '5m', '600': '10m', '1800': '30m', '0': 'Custom...'}
+TIME_STRINGS = {10: '10s', 30: '30s', 60: '1m', 120: '2m', 300: '5m', 600: '10m', 1800: '30m', 0: 'Custom...'}
 # DATE TIME NOW
 DATE_NOW = lambda: dt.datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))
 # CHECKS LIST
-CHECKS_LIST = {"NaN-Check": "nan", "Overange-Check": "overange", "Instrument-Range-Validation-Check": "irv"}
+CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'roc_check': 'Rate-Of-Change-Check', 'all': 'All'}
 CHECK_PERIOD = 1
 # INFLUX
 BUCKET = "datahub"

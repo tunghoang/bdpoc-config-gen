@@ -31,10 +31,11 @@ def do_irv_check(table, devices, tags):
 
 def do_overange_check(table, tags, devices):
   overange_checks = overange_check(table, devices, tags, True)
-  for point in check_gen("overange_check", overange_checks):
-    write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-    check_logger.info("overange_checking 1 point")
-  check_logger.info("overange_checking done")
+  overange_checks.to_csv("test.csv")
+  # for point in check_gen("overange_check", overange_checks):
+  #   write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
+  #   check_logger.info("overange_checking 1 point")
+  # check_logger.info("overange_checking done")
 
 
 def do_nan_check(table, tags):

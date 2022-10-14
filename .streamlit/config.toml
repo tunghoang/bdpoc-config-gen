@@ -10,7 +10,7 @@ showWarningOnDirectExecution = false
 
 [server]
 runOnSave = true
-fileWatcherType = "none"
+# fileWatcherType = "none"
 
 [runner]
 fastReruns = true
