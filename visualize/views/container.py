@@ -1,7 +1,12 @@
 import streamlit as st
 from configs.constants import CHECKS_LIST, TIME_STRINGS
-from utils.session import (update_calldb_session, update_interpolated_calldb_session, update_pivot_calldb_session)
-from utils.view_utils import (cal_different_time_range, get_device_by_name, select_tag_update_calldb, visualize_data_by_checks, visualize_data_by_raw_data)
+from utils.session import (update_calldb_session,
+                           update_interpolated_calldb_session,
+                           update_pivot_calldb_session)
+from utils.view_utils import (cal_different_time_range, get_device_by_name,
+                              select_tag_update_calldb,
+                              visualize_data_by_checks,
+                              visualize_data_by_raw_data)
 
 
 def render_configurations():
@@ -16,11 +21,17 @@ def render_configurations():
     with tCols[0]:
       st.text_input("Search Tags", placeholder="Search for tags", key="search_tags")
     with tCols[1]:
-      st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw", on_change=update_interpolated_calldb_session)
+      if st.session_state["raw_data"]:
+        st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw", on_change=update_interpolated_calldb_session)
+      else:
+        st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw", on_change=update_interpolated_calldb_session, disabled=True)
     with tCols[2]:
       st.selectbox("Time Range", options=TIME_STRINGS.keys(), format_func=lambda sec: TIME_STRINGS[sec], key="time_range", on_change=update_calldb_session)
     with tCols[3]:
-      st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data", on_change=update_calldb_session)
+      if st.session_state["raw_data"]:
+        st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data", on_change=update_calldb_session)
+      else:
+        st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data", on_change=update_calldb_session, disabled=True)
     with tCols[4]:
       st.selectbox("Chart Mode", ("all", "merge"), key="chart_mode", on_change=update_calldb_session)
     with tCols[5]:
