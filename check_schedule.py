@@ -52,8 +52,8 @@ def job():
   print("All Done")
 
 
-# schedule.every(CHECK_PERIOD).minute.do(job)
+schedule.every(CHECK_PERIOD).minute.do(job)
 
-# while True:
-#   schedule.run_pending()
-job()
+while True:
+  schedule.run_pending()
+# job()
