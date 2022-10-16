@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def init_session(name, value):
     if name not in st.session_state:
         st.session_state[name] = value
@@ -15,5 +16,4 @@ def update_calldb_session():
     st.session_state["call_influx"] = True
 
 def update_pivot_calldb_session():
-    st.session_state["pivot_state"] = False if st.session_state["table_mode"] == "thin" else True
     st.session_state["call_influx"] = True

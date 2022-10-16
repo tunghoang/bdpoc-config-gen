@@ -44,7 +44,7 @@ def main():
     st.session_state["call_influx"] = False
   with placeholder.container():
     render_configurations()
-    render_columns(devices, deviation_checks)
+    render_columns(devices)
 
 
 if __name__ == "__main__":

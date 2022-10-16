@@ -7,7 +7,7 @@ from utils.check_utils import check_gen
 
 def do_roc_check(table, devices):
   roc_checks = roc_check(table, devices)
-  for point in roc_checks:
+  for point in check_gen("roc_check", roc_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("roc_checking 1 point")
   check_logger.info("roc_checking done")
@@ -15,7 +15,7 @@ def do_roc_check(table, devices):
 
 def do_deviation_check(table, deviation_checks_detail, devices):
   deviation_checks = deviation_check(table, deviation_checks_detail, devices)
-  for point in deviation_checks:
+  for point in check_gen("deviation_check", deviation_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("deviation_checking 1 point")
   check_logger.info("deviation_checking done")
@@ -39,7 +39,7 @@ def do_overange_check(table, tags, devices):
 
 def do_nan_check(table, tags):
   nan_checks = nan_check(table, tags, True)
-  for point in nan_checks:
+  for point in check_gen("nan_check", nan_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("nan_checking 1 point")
   check_logger.info("nan_checking done")
@@ -47,7 +47,7 @@ def do_nan_check(table, tags):
 
 def do_frozen_check(table, devices):
   frozen_checks = frozen_check(table, devices)
-  for point in frozen_checks:
+  for point in check_gen("frozen_check", frozen_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("frozen_checking 1 point")
   check_logger.info("frozen_checking done")

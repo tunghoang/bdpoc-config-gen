@@ -1,8 +1,8 @@
-from configs.checks import irv_check, nan_check, overange_check
-from configs.constants import TIME_STRINGS
+from configs.checks import (deviation_check, frozen_check, irv_check, nan_check, overange_check, roc_check)
+from configs.constants import PIVOT, TIME_STRINGS
 from configs.module_loader import *
 
-from utils.draw_line_chart import draw_line_chart_by_data_frame
+from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
 from utils.influx_utils import query_check_data, query_raw_data
 
 
@@ -40,37 +40,38 @@ def load_data():
   with st.spinner('Loading ...'):
     time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
     if st.session_state["raw_data"]:
-      st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"], table_mode=st.session_state["table_mode"])
+      st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"])
       return
     st.session_state['data'] = query_check_data(time, st.session_state['selected_device_name'], st.session_state["tags"], st.session_state["check_mode"])
 
 
-def visualize_data_by_raw_data():
+def visualize_data_by_raw_data(devices, deviation_checks):
   # Load data from influxdb
-  if (st.session_state["check_mode"] == "nan_check"):
-    nan = nan_check(st.session_state["data"], st.session_state["tags"], st.session_state["pivot_state"])
+  if (st.session_state["check_mode"] == "nan_check" or st.session_state["check_mode"] == "all"):
+    nan = nan_check(st.session_state["data"], st.session_state["tags"], PIVOT)
     st.write(nan)
-  if (st.session_state["check_mode"] == "overange_check"):
-    overange = overange_check(st.session_state["data"], st.session_state["tags"], st.session_state["pivot_state"])
+  if (st.session_state["check_mode"] == "overange_check" or st.session_state["check_mode"] == "all"):
+    overange = overange_check(st.session_state["data"], devices, st.session_state["tags"], PIVOT)
     st.write(overange)
-  if (st.session_state["check_mode"] == "irv_check"):
-    irv = irv_check(st.session_state["data"], st.session_state["tags"], st.session_state["pivot_state"])
+  if (st.session_state["check_mode"] == "irv_check" or st.session_state["check_mode"] == "all"):
+    irv = irv_check(st.session_state["data"], devices, st.session_state["tags"], PIVOT)
     st.write(irv)
-  # if (st.session_state["check_mode"] == "deviation_check"):
-  #   deviation = deviation_check(st.session_state["data"], st.session_state["tags"], st.session_state["pivot_state"])
-  #   st.write(deviation)
-  # if (st.session_state["check_mode"] == "roc_check"):
-  #   roc = roc_check(st.session_state["data"], st.session_state["tags"], st.session_state["pivot_state"])
-  #   st.write(roc)
-  # draw_line_chart_by_data_frame(st.session_state["data"], st.session_state["pivot_state"])
+  if (st.session_state["check_mode"] == "deviation_check" or st.session_state["check_mode"] == "all"):
+    deviation = deviation_check(st.session_state["data"], deviation_checks, devices)
+    st.write(deviation)
+  if (st.session_state["check_mode"] == "roc_check" or st.session_state["check_mode"] == "all"):
+    roc = roc_check(st.session_state["data"], devices)
+    st.write(roc)
+  if (st.session_state["check_mode"] == "frozen_check" or st.session_state["check_mode"] == "all"):
+    frozen = frozen_check(st.session_state["data"], devices)
+    st.write(frozen)
+  draw_line_chart_by_data_frame(st.session_state["data"], PIVOT)
 
 
 def visualize_data_by_checks():
-  if type(st.session_state["data"]) == list:
-    for data in st.session_state["data"]:
-      st.write(data)
-    return
-  st.write(st.session_state["data"])
+  for data in st.session_state["data"]:
+    # st.write(data)
+    draw_bar_chart_by_data_frame(data)
 
 
 @st.cache

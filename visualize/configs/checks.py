@@ -1,17 +1,14 @@
 import copy
+import datetime as dt
 import math
 from typing import List
 
 import numpy as np
 import pandas as pd
-from utils.check_utils import (find_low_high_irv_by_devices,
-                               find_low_high_oc_by_devices,
-                               get_frozen_check_roc_check_by_tag)
+import pytz
+from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD,
-                               DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE,
-                               MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE,
-                               SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE, SECOND)
 
 
 def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
@@ -29,19 +26,7 @@ def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot
   for tag in tags:
     max, min = find_low_high_oc_by_devices(devices, tag)
     if [max, min].count() == 0:
-      # SHORTHAND version
       res["_value"] = [np.nan if math.isnan(row["_value"]) else 1 if row["_value"] >= max else 0 if row["_value"] < max and row["_value"] > min else -1 for _, row in res.iterrows()]
-      # EASY TO READ version
-      # for index, row in df.iterrows():
-      #     if (row["_field"] == tag):
-      #         if (math.isnan(row["_value"])):
-      #             continue
-      #         elif (row["_value"] >= max):
-      #             df["_value"][index] = 1
-      #         elif (row["_value"] < max and row["_value"] > min):
-      #             df["_value"][index] = 0
-      #         elif (row["_value"] <= min):
-      #             df["_value"][index] = -1
   return res
 
 
@@ -49,13 +34,13 @@ def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.Data
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
-  nan_check_with_data = []
+  nan_check_with_data = pd.DataFrame()
   if pivot:
     for tag in res.columns:
       count_nan = res[tag].isnull().sum()
       count_total = len(res.index)
       if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
-        nan_check_with_data.append({"measurement": "nan_check", "fields": {tag: 1}, "tags": {"tag": tag}, "time": res.index[-1]})
+        nan_check_with_data = pd.concat([pd.DataFrame({"_measurement": "nan_check", tag: 1, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], join="outer")
     return nan_check_with_data
   res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
   return res
@@ -88,7 +73,7 @@ def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: boo
 
 
 def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[dict]):
-  deviation_checks_with_data = []
+  deviation_checks_with_data = pd.DataFrame()
   for key, tags in deviation_checks.items():
     # CHECK IF DEVIATION CHECK AVAILABLE
     if len(tags) == AVAILABLE_DEVIATION and pd.Series(tags).isin(table.columns).all():
@@ -100,13 +85,13 @@ def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[d
             _tags = {"max": max, "min": min}
             for idx, tag in enumerate(tags):
               _tags[f"tag_{idx}"] = tag
-            deviation_checks_with_data.append({"measurement": "deviation_checks", "fields": {key: value}, "tags": _tags, "time": table.index[idx]})
+            deviation_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "deviation_checks", key: value, **_tags, "_time": DATE_NOW()}, index=[table.index[-1]]), deviation_checks_with_data], join="outer")
   return deviation_checks_with_data
 
 
 def roc_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)
-  roc_checks_with_data = []
+  roc_checks_with_data = pd.DataFrame()
   for col in table.columns:
     max, min = find_low_high_oc_by_devices(devices, col)
     if max is not None and min is not None:
@@ -117,13 +102,13 @@ def roc_check(table: pd.DataFrame, devices: List[dict]):
       else:
         rroc = abs(numerator / denominator)
       if rroc > ROC_CHECK_VALUE:
-        roc_checks_with_data.append({"measurement": "roc_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+        roc_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "roc_check", col: 1, "_time": DATE_NOW()}, index=[table.index[-1]]), roc_checks_with_data], join="outer")
   return roc_checks_with_data
 
 
 def frozen_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)
-  frozen_checks_with_data = []
+  frozen_checks_with_data = pd.DataFrame()
   for col in table.columns:
     max, min = find_low_high_oc_by_devices(devices, col)
     if max is not None and min is not None:
@@ -136,5 +121,5 @@ def frozen_check(table: pd.DataFrame, devices: List[dict]):
       _, is_frozen_check = get_frozen_check_roc_check_by_tag(col, devices)
       if is_frozen_check:
         if rroc < FROZEN_CHECK_VALUE:
-          frozen_checks_with_data.append({"measurement": "frozen_check", "fields": {col: 1}, "tags": {"tag": col, "type": "Pressure"}, "time": table.index[-1]})
+          frozen_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "frozen_check", col: 1, "_time": DATE_NOW()}, index=[table.index[-1]]), frozen_checks_with_data], join="outer")
   return frozen_checks_with_data
