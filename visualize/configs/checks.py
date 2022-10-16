@@ -6,51 +6,58 @@ from typing import List
 import numpy as np
 import pandas as pd
 import pytz
+import streamlit as st
 from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, ROC_CHECK_VALUE, SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, PIVOT, ROC_CHECK_VALUE, SECOND)
 
 
-def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
-  if pivot:
+  if PIVOT:
     for tag in df.columns:
       max, min = find_low_high_oc_by_devices(devices, tag)
       if max is not None and min is not None:
         res[tag] = [np.nan if math.isnan(value) else 1 if value >= max else 0 if value < max and value > min else -1 for value in res[tag].values]
       else:
         res.drop(columns=tag)
+    res = res.assign(_measurement="overange_check")
     return res
   for tag in tags:
     max, min = find_low_high_oc_by_devices(devices, tag)
     if [max, min].count() == 0:
       res["_value"] = [np.nan if math.isnan(row["_value"]) else 1 if row["_value"] >= max else 0 if row["_value"] < max and row["_value"] > min else -1 for _, row in res.iterrows()]
+  res = res.assign(_measurement="overange_check")
   return res
 
 
-def nan_check(df: pd.DataFrame, tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def nan_check(df: pd.DataFrame, tags: list = []) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
   nan_check_with_data = pd.DataFrame()
-  if pivot:
+  if PIVOT:
     for tag in res.columns:
       count_nan = res[tag].isnull().sum()
       count_total = len(res.index)
       if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
         nan_check_with_data = pd.concat([pd.DataFrame({"_measurement": "nan_check", tag: 1, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], join="outer")
+      # Add missing tags data
+      for t in tags:
+        if t not in res.columns:
+          nan_check_with_data = pd.concat([pd.DataFrame({"_measurement": "nan_check", t: np.nan, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], join="outer")
     return nan_check_with_data
   res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
   return res
 
 
-def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: bool = False) -> pd.DataFrame:
+def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
   res = copy.deepcopy(df)
-  if pivot:
+  if PIVOT:
     for tag in res.columns:
       max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)
       if [max3, max2, max1, min1, min2, min3].count(None) == 0:
@@ -60,6 +67,7 @@ def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = [], pivot: boo
         ]
       else:
         res.drop(columns=tag)
+    res = res.assign(_measurement="irv_check")
     return res
   for tag in tags:
     max3, max2, max1, min1, min2, min3 = find_low_high_irv_by_devices(devices, tag)

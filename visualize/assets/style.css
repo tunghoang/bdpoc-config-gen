@@ -1,6 +1,12 @@
 button:not([title="View fullscreen"]) {
 	width: 100% !important;
 }
+div[data-testid="stExpander"] {
+    position: sticky;
+    top: 2px;
+    background: white;
+    z-index: 999991;
+}
 /*
 #MainMenu {
 	visibility: hidden;
