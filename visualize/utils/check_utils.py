@@ -8,7 +8,7 @@ def check_gen(type: str, checks: pd.DataFrame):
   for time, row in checks.iterrows():
     points = []
     for col in checks.columns:
-      if row[col] != 0 and col != "_time":
+      if row[col] != 0 and col != "_time" and col != "_measurement":
         points.append({"measurement": f"{type}", "time": time, "fields": {col: row[col]}})
     yield points
 
