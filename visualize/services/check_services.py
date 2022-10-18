@@ -1,4 +1,5 @@
-from configs.checks import (deviation_check, frozen_check, irv_check, nan_check, overange_check, roc_check)
+from configs.checks import (deviation_check, frozen_check, irv_check,
+                            nan_check, overange_check, roc_check)
 from configs.constants import CHECK_BUCKET, ORG
 from configs.influx_client import write_api
 from configs.logger import check_logger
@@ -22,7 +23,7 @@ def do_deviation_check(table, deviation_checks_detail, devices):
 
 
 def do_irv_check(table, devices, tags):
-  irv_checks = irv_check(table, devices, tags, True)
+  irv_checks = irv_check(table, devices, tags)
   for point in check_gen("irv_check", irv_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("irv_checking 1 point")
@@ -30,7 +31,7 @@ def do_irv_check(table, devices, tags):
 
 
 def do_overange_check(table, tags, devices):
-  overange_checks = overange_check(table, devices, tags, True)
+  overange_checks = overange_check(table, devices, tags)
   for point in check_gen("overange_check", overange_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("overange_checking 1 point")
@@ -38,7 +39,7 @@ def do_overange_check(table, tags, devices):
 
 
 def do_nan_check(table, tags):
-  nan_checks = nan_check(table, tags, True)
+  nan_checks = nan_check(table, tags)
   for point in check_gen("nan_check", nan_checks):
     write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info("nan_checking 1 point")
