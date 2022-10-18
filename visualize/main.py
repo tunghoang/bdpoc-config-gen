@@ -1,11 +1,11 @@
 from configs.constants import DATE_NOW
 from configs.module_loader import *
 from utils.css_utils import local_css
+from utils.influx_utils import collector_status
+from utils.server_info import now
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
 from utils.view_utils import cal_different_time_range, load_data
-from utils.server_info import now
-from utils.influx_utils import collector_status
 from views.container import render_columns, render_configurations
 from views.sidebar import render_sidebar
 
@@ -42,10 +42,10 @@ def main():
     render_sidebar(devices)
 
   placeholder = st.empty()
-  if (st.session_state["call_influx"]):
+  if (st.session_state["call_influx"] and len(st.session_state["tags"]) > 0):
     placeholder = st.empty()
     try:
-        load_data()
+      load_data()
     except KeyError:
       st.error("No data found. Extend 'Time Range' to retrieve more data", icon="❗")
     st.session_state["call_influx"] = False
@@ -53,8 +53,10 @@ def main():
     st.markdown(f"""<div id='info'>
       <div><b>Server time </b>: {st.session_state['server_time']}</div>
       <div><b>Harvest rate</b>: {st.session_state['harvest_rate']} tags/s</div>
-    </div>""", unsafe_allow_html=True );
+    </div>""", unsafe_allow_html=True)
     render_configurations()
     render_columns(devices, deviation_checks)
+
+
 if __name__ == "__main__":
   main()

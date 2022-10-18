@@ -7,9 +7,14 @@ import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
+from utils.check_utils import (find_low_high_irv_by_devices,
+                               find_low_high_oc_by_devices,
+                               get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, PIVOT, ROC_CHECK_VALUE, SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW,
+                               DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE,
+                               MINIMUM_RATIO_NAN_ALLOW, PIVOT, ROC_CHECK_VALUE,
+                               SECOND)
 
 
 def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd.DataFrame:

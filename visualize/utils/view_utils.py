@@ -74,9 +74,9 @@ def visualize_data_by_raw_data(devices, deviation_checks):
 
 
 def visualize_data_by_checks():
+  # st.write(st.session_state["data"])
   # for data in st.session_state["data"]:
-  #   st.write(data)
-  st.session_state["data"].to_csv("data.csv")
+  # st.write(data)
   draw_bar_chart_by_data_frame(st.session_state["data"])
 
 
