@@ -28,6 +28,8 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
     query.filter_measurement(check_mode)
   query = query.filter_fields(tags).to_str()
   table = get_check(query)
+  if table.empty:
+    assert Exception("No data found")
   return table
 
 

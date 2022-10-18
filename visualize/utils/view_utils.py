@@ -49,35 +49,34 @@ def load_data():
 
 
 def visualize_data_by_raw_data(devices, deviation_checks):
-  if (st.session_state["data"] is None or st.session_state["data"].empty):
+  if st.session_state["data"] is None:
     return
   # Load data from influxdb
-  if (st.session_state["check_mode"] == "nan_check" or st.session_state["check_mode"] == "all"):
-    nan = nan_check(st.session_state["data"], st.session_state["tags"])
-    draw_bar_chart_by_data_frame(nan, "nan_check")
-  if (st.session_state["check_mode"] == "overange_check" or st.session_state["check_mode"] == "all"):
-    overange = overange_check(st.session_state["data"], devices, st.session_state["tags"])
-    draw_bar_chart_by_data_frame(overange, "overange_check")
-  if (st.session_state["check_mode"] == "irv_check" or st.session_state["check_mode"] == "all"):
-    irv = irv_check(st.session_state["data"], devices, st.session_state["tags"])
-    draw_bar_chart_by_data_frame(irv, "irv_check")
-  if (st.session_state["check_mode"] == "deviation_check" or st.session_state["check_mode"] == "all"):
-    deviation = deviation_check(st.session_state["data"], deviation_checks, devices)
-    draw_bar_chart_by_data_frame(deviation, "deviation_check")
-  if (st.session_state["check_mode"] == "roc_check" or st.session_state["check_mode"] == "all"):
-    roc = roc_check(st.session_state["data"], devices)
-    draw_bar_chart_by_data_frame(roc, "roc_check")
-  if (st.session_state["check_mode"] == "frozen_check" or st.session_state["check_mode"] == "all"):
-    frozen = frozen_check(st.session_state["data"], devices)
-    draw_bar_chart_by_data_frame(frozen, "frozen_check")
+  # if (st.session_state["check_mode"] == "nan_check" or st.session_state["check_mode"] == "all"):
+  #   nan = nan_check(st.session_state["data"], st.session_state["tags"])
+  #   draw_bar_chart_by_data_frame(nan, "nan_check")
+  # if (st.session_state["check_mode"] == "overange_check" or st.session_state["check_mode"] == "all"):
+  #   overange = overange_check(st.session_state["data"], devices, st.session_state["tags"])
+  #   draw_bar_chart_by_data_frame(overange, "overange_check")
+  # if (st.session_state["check_mode"] == "irv_check" or st.session_state["check_mode"] == "all"):
+  #   irv = irv_check(st.session_state["data"], devices, st.session_state["tags"])
+  #   draw_bar_chart_by_data_frame(irv, "irv_check")
+  # if (st.session_state["check_mode"] == "deviation_check" or st.session_state["check_mode"] == "all"):
+  #   deviation = deviation_check(st.session_state["data"], deviation_checks, devices)
+  #   draw_bar_chart_by_data_frame(deviation, "deviation_check")
+  # if (st.session_state["check_mode"] == "roc_check" or st.session_state["check_mode"] == "all"):
+  #   roc = roc_check(st.session_state["data"], devices)
+  #   draw_bar_chart_by_data_frame(roc, "roc_check")
+  # if (st.session_state["check_mode"] == "frozen_check" or st.session_state["check_mode"] == "all"):
+  #   frozen = frozen_check(st.session_state["data"], devices)
+  #   draw_bar_chart_by_data_frame(frozen, "frozen_check")
   draw_line_chart_by_data_frame(st.session_state["data"])
 
 
 def visualize_data_by_checks():
   # st.write(st.session_state["data"])
   # for data in st.session_state["data"]:
-  # st.write(data)
-  draw_bar_chart_by_data_frame(st.session_state["data"])
+  draw_bar_chart_by_data_frame(st.session_state["data"], st.session_state["check_mode"])
 
 
 @st.cache

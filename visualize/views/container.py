@@ -15,7 +15,7 @@ def render_configurations():
     tCols = st.columns([1, 1, 1, 1, 1, 1])
     with tCols[0]:
       # Check if raw_data is True, user can view raw data
-      st.selectbox("Check", CHECKS_LIST.keys() if st.session_state["raw_data"] else list(CHECKS_LIST.keys())[1:], format_func=lambda check_mode: CHECKS_LIST[check_mode], key="check_mode", on_change=update_calldb_session)
+      st.selectbox("Check", CHECKS_LIST.keys() if st.session_state["raw_data"] else list(CHECKS_LIST.keys())[1:], format_func=lambda check_mode: CHECKS_LIST[check_mode], key="check_mode", on_change=update_calldb_session, disabled=st.session_state["raw_data"])
     with tCols[1]:
       st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw", on_change=update_interpolated_calldb_session, disabled=not st.session_state["raw_data"])
     with tCols[2]:

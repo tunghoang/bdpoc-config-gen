@@ -46,8 +46,9 @@ def main():
     placeholder = st.empty()
     try:
       load_data()
-    except KeyError:
+    except Exception:
       st.error("No data found. Extend 'Time Range' to retrieve more data", icon="❗")
+      st.session_state["data"] = None
     st.session_state["call_influx"] = False
   with placeholder.container():
     st.markdown(f"""<div id='info'>

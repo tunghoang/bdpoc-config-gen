@@ -38,12 +38,14 @@ def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator
 
 
 def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st._DeltaGenerator]:
-  if PIVOT and data is not None and not data.empty and "_field" not in data.columns:
+  if data is None:
+    return
+  if PIVOT and "_field" not in data.columns:
     # Convert pivot to normal dataframe
     data = pd.melt(data, id_vars=["_time", "_measurement"], value_vars=st.session_state["tags"], value_name="_value", var_name="_field", ignore_index=False)
-  if data.empty and type:
-    tags = st.session_state["tags"]
-    data = pd.DataFrame({"_measurement": [type for _ in tags], "_field": tags, "_value": [np.nan for _ in tags], "_time": [DATE_NOW() for _ in tags]})
+  # if data.empty and type:
+  #   tags = st.session_state["tags"]
+  #   data = pd.DataFrame({"_measurement": [type for _ in tags], "_field": tags, "_value": [np.nan for _ in tags], "_time": [DATE_NOW() for _ in tags]})
   range = st.session_state["difference_time_range"] if st.session_state["time_range"] == 0 else int(st.session_state["time_range"])
   time_range_in_datetime = [DATE_NOW() - dt.timedelta(seconds=range), DATE_NOW()]
   if st.session_state["chart_mode"] == "merge":
