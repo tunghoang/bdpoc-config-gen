@@ -20,6 +20,8 @@ def set_middle_title(chart: plotly.graph_objs.Figure, title_name):
 
 
 def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator]:
+  if data is None or data.empty or len(st.session_state["tags"]) == 0:
+    return
   range = st.session_state["difference_time_range"] if st.session_state["time_range"] == 0 else int(st.session_state["time_range"])
   time_range_in_datetime = [DATE_NOW() - dt.timedelta(seconds=range), DATE_NOW()]
   if PIVOT:
@@ -35,11 +37,12 @@ def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator
   return charts
 
 
-def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str) -> List[st._DeltaGenerator]:
-  if PIVOT and not data.empty:
+def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st._DeltaGenerator]:
+  if (data["_measurement"].values[0] == "frozen_check"): data.to_csv("test.csv")
+  if PIVOT and not data.empty and "_field" not in data.columns:
     # Convert pivot to normal dataframe
     data = pd.melt(data, id_vars=["_time", "_measurement"], value_vars=st.session_state["tags"], value_name="_value", var_name="_field", ignore_index=False)
-  if data.empty:
+  if data.empty and type:
     tags = st.session_state["tags"]
     data = pd.DataFrame({"_measurement": [type for _ in tags], "_field": tags, "_value": [np.nan for _ in tags], "_time": [DATE_NOW() for _ in tags]})
   range = st.session_state["difference_time_range"] if st.session_state["time_range"] == 0 else int(st.session_state["time_range"])
@@ -48,6 +51,7 @@ def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str) -> List[st._Delt
     chart = px.bar(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', range_x=time_range_in_datetime)
     set_middle_title(chart, CHECKS_LIST[data["_measurement"].values[0]])
     return st.plotly_chart(chart, use_container_width=True)
+
   charts = []
   for tag in st.session_state["tags"]:
     chart = px.bar(data[data["_field"] == tag], x="_time", y="_value", labels={"_time": "Time (s)", "_value": data[data["_field"] == tag]["_measurement"].values[0], "_field": "Tag"}, range_x=time_range_in_datetime)

@@ -13,7 +13,7 @@ DATE_NOW_IN_NS = lambda: int(DATE_NOW().strftime('%s')) * 10**9
 # PIVOT OR NOT
 PIVOT = True
 # CHECKS LIST
-CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'frozen_check': 'Frozen-Check', 'roc_check': 'Rate-Of-Change-Check', 'all': 'All'}
+CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'frozen_check': 'Frozen-Check', 'roc_check': 'Rate-Of-Change-Check'}
 CHECK_PERIOD = 1
 # INFLUX
 BUCKET = "datahub"
@@ -29,3 +29,9 @@ ROC_CHECK_VALUE = 0.05
 DEVIATION_CHECK_VALUE = 0.05
 # FROZEN CHECK VALUE
 FROZEN_CHECK_VALUE = 0.05
+
+MONITORING_BUCKET = "monitoring"
+MONITORING_PERIOD = "5m"
+MONITORING_MEASUREMENT = "collector_metric"
+MONITORING_FIELD = "collect_rate"
+MONITORING_AGG_WINDOW = '1m'

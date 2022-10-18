@@ -4,6 +4,8 @@ from utils.css_utils import local_css
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
 from utils.view_utils import cal_different_time_range, load_data
+from utils.server_info import now
+from utils.influx_utils import collector_status
 from views.container import render_columns, render_configurations
 from views.sidebar import render_sidebar
 
@@ -28,6 +30,8 @@ def init():
   init_session("chart_mode", "all")
   init_session("call_influx", False)
   init_session("data", pd.DataFrame())
+  init_session("harvest_rate", collector_status())
+  init_session("server_time", now())
 
 
 def main():
@@ -40,12 +44,17 @@ def main():
   placeholder = st.empty()
   if (st.session_state["call_influx"]):
     placeholder = st.empty()
-    load_data()
+    try:
+        load_data()
+    except KeyError:
+      st.error("No data found. Extend 'Time Range' to retrieve more data", icon="❗")
     st.session_state["call_influx"] = False
   with placeholder.container():
+    st.markdown(f"""<div id='info'>
+      <div><b>Server time </b>: {st.session_state['server_time']}</div>
+      <div><b>Harvest rate</b>: {st.session_state['harvest_rate']} tags/s</div>
+    </div>""", unsafe_allow_html=True );
     render_configurations()
     render_columns(devices, deviation_checks)
-
-
 if __name__ == "__main__":
   main()

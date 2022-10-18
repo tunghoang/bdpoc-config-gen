@@ -3,7 +3,8 @@ from configs.constants import PIVOT, TIME_STRINGS
 from configs.module_loader import *
 
 from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import query_check_data, query_raw_data
+from utils.influx_utils import (collector_status, query_check_data, query_raw_data)
+from utils.server_info import now
 
 
 def cal_different_time_range():
@@ -43,9 +44,13 @@ def load_data():
       st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"])
       return
     st.session_state['data'] = query_check_data(time, st.session_state['selected_device_name'], st.session_state["tags"], st.session_state["check_mode"])
+    st.session_state['harvest_rate'] = collector_status()
+    st.session_state['server_time'] = now()
 
 
 def visualize_data_by_raw_data(devices, deviation_checks):
+  if (st.session_state["data"] is None or st.session_state["data"].empty):
+    return
   # Load data from influxdb
   if (st.session_state["check_mode"] == "nan_check" or st.session_state["check_mode"] == "all"):
     nan = nan_check(st.session_state["data"], st.session_state["tags"])

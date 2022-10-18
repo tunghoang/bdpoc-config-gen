@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -42,20 +43,20 @@ def get_database(query: str) -> pd.DataFrame:
 
 
 def get_check(query: str) -> pd.DataFrame:
-  table = client.query_api().query_data_frame(query, org=ORG)
-  if type(table) == pd.DataFrame:
-    table = [table] if not table.empty else []
+  table = client.query_api().query_data_frame(query, org=ORG).groupby(["_measurement"])
+  table = [df for _, df in table]
   # Get the checks appear in each table
   checks_appear_in_table = []
   for idx, t in enumerate(table):
     if not t.empty:
       checks_appear_in_table.append(t["_measurement"][0])
-      # Get missing tags in  table (tags which have no data)
-      missing_tags_in_table = [tag for tag in st.session_state["tags"] if tag not in t["_field"].values]
-      # Then add missing data to table
-      table[idx] = pd.concat([pd.DataFrame({"_field": missing_tags_in_table, "_time": [t["_time"][0] for _ in missing_tags_in_table], "_measurement": [t["_measurement"][0] for _ in missing_tags_in_table], "_value": np.nan}), t], join="outer", ignore_index=True)
-      # Now format time to local time zone
-      table[idx]["_time"] = table[idx]["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+    # Get missing tags in  table (tags which have no data)
+    missing_tags_in_table = [tag for tag in st.session_state["tags"] if tag not in t["_field"].values]
+    # Then add missing data to table
+    table[idx] = pd.concat([pd.DataFrame({"_field": missing_tags_in_table, "_time": [t["_time"][0] for _ in missing_tags_in_table], "_measurement": [t["_measurement"][0] for _ in missing_tags_in_table], "_value": np.nan}), t], join="outer", ignore_index=True)
+    # Now format time to local time zone
+    table[idx]["_time"] = table[idx]["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+
   current_checks = [st.session_state["check_mode"]]
   # Check if needed to get all the checks
   if st.session_state["check_mode"] == "all":
@@ -67,3 +68,10 @@ def get_check(query: str) -> pd.DataFrame:
     if check not in checks_appear_in_table:
       table.append(pd.DataFrame({"_field": st.session_state["tags"], "_time": [dt.datetime.now(pytz.timezone("Asia/Ho_Chi_Minh")) for _ in st.session_state["tags"]], "_value": [np.nan for _ in st.session_state["tags"]], "_measurement": [check for _ in st.session_state["tags"]]}))
   return table
+
+
+def execute(query: str) -> float:
+  table = client.query_api().query_data_frame(query, org=ORG)
+  if table is None or table.empty:
+    return 0.
+  return table.iloc[-1, 6]
