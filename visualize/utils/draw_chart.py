@@ -38,7 +38,7 @@ def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator
 
 
 def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st._DeltaGenerator]:
-  if data is None:
+  if data is None or data.empty:
     return
   if PIVOT and "_field" not in data.columns:
     # Convert pivot to normal dataframe

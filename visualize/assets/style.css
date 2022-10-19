@@ -10,7 +10,7 @@ div[data-testid="stExpander"] {
 div.stAlert {
     position: fixed;
     z-index: 999992;
-    bottom: 0;
+    top: 0;
     left: 50vw;
     transform: translateX(-50%)
 }
