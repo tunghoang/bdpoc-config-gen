@@ -28,11 +28,14 @@ def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator
     # Convert pivot to normal dataframe
     data = pd.melt(data, id_vars=["_time"], value_vars=st.session_state["tags"], value_name="_value", var_name="_field")
   if st.session_state["chart_mode"] == "merge":
-    chart = px.line(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', line_shape=LINE_SHAPE, markers=True, range_x=time_range_in_datetime)
+    range_y = [0, 1.1 * data["_value"].max()]
+    chart = px.line(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', line_shape=LINE_SHAPE, markers=True, range_x=time_range_in_datetime, range_y = range_y)
     return st.plotly_chart(chart, use_container_width=True)
   charts = []
   for tag in st.session_state["tags"]:
-    chart = px.line(data[data["_field"] == tag], x="_time", y="_value", labels={"_time": "Time (s)", "_value": tag, "_field": "Tag"}, line_shape=LINE_SHAPE, markers=True, range_x=time_range_in_datetime)
+    draw_data = data[data["_field"] == tag]
+    range_y = [0, 1.1 * draw_data["_value"].max()]
+    chart = px.line(draw_data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": tag, "_field": "Tag"}, line_shape=LINE_SHAPE, markers=True, range_x=time_range_in_datetime, range_y = range_y)
     charts.append(st.plotly_chart(chart, use_container_width=True))
   return charts
 

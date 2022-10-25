@@ -1,4 +1,5 @@
-from configs.checks import (deviation_check, frozen_check, irv_check, nan_check, overange_check, roc_check)
+from configs.checks import (deviation_check, frozen_check, irv_check,
+                            nan_check, overange_check, roc_check)
 from configs.constants import CHECK_BUCKET, ORG
 from configs.influx_client import write_api
 from configs.logger import check_logger
