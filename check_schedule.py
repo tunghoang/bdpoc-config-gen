@@ -49,7 +49,7 @@ def job():
   t5.join()
   t6.join()
 
-  write_api.write(bucket=MONITORING_BUCKET, org=ORG, point={"measurement": "check_harvest", "fields": {"rate": 1}})
+  write_api.write(MONITORING_BUCKET, ORG, {"measurement": "check_harvest", "fields": {"rate": 1.0}})
 
   print("All Done")
 
