@@ -9,7 +9,7 @@ import schedule
 from influxdb_client.client.warnings import MissingPivotFunction
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
-from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITOR_BUCKET, ORG)
+from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG)
 from visualize.configs.influx_client import query_api, write_api
 from visualize.configs.Query import Query
 from visualize.services.check_services import (do_deviation_check, do_frozen_check, do_irv_check, do_nan_check, do_overange_check, do_roc_check)
@@ -49,7 +49,7 @@ def job():
   t5.join()
   t6.join()
 
-  # write_api.write(bucket=MONITOR_BUCKET, org=ORG, point={"measurement": "check_harvest", "fields": {"rate": 1}})
+  write_api.write(bucket=MONITORING_BUCKET, org=ORG, point={"measurement": "check_harvest", "fields": {"rate": 1}})
 
   print("All Done")
 
