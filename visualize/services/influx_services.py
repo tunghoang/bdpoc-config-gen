@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import CHECKS_LIST, DATE_NOW, DATE_NOW_IN_NS, ORG, PIVOT
+from configs.constants import (CHECKS_LIST, DATE_NOW, DATE_NOW_IN_NS, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, ORG, PIVOT)
 from configs.influx_client import client
+from visualize.configs.Query import Query
 
 
 def get_database(query: str) -> pd.DataFrame:
@@ -71,8 +72,15 @@ def get_check(query: str) -> pd.DataFrame:
   return table
 
 
-def execute(query: str) -> float:
+def get_tag_harvest_rate(query: str) -> float:
   table = client.query_api().query_data_frame(query, org=ORG)
   if table is None or table.empty:
-    return 0.
-  return table.iloc[-1, 6]
+    return 0
+  return table["_value"].values[-1]
+
+
+def get_check_harvest_rate(query: str) -> float:
+  table = client.query_api().query_data_frame(query, org=ORG)
+  if table is None or table.empty:
+    return 0
+  return table["_value"].mean()

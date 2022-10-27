@@ -1,7 +1,8 @@
 import streamlit as st
+import pandas as pd
 from configs.constants import CHECKS_LIST, TIME_STRINGS
 from utils.session import (update_calldb_session, update_interpolated_calldb_session, update_pivot_calldb_session)
-from utils.view_utils import (cal_different_time_range, get_device_by_name, select_tag_update_calldb, visualize_data_by_checks, visualize_data_by_raw_data)
+from utils.view_utils import (cal_different_time_range, get_device_by_name, select_tag_update_calldb, visualize_data_by_checks, visualize_data_by_raw_data, visualize_check_overview)
 
 
 def render_configurations():
@@ -27,6 +28,8 @@ def render_configurations():
     with tCols[5]:
       st.selectbox("Raw data", (True, False), key="raw_data", on_change=update_calldb_session)
 
+def render_overview():
+  visualize_check_overview()
 
 def render_columns(devices, deviation_checks):
   col1, col2 = st.columns([1.5, 6])
@@ -44,4 +47,4 @@ def render_columns(devices, deviation_checks):
     if st.session_state["raw_data"]:
       visualize_data_by_raw_data(devices, deviation_checks)
     else:
-      visualize_data_by_checks()
+      visualize_data_by_checks(pd.concat(st.session_state['data']))

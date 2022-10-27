@@ -52,7 +52,7 @@ def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st.
   range = st.session_state["difference_time_range"] if st.session_state["time_range"] == 0 else int(st.session_state["time_range"])
   time_range_in_datetime = [DATE_NOW() - dt.timedelta(seconds=range), DATE_NOW()]
   if st.session_state["chart_mode"] == "merge":
-    chart = px.bar(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', range_x=time_range_in_datetime)
+    chart = px.bar(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', range_x= time_range_in_datetime)
     set_middle_title(chart, CHECKS_LIST[data["_measurement"].values[0]])
     return st.plotly_chart(chart, use_container_width=True)
 
@@ -62,3 +62,13 @@ def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st.
     set_middle_title(chart, tag)
     charts.append(st.plotly_chart(chart, use_container_width=True))
   return charts
+
+def draw_scatter_chart_by_data_frame(data: pd.DataFrame):
+  if data is None or data.empty:
+    print("No data")
+    print(data)
+    return
+  range = st.session_state["difference_time_range"] if st.session_state["time_range"] == 0 else int(st.session_state["time_range"])
+  time_range_in_datetime = [DATE_NOW() - dt.timedelta(seconds=range), DATE_NOW()]
+  chart = px.scatter(data, x = "_time", y = "_measurement", labels={"_time" : "Time (s)", "_measurement": "Alert" }, range_x = time_range_in_datetime)
+  return chart

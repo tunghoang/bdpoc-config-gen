@@ -1,10 +1,8 @@
-from configs.checks import (deviation_check, frozen_check, irv_check, nan_check, overange_check, roc_check)
-from configs.constants import PIVOT, TIME_STRINGS
+from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 
-from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (collector_status, query_check_data, query_raw_data)
-from utils.server_info import now
+from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame, draw_scatter_chart_by_data_frame)
+from utils.influx_utils import (collector_status, query_check_all, query_check_data, query_raw_data)
 
 
 def cal_different_time_range():
@@ -38,14 +36,18 @@ def get_data_by_device_name(data, devices, device_name):
 
 
 def load_data():
+  print('load_data')
   with st.spinner('Loading ...'):
     time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
     if st.session_state["raw_data"]:
       st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"])
       return
-    st.session_state['data'] = query_check_data(time, st.session_state['selected_device_name'], st.session_state["tags"], st.session_state["check_mode"])
+    if len(st.session_state['tags']) > 0:
+      st.session_state['data'] = query_check_data(time, st.session_state['selected_device_name'], st.session_state["tags"], st.session_state["check_mode"])
+    else:
+      st.session_state['data'] = query_check_all(time)
     st.session_state['harvest_rate'] = collector_status()
-    st.session_state['server_time'] = now()
+    st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def visualize_data_by_raw_data(devices, deviation_checks):
@@ -77,6 +79,10 @@ def visualize_data_by_checks():
   # st.write(st.session_state["data"])
   # for data in st.session_state["data"]:
   draw_bar_chart_by_data_frame(st.session_state["data"], st.session_state["check_mode"])
+
+
+def visualize_check_overview():
+  draw_scatter_chart_by_data_frame(st.session_state["data"])
 
 
 @st.cache

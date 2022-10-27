@@ -30,9 +30,9 @@ class Query:
   def keep_columns(self, *columns):
     return self(f'|> keep(columns: {json.dumps(columns)})')
 
-  def interpolate(self):
+  def interpolate(self, every='1s'):
     self.query = 'import "interpolate"\n' + self.query
-    return self(f'|> interpolate.linear(every: 1s)')
+    return self(f'|> interpolate.linear(every: {every})')
 
   def aggregate_window(self, create_empty=False, window='1s'):
     return self(f'|> aggregateWindow(every: {window}, fn: mean, createEmpty: {"true" if create_empty else "false"})')

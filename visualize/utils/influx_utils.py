@@ -1,7 +1,8 @@
+import pandas as pd
 from configs.constants import (BUCKET, CHECK_BUCKET, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, PIVOT)
 from configs.module_loader import *
 from configs.Query import Query
-from services.influx_services import execute, get_check, get_database
+from services.influx_services import (get_check, get_database, get_tag_harvest_rate)
 
 warnings.simplefilter("ignore", MissingPivotFunction)
 
@@ -33,6 +34,13 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
   return table
 
 
+def query_check_all(time: int) -> DataFrame:
+  print('Query_check_all')
+  query = Query().from_bucket(CHECK_BUCKET).range(time)
+  table = get_check(query)
+  return pd.concat(table)
+
+
 def dataframe_to_dictionary(df, measurement):
   df["_time"] = to_datetime(df['_time'], errors='coerce').astype(np.int64)
   lines = [{"measurement": f"{measurement}", "tags": {"device": row["_measurement"]}, "fields": {row["_field"]: float(row["_value"])}, "time": row["_time"]} for _, row in df.iterrows() if row["_value"] != 0 and not math.isnan(row["_value"])]
@@ -41,5 +49,11 @@ def dataframe_to_dictionary(df, measurement):
 
 def collector_status() -> float:
   query = Query().from_bucket(MONITORING_BUCKET).range(MONITORING_PERIOD).filter_measurement(MONITORING_MEASUREMENT).filter_fields([MONITORING_FIELD]).aggregate_window(False, MONITORING_AGG_WINDOW).to_str()
-  result = execute(query)
+  result = get_tag_harvest_rate(query)
+  return "{:.2f}".format(result)
+
+
+def check_status() -> float:
+  query = Query().from_bucket(MONITORING_BUCKET).range(st.session_state["time_range"]).filter_measurement("check_harvest").interpolate().to_str()
+  result = get_tag_harvest_rate(query)
   return "{:.2f}".format(result)
