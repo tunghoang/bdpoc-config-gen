@@ -1,8 +1,12 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 
-from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame, draw_scatter_chart_by_data_frame)
-from utils.influx_utils import (collector_status, query_check_all, query_check_data, query_raw_data)
+from utils.draw_chart import (draw_bar_chart_by_data_frame,
+                              draw_line_chart_by_data_frame)
+from utils.influx_utils import (check_status, collector_status,
+                                query_check_all, query_check_data, query_irv_tags,
+                                query_raw_data)
+from utils.tag_utils import load_tag_specs
 
 
 def cal_different_time_range():
@@ -15,7 +19,7 @@ def select_tag_update_calldb(tag_number):
     st.session_state["tags"].remove(tag_number)
   else:
     st.session_state["tags"].append(tag_number)
-  st.session_state["call_influx"] = True if len(st.session_state["tags"]) > 0 else False
+  #st.session_state["call_influx"] = True if len(st.session_state["tags"]) > 0 else False
 
 
 def get_device_by_name(devices, device_name):
@@ -36,53 +40,42 @@ def get_data_by_device_name(data, devices, device_name):
 
 
 def load_data():
-  print('load_data')
+  print('load_dataaaaaa')
   with st.spinner('Loading ...'):
     time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
     if st.session_state["raw_data"]:
       st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"])
-      return
-    if len(st.session_state['tags']) > 0:
-      st.session_state['data'] = query_check_data(time, st.session_state['selected_device_name'], st.session_state["tags"], st.session_state["check_mode"])
-    else:
-      st.session_state['data'] = query_check_all(time)
+    st.session_state['harvest_rate'] = collector_status()
+    st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
+    st.session_state["check_rate"] = check_status()
+
+
+def load_all_check():
+  print('load_all_check')
+  with st.spinner('Loading ...'):
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    st.session_state['data'] = query_check_all(time)
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
+def load_irv_tags():
+  tagDict = load_tag_specs()
+  with st.spinner("Loading irv tags ..."):
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    st.session_state["data"] = query_irv_tags(time)
+    st.session_state['harvest_rate'] = collector_status()
+    st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
-def visualize_data_by_raw_data(devices, deviation_checks):
-  if st.session_state["data"] is None:
-    return
-  # Load data from influxdb
-  # if (st.session_state["check_mode"] == "nan_check" or st.session_state["check_mode"] == "all"):
-  #   nan = nan_check(st.session_state["data"], st.session_state["tags"])
-  #   draw_bar_chart_by_data_frame(nan, "nan_check")
-  # if (st.session_state["check_mode"] == "overange_check" or st.session_state["check_mode"] == "all"):
-  #   overange = overange_check(st.session_state["data"], devices, st.session_state["tags"])
-  #   draw_bar_chart_by_data_frame(overange, "overange_check")
-  # if (st.session_state["check_mode"] == "irv_check" or st.session_state["check_mode"] == "all"):
-  #   irv = irv_check(st.session_state["data"], devices, st.session_state["tags"])
-  #   draw_bar_chart_by_data_frame(irv, "irv_check")
-  # if (st.session_state["check_mode"] == "deviation_check" or st.session_state["check_mode"] == "all"):
-  #   deviation = deviation_check(st.session_state["data"], deviation_checks, devices)
-  #   draw_bar_chart_by_data_frame(deviation, "deviation_check")
-  # if (st.session_state["check_mode"] == "roc_check" or st.session_state["check_mode"] == "all"):
-  #   roc = roc_check(st.session_state["data"], devices)
-  #   draw_bar_chart_by_data_frame(roc, "roc_check")
-  # if (st.session_state["check_mode"] == "frozen_check" or st.session_state["check_mode"] == "all"):
-  #   frozen = frozen_check(st.session_state["data"], devices)
-  #   draw_bar_chart_by_data_frame(frozen, "frozen_check")
-  draw_line_chart_by_data_frame(st.session_state["data"])
+def visualize_data_by_raw_data():
+  if st.session_state["data"] is not None and not st.session_state.data.empty:
+    # st.write(st.session_state.data)
+    draw_line_chart_by_data_frame(st.session_state["data"])
+  else:
+    print("No data-------")
 
 
 def visualize_data_by_checks():
-  # st.write(st.session_state["data"])
-  # for data in st.session_state["data"]:
   draw_bar_chart_by_data_frame(st.session_state["data"], st.session_state["check_mode"])
-
-
-def visualize_check_overview():
-  draw_scatter_chart_by_data_frame(st.session_state["data"])
 
 
 @st.cache

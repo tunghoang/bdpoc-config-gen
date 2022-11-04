@@ -1,26 +1,38 @@
 import pandas as pd
-from configs.constants import (BUCKET, CHECK_BUCKET, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, PIVOT)
+from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, PIVOT, ORG)
 from configs.module_loader import *
 from configs.Query import Query
-from services.influx_services import (get_check, get_database, get_tag_harvest_rate)
+from utils.tag_utils import load_tag_specs
+from services.influx_services import (get_check, get_check_harvest_rate, get_database, get_tag_harvest_rate)
+from configs.influx_client import query_api
 
 warnings.simplefilter("ignore", MissingPivotFunction)
 
 
 def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool = False, missing_data: str = "NaN") -> DataFrame:
-  if (not device) or (len(tags) == 0):
+  if len(tags) == 0:
     return DataFrame()
-  query = Query().from_bucket(BUCKET).range(time).filter_measurement(device).filter_fields(tags).keep_columns("_time", "_value", "_field")
-  query = query.aggregate_window(True if missing_data == "NaN" else False).to_str()
-  # print(query)
-  pivot_query = Query().from_bucket(BUCKET).range(time).filter_measurement(device).filter_fields(tags).keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
-  table = get_database(pivot_query if PIVOT else query)
+  query = Query().from_bucket(BUCKET).range(time)
+  if device:
+    query = query.filter_measurement(device)
+  query = query.filter_fields(tags).keep_columns("_time", "_value", "_field").aggregate_window(True if missing_data == "NaN" else False).to_str()
+  table = get_database(query)
   if interpolated:
     test = table["_time"]
     table = table.drop(columns=["_time", "_start", "_stop"]).interpolate(method='linear', limit_direction='both', axis=0).assign(_time=test)
   return table
 
-
+def query_irv_tags(time: int) -> DataFrame:
+  tagDict = load_tag_specs()
+  
+  irv_fields = list(filter(lambda x: tagDict[x]["high"] is not None, tagDict.keys()))
+  query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").aggregate_window(False).to_str()
+  
+  results = query_api.query_data_frame(query, org=ORG)
+  if type(results) == list :
+    return pd.concat(results)
+  return results
+  
 def query_check_data(time: int, device: str, tags: list = [], check_mode='none') -> DataFrame:
   if (not device) or (len(tags) == 0) or check_mode == 'none':
     return DataFrame()
@@ -33,12 +45,12 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
     assert Exception("No data found")
   return table
 
-
 def query_check_all(time: int) -> DataFrame:
   print('Query_check_all')
-  query = Query().from_bucket(CHECK_BUCKET).range(time)
+  query = Query().from_bucket(CHECK_BUCKET).range(time).to_str()
+  print(query)
   table = get_check(query)
-  return pd.concat(table)
+  return table
 
 
 def dataframe_to_dictionary(df, measurement):
@@ -54,6 +66,6 @@ def collector_status() -> float:
 
 
 def check_status() -> float:
-  query = Query().from_bucket(MONITORING_BUCKET).range(st.session_state["time_range"]).filter_measurement("check_harvest").interpolate().to_str()
-  result = get_tag_harvest_rate(query)
+  query = Query().from_bucket(MONITORING_BUCKET).range(CHECK_MONITORING_PERIOD).filter_measurement("check_harvest").aggregate_window(True, MONITORING_AGG_WINDOW).fill().to_str()
+  result = get_check_harvest_rate(query)
   return "{:.2f}".format(result)

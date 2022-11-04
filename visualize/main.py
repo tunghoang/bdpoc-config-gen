@@ -1,11 +1,12 @@
+import traceback
 from configs.constants import DATE_NOW
 from configs.module_loader import *
 from utils.css_utils import local_css
-from utils.influx_utils import collector_status
+from utils.influx_utils import check_status, collector_status
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
-from utils.view_utils import cal_different_time_range, load_data
-from views.container import render_columns, render_configurations, render_overview
+from utils.view_utils import cal_different_time_range, load_data, load_all_check
+from views.container import (render_columns, render_configurations, render_overview)
 from views.sidebar import render_sidebar
 
 # from checks import check_schedule
@@ -41,14 +42,23 @@ def main():
     render_sidebar(devices)
 
   placeholder = st.empty()
-  if (st.session_state["call_influx"] and len(st.session_state["tags"]) > 0):
-    placeholder = st.empty()
-    try:
-      load_data()
-    except Exception:
-      st.error("No data found. Extend 'Time Range' to retrieve more data", icon="❗")
-      st.session_state["data"] = None
-    st.session_state["call_influx"] = False
+
+  try:
+    if st.session_state["call_influx"]: 
+      st.session_state["call_influx"] = False
+      placeholder = st.empty()
+      if len(st.session_state["tags"]) > 0:
+        load_data()
+      else:
+        load_all_check()
+        print("=============")
+        print(st.session_state['data'])
+        print("=============")
+  except Exception:
+    traceback.print_exc()
+    st.error("No data found. Extend 'Time Range' to retrieve more data", icon="❗")
+    st.session_state["data"] = None
+
   with placeholder.container():
     st.markdown(f"""<div id='info'>
       <div><b>Server time </b>: {st.session_state['server_time']}</div>
@@ -56,6 +66,7 @@ def main():
     </div>""", unsafe_allow_html=True)
     render_configurations()
     render_overview()
+    print(f"-----{check_status()}")
     #render_columns(devices, deviation_checks)
 
 

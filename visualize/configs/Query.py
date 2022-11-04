@@ -21,7 +21,12 @@ class Query:
   def range(self, time):
     return self(f'|> range(start: -{time})')
 
+  def range1(self, start, stop):
+    return self(f'|> range(start: {start}, stop: {stop})')
+
   def filter_measurement(self, measurement):
+    if measurement is None:
+      return self
     return self(f'|> filter(fn: (r) => r._measurement == "{measurement}")')
 
   def filter_fields(self, fields):
@@ -45,3 +50,6 @@ class Query:
 
   def group(self, *columns):
     return self(f'|> group(columns: {json.dumps(columns)})')
+
+  def fill(self, value=0.0):
+    return self(f'|> fill(value: {value})')

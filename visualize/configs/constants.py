@@ -2,6 +2,7 @@ import datetime as dt
 
 import pytz
 
+VIEW_MODES = ("Overview", "Raw Data", "MP Routine Report")
 SECOND = 60
 # DEFAULT CHART STYLE
 # LINE_SHAPE = 'hv'
@@ -31,6 +32,7 @@ DEVIATION_CHECK_VALUE = 0.05
 FROZEN_CHECK_VALUE = 0.05
 
 MONITORING_BUCKET = "monitoring"
+CHECK_MONITORING_PERIOD = "30m"
 MONITORING_PERIOD = "5m"
 MONITORING_MEASUREMENT = "collector_metric"
 MONITORING_FIELD = "collect_rate"

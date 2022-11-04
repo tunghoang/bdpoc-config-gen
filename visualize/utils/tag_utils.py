@@ -10,3 +10,9 @@ def load_tag_config():
     control_logic_checks, deviation_checks, devices = itemgetter("control_logic_checks", "deviation_checks", "devices")(yaml.safe_load(yaml_file))
     devices.sort(key=lambda device: device["label"])
     return control_logic_checks, deviation_checks, devices
+
+@st.cache
+def load_tag_specs():
+  with open("tag-specs.yaml", "r") as yaml_file:
+    tagDict = yaml.safe_load(yaml_file)
+    return tagDict

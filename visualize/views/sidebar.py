@@ -1,9 +1,14 @@
 import streamlit as st
-from utils.view_utils import select_device
+from utils.view_utils import get_device_by_name, select_tag_update_calldb
 
 
 def render_sidebar(devices):
-  st.text_input("Search Tags", placeholder="Search for tags", key="search_tags")
-  st.subheader("Devices")
-  for device in devices:
-    st.button(f'{ "✔️" if device["label"] == st.session_state["selected_device_name"] else ""} {device["label"]}', on_click=select_device, args=(device, ))
+  with st.expander("Devices", expanded=True):
+    st.text_input("Search Tags", placeholder="Search for tags", key="search_tags")
+    for device in devices:
+      with st.expander(device["label"]):
+        selected_device = get_device_by_name(devices, device["label"])
+        tags = selected_device["tags"] if selected_device is not None else []
+        tags = filter(lambda tag: st.session_state["search_tags"].lower() in tag["tag_number"].lower(), tags)
+        for tag in tags:
+          st.checkbox(tag["tag_number"], True if tag["tag_number"] in st.session_state["tags"] else False, on_change=select_tag_update_calldb, args=(tag["tag_number"], ))
