@@ -43,6 +43,7 @@ def inside(v, b1, b2):
 
 __INFINITIES = (-999999.0, 999999.0)
 __LABELS = ("LOW", "HIGH")
+
 def irv_diagnose(min_max, tagSpec):
   if tagSpec is None: 
     return ""
@@ -57,9 +58,16 @@ def irv_diagnose(min_max, tagSpec):
   
   for i in range(0, 2):
     if inside(min_max[i], __INFINITIES[i], shutdown_limits[i]):
-      # results["shutdowns"][i] = True
-      flags[i] = 3
-      output = output + f"{__LABELS[i]} - SHUTDOWN;"
+      if shutdown_limits[i] != alarm_limits[i]:
+        flags[i] = 3
+        comment = f"{__LABELS[i]} - SHUTDOWN;"
+      elif alarm_limits[i] != prealarm_limits[i]:
+        flags[i] = 2
+        comment = f"{__LABELS[i]} - ALARM;"
+      else:
+        flags[i] = 1
+        comment = f"{__LABELS[i]} - PREALARM;"
+      output = output + comment
     elif inside(min_max[i], shutdown_limits[i], alarm_limits[i]):
       # results["alarms"][i] = True
       flags[i] = 2
@@ -79,16 +87,16 @@ def render_irv_report():
   if st.session_state.data is not None:
     df = st.session_state.data[["_field", "_value"]]
       
-    df = (df.groupby("_field", as_index=False)._value.agg({"min": lambda x: min(list(x)), "max": lambda x: max(list(x))}))
+    df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
     
-    df[["Flag", "Alarm","group", 
-         "description",
-         "unit", 
-         "lll", 
-         "ll",
-         "l","h",
-         "hh",
-         "hhh"]] = df.apply(lambda row: pd.Series([ *irv_diagnose((row["min"], row["max"]), tagDict.get(row["_field"], None)),
+    df[["Flag", "Alarm","Group", 
+         "Description",
+         "Unit", 
+         "LLL", 
+         "LL",
+         "L","H",
+         "HH",
+         "HHH"]] = df.apply(lambda row: pd.Series([ *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None)),
                                                   tagDict.get(row["_field"], {}).get("device", "NA"),
                                                   tagDict.get(row["_field"], {}).get("description"),
                                                   tagDict.get(row["_field"], {}).get("unit", "NA"),
@@ -98,6 +106,9 @@ def render_irv_report():
                                                   tagDict.get(row["_field"], {}).get("high", "NA"),
                                                   tagDict.get(row["_field"], {}).get("high2", "NA"),
                                                   tagDict.get(row["_field"], {}).get("high3", "NA")]), axis=1)
+    
+    df.rename(columns = {"_field": "Field"}, inplace=True)
+    
     # df = df[['_field', 
     #              'group',
     #              "description", 
@@ -110,7 +121,7 @@ def render_irv_report():
     #              'hhh',
     #              'min',
     #              'max']]
-    df = df.sort_values("group")
+    df = df.sort_values("Group")
     draw_table(df, height=1000, title="MP Routing Monitoring")
 
 def render_columns(devices, deviation_checks):

@@ -112,7 +112,7 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
 
   st.plotly_chart(chart1, use_container_width=True)
 
-__COLORS = ["#fffff8", "#ffaaaa", "#ee2222", "#ee44bb"]
+__COLORS = ["#fffff8", "#ffeeee", "#ffaaaa", "#ff8888"]
 
 def draw_table(data: pd.DataFrame, height=700, title=""):
   headers = data.columns.tolist()
