@@ -114,15 +114,17 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
 
 __COLORS = ["#fffff8", "#ffeeee", "#ffaaaa", "#ff8888"]
 
+def conclusion_change():
+  
 def draw_table(data: pd.DataFrame, height=700, title=""):
-  # headers = data.columns.tolist()
+  #headers = data.columns.tolist()
   headers = [ f'<b>{colName}</b>' for colName in data.columns ]
   cells = [ data[col].tolist() for col in data.columns ]
-  cellColors = [ [ __COLORS[cells[3][i]] for i in range(0, len(cells[0]))  ] ] * len(cells)
+  cellColors = [ [ __COLORS[cells[12][i]] for i in range(0, len(cells[0]))  ] ] * len(cells)
   
   chart = go.Figure( data = [
     go.Table( 
-      header=dict(values=headers, height=35, font=dict(size=14)), 
+      header=dict(values=headers, height=35, font=dict(size=16)), 
       cells=dict(
         values=cells, 
         fill_color=cellColors,
@@ -136,5 +138,6 @@ def draw_table(data: pd.DataFrame, height=700, title=""):
   col1, col2 = st.columns([5, 1])
   col1.subheader(f"{title}")
   col2.download_button("Download CSV", irv_report, f'{title}.csv', 'text/csv', key="irv_report")
-  
   st.plotly_chart(chart, use_container_width=True)
+  st.text_input("Conclusion:", key="conclusion", on_change="")
+  

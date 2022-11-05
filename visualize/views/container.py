@@ -89,15 +89,15 @@ def render_irv_report():
       
     df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
     
-    df[["Flag", "Alarm","Group", 
+    df[[ "Group",
          "Description",
          "Unit", 
          "LLL", 
          "LL",
          "L","H",
          "HH",
-         "HHH"]] = df.apply(lambda row: pd.Series([ *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None)),
-                                                  tagDict.get(row["_field"], {}).get("device", "NA"),
+         "HHH",
+         "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([ tagDict.get(row["_field"], {}).get("device", "NA"),
                                                   tagDict.get(row["_field"], {}).get("description"),
                                                   tagDict.get(row["_field"], {}).get("unit", "NA"),
                                                   tagDict.get(row["_field"], {}).get("low3", "NA"),
@@ -105,7 +105,8 @@ def render_irv_report():
                                                   tagDict.get(row["_field"], {}).get("low", "NA"),
                                                   tagDict.get(row["_field"], {}).get("high", "NA"),
                                                   tagDict.get(row["_field"], {}).get("high2", "NA"),
-                                                  tagDict.get(row["_field"], {}).get("high3", "NA")]), axis=1)
+                                                  tagDict.get(row["_field"], {}).get("high3", "NA"),
+                                                  *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))]), axis=1)
     
     df.rename(columns = {"_field": "Field"}, inplace=True)
     
@@ -122,7 +123,7 @@ def render_irv_report():
     #              'min',
     #              'max']]
     df = df.sort_values("Group")
-    draw_table(df, height=1000, title="MP Routing Monitoring")
+    draw_table(df, height=700, title="MP Routing Monitoring")
 
 def render_columns(devices, deviation_checks):
   print('render columns')
