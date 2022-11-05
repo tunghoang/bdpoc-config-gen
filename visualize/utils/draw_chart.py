@@ -115,13 +115,14 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
 __COLORS = ["#fffff8", "#ffeeee", "#ffaaaa", "#ff8888"]
 
 def draw_table(data: pd.DataFrame, height=700, title=""):
-  headers = data.columns.tolist()
+  # headers = data.columns.tolist()
+  headers = [ f'<b>{colName}</b>' for colName in data.columns ]
   cells = [ data[col].tolist() for col in data.columns ]
   cellColors = [ [ __COLORS[cells[3][i]] for i in range(0, len(cells[0]))  ] ] * len(cells)
   
   chart = go.Figure( data = [
     go.Table( 
-      header=dict(values=headers), 
+      header=dict(values=headers, height=35, font=dict(size=14)), 
       cells=dict(
         values=cells, 
         fill_color=cellColors,
