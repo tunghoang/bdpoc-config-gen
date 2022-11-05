@@ -115,7 +115,8 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
 __COLORS = ["#fffff8", "#ffeeee", "#ffaaaa", "#ff8888"]
 
 def conclusion_change():
-  
+  pass
+
 def draw_table(data: pd.DataFrame, height=700, title=""):
   #headers = data.columns.tolist()
   headers = [ f'<b>{colName}</b>' for colName in data.columns ]
