@@ -1,0 +1,68 @@
+button:not([title="View fullscreen"]) {
+	width: 100% !important;
+}
+div[data-testid="stExpander"] {
+    position: sticky;
+    top: 2px;
+    background: white;
+    z-index: 999991;
+}
+div.stAlert {
+    position: fixed;
+    z-index: 999992;
+    top: 0;
+    left: 50vw;
+    transform: translateX(-50%)
+}
+#info {
+    position: fixed;
+    z-index: 999992;
+    top: 2px;
+    right: 0;
+    padding: 10px;
+    background: rgba(230,255,240,1);
+    box-shadow: 1px 1px 5px 0px #888;
+}
+div.streamlit-expanderContent label {
+    color: blue;
+    font-style: italic;
+}
+section[data-testid='stSidebar'] button[kind='primary'] {
+    background: #d5330e;
+    color: white;
+    font-size: 1.25em;
+}
+section[data-testid='stSidebar'] button[kind='primary']:focus:not(:active) {
+    color: white;
+}
+section[data-testid='stSidebar'] .streamlit-expanderContent button[kind='primary'] {
+    background: white;
+    color: black;
+    font-size: 1em;
+}
+section[data-testid='stSidebar'] .streamlit-expanderContent button[kind='primary']:focus:not(:active) {
+    color: red;
+}
+.nan-check, .overange-check, .irv-check, .frozen-check {
+    display: inline-block;
+    width: 24px;
+    text-align: center;
+    border: 1px solid rgba(38, 39, 48, 0.2)
+}
+.pt-30 {
+    padding-top: 30px;
+}
+
+/*
+#MainMenu {
+	visibility: hidden;
+}
+
+footer {
+	visibility: hidden;
+}
+
+header {
+	visibility: hidden;
+}
+*/

@@ -1,0 +1,2 @@
+recursive-include custom_components/st_dataframe_component/frontend/build *
+recursive-include custom_components/tag_list/frontend/dist *

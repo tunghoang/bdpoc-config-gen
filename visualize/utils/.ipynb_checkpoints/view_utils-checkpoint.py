@@ -1,7 +1,11 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
-from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (check_status, collector_status, query_check_all, query_check_data, query_irv_tags, query_raw_data)
+
+from utils.draw_chart import (draw_bar_chart_by_data_frame,
+                              draw_line_chart_by_data_frame)
+from utils.influx_utils import (check_status, collector_status,
+                                query_check_all, query_check_data, query_irv_tags,
+                                query_raw_data)
 from utils.tag_utils import load_tag_specs
 
 
@@ -54,7 +58,6 @@ def load_all_check():
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
-
 def load_irv_tags():
   tagDict = load_tag_specs()
   with st.spinner("Loading irv tags ..."):
@@ -62,7 +65,6 @@ def load_irv_tags():
     st.session_state["data"] = query_irv_tags(time)
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
-
 
 def visualize_data_by_raw_data():
   if st.session_state["data"] is not None and not st.session_state.data.empty:

@@ -7,7 +7,7 @@ from utils.influx_utils import check_status, collector_status
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
 from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, visualize_data_by_raw_data)
-from views.container import (render_inspection, render_irv_report, render_outstanding_tags, render_overview)
+from views.container import (render_inspection, render_outstanding_tags, render_overview,render_irv_report)
 from views.sidebar import render_sidebar
 
 
@@ -48,13 +48,11 @@ def apply():
   st.session_state._selected_checks.clear()
   st.session_state["call_influx"] = True
 
-
 def reset_session():
   st.session_state["tags"] = []
   st.session_state._selected_tag = None
   st.session_state._selected_checks = {}
   st.session_state["data"] = None
-
 
 def setting_controls():
   st.button("Fetch & View", on_click=apply)
@@ -71,7 +69,10 @@ def setting_controls():
     st.selectbox("Time Range", options=TIME_STRINGS.keys(), format_func=lambda sec: TIME_STRINGS[sec], key="time_range", on_change=reset_session)
 
     if st.session_state["raw_data"] == 1:
-      st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
+      st.selectbox("Preprocessing", 
+                   (True, False), 
+                   index=0 if st.session_state["interpolated"] else 1, 
+                   format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
 
       st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data")
 
@@ -112,8 +113,7 @@ def main():
         <div><b>Server time </b>: {st.session_state['server_time']}</div>
         <div><b>Harvest rate</b>: {st.session_state['harvest_rate']} tags/s</div>
         <div><b>Check rate</b>: {st.session_state['check_rate']} check/min</div>
-      </div>""",
-                  unsafe_allow_html=True)
+      </div>""", unsafe_allow_html=True)
 
       #render_configurations()
       if st.session_state["raw_data"] == 1:

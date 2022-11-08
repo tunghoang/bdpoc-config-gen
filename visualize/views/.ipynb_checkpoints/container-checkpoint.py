@@ -2,15 +2,14 @@ import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import BUCKET, ORG, TIME_STRINGS
+from configs.constants import BUCKET, CHECKS_LIST, ORG, TIME_STRINGS
 from configs.influx_client import query_api
 from configs.Query import Query
-from custom_components.st_dataframe_component import st_custom_dataframe
-from custom_components.tag_list import outstanding_tag_list
-from utils.draw_chart import draw_chart_by_check_data, draw_chart_by_raw_data
+from utils.draw_chart import draw_chart_by_check_data, draw_chart_by_raw_data, draw_table
+from utils.session import update_interpolated_calldb_session
 from utils.tag_utils import load_tag_specs
-from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
-                              visualize_data_by_raw_data)
+from utils.view_utils import (cal_different_time_range, get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
+
 
 # def render_configurations():
 #   with st.expander("SETTINGS", True):
@@ -39,27 +38,24 @@ from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
 def render_overview():
   draw_chart_by_check_data(st.session_state["data"])
 
-
 def inside(v, b1, b2):
   return (v - b1) * (v - b2) < 0
-
 
 __INFINITIES = (-999999.0, 999999.0)
 __LABELS = ("LOW", "HIGH")
 
-
 def irv_diagnose(min_max, tagSpec):
-  if tagSpec is None:
+  if tagSpec is None: 
     return ""
 
   shutdown_limits = [tagSpec["low3"], tagSpec["high3"]]
   alarm_limits = [tagSpec["low2"], tagSpec["high2"]]
   prealarm_limits = [tagSpec["low"], tagSpec["high"]]
-
+  
   # results = dict(shutdowns = [False, False], alarms = [False, False], prealams = [False, False], normals = [False, False])
   flags = [0, 0]
   output = ""
-
+  
   for i in range(0, 2):
     if inside(min_max[i], __INFINITIES[i], shutdown_limits[i]):
       if shutdown_limits[i] != alarm_limits[i]:
@@ -85,36 +81,41 @@ def irv_diagnose(min_max, tagSpec):
       flags[i] = 0
       output = output + f"{__LABELS[i]} - NORMAL;"
   return max(flags[0], flags[1]), output
-
-
+  
 def render_irv_report():
   tagDict = load_tag_specs()
   if st.session_state.data is not None:
     df = st.session_state.data[["_field", "_value"]]
-
+      
     df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
-
-    df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
-        tagDict.get(row["_field"], {}).get("device", "NA"),
-        tagDict.get(row["_field"], {}).get("description"),
-        tagDict.get(row["_field"], {}).get("unit", "NA"),
-        tagDict.get(row["_field"], {}).get("low3", "NA"),
-        tagDict.get(row["_field"], {}).get("low2", "NA"),
-        tagDict.get(row["_field"], {}).get("low", "NA"),
-        tagDict.get(row["_field"], {}).get("high", "NA"),
-        tagDict.get(row["_field"], {}).get("high2", "NA"),
-        tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))
-    ]),
-                                                                                                              axis=1)
-
-    df.rename(columns={"_field": "Field"}, inplace=True)
-
-    # df = df[['_field',
+    
+    df[[ "Group",
+         "Description",
+         "Unit", 
+         "LLL", 
+         "LL",
+         "L","H",
+         "HH",
+         "HHH",
+         "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([ tagDict.get(row["_field"], {}).get("device", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("description"),
+                                                  tagDict.get(row["_field"], {}).get("unit", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("low3", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("low2", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("low", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("high", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("high2", "NA"),
+                                                  tagDict.get(row["_field"], {}).get("high3", "NA"),
+                                                  *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))]), axis=1)
+    
+    df.rename(columns = {"_field": "Field"}, inplace=True)
+    
+    # df = df[['_field', 
     #              'group',
-    #              "description",
-    #              'unit',
-    #              'lll',
-    #              'll',
+    #              "description", 
+    #              'unit', 
+    #              'lll', 
+    #              'll', 
     #              'l',
     #              'h',
     #              'hh',
@@ -122,10 +123,7 @@ def render_irv_report():
     #              'min',
     #              'max']]
     df = df.sort_values("Group")
-    records = df.to_dict("records")
-    # draw_table(df, height=700, title="MP Routing Monitoring")
-    st_custom_dataframe(records)
-
+    draw_table(df, height=700, title="MP Routing Monitoring")
 
 def render_columns(devices, deviation_checks):
   print('render columns')
@@ -143,6 +141,16 @@ def render_columns(devices, deviation_checks):
 
     if st.session_state["raw_data"]:
       visualize_data_by_raw_data()
+
+
+import streamlit.components.v1 as components
+
+_component_func = components.declare_component("outstanding_tag_list", url="https://st.mmthub.freeddns.org/dist/")
+
+
+def outstanding_tag_list(name, key=None, nMasks=[], oMasks=[], iMasks=[], fMasks=[], tags=[], tagDescriptions=[]):
+  component_value = _component_func(name=name, key=key, default={}, nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks, tags=tags, tagDescriptions=tagDescriptions)
+  return component_value
 
 
 def render_outstanding_tags(container):
