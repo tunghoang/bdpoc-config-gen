@@ -1,3 +1,0 @@
-[submodule "assets/components/custom_components/st_dataframe_component/frontend"]
-	path = assets/components/custom_components/st_dataframe_component/frontend
-	url = https://github.com/MrYasuo/st-custom-dataframe-component.git
