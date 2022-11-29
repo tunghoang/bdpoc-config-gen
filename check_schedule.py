@@ -28,7 +28,7 @@ def job():
   print(query)
   table = query_api.query_data_frame(query, org=ORG)
   if (table.empty):
-    check_logger.warn("No data found")
+    check_logger.warning("No data found")
     return
   table = table.assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
   print("Query done")
