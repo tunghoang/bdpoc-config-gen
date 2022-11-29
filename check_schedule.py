@@ -12,6 +12,7 @@ from influxdb_client.client.warnings import MissingPivotFunction
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
 from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG)
 from visualize.configs.influx_client import query_api, write_api
+from visualize.configs.logger import check_logger
 from visualize.configs.Query import Query
 from visualize.services.check_services import (do_deviation_check, do_frozen_check, do_irv_check, do_nan_check, do_overange_check, do_roc_check)
 from visualize.utils.tag_utils import load_tag_config
@@ -26,7 +27,9 @@ def job():
   query = Query().from_bucket(BUCKET).range(f"{2 * CHECK_PERIOD}m").keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
   print(query)
   table = query_api.query_data_frame(query, org=ORG)
-  if (table.empty): return
+  if (table.empty):
+    check_logger.warn("No data found")
+    return
   table = table.assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
   print("Query done")
 
@@ -59,7 +62,7 @@ def job():
 
 schedule.every(CHECK_PERIOD).minute.do(job)
 
-# while True:
-#   schedule.run_pending()
-#   time.sleep(200./1000)
-job()
+while True:
+  schedule.run_pending()
+  time.sleep(200. / 1000)
+# job()
