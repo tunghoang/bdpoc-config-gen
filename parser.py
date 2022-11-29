@@ -18,9 +18,9 @@ __CONTROL_LOGIC_CHECK_NAME = ["control_logic_check__number", "control_logic_chec
 __DESCRIPTION = ["measuring_point", "description"]
 __MP_STARTUP = ["mp_startup", "mp_startup"]
 
-_YAML_FILE = "tags.yaml"
+_YAML_FILE = "assets/files/tags.yaml"
 
-_TAG_LIST_FILE = "tag_list.csv"
+_TAG_LIST_FILE = "assets/files/tag_list.csv"
 # PARAMETER NAME CONSTANTS ###
 __OVERANGE_CHECK_PARAM_NAMES = ["low", "high"]
 __IRV_CHECK_PARAM_NAMES = ["low3", "low2", "low", "high", "high2", "high3"]
