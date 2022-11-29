@@ -35,6 +35,12 @@ class Query:
   def keep_columns(self, *columns):
     return self(f'|> keep(columns: {json.dumps(columns)})')
 
+  def drop(self, *columns):
+    return self(f'|> drop(columns: {json.dumps(columns)})')
+
+  def rename(self, columns):
+    return self(f'|> rename(columns: {json.dumps(columns)})')
+
   def interpolate(self, every='1s'):
     self.query = 'import "interpolate"\n' + self.query
     return self(f'|> interpolate.linear(every: {every})')
@@ -53,3 +59,9 @@ class Query:
 
   def fill(self, value=0.0):
     return self(f'|> fill(value: {value})')
+
+  def duplicate(self, column, _as):
+    return self(f'|> duplicate(column: "{column}", as: "{_as}")')
+
+  def derivative(self, non_negative=False, unit='1s', columns=['_value']):
+    return self(f'|> derivative(unit: {unit}, nonNegative: {"true" if non_negative else "false"}, columns: {json.dumps(columns)})')

@@ -1,5 +1,6 @@
+
 button:not([title="View fullscreen"]) {
-	width: 100% !important;
+    width: 100% !important;
 }
 div[data-testid="stExpander"] {
     position: sticky;

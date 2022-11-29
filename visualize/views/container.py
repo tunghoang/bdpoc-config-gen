@@ -1,57 +1,39 @@
+from itertools import islice
+
+import traceback
 import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import BUCKET, ORG, TIME_STRINGS
+from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS)
+from configs.custom_components import outstanding_tag_list, st_custom_dataframe
 from configs.influx_client import query_api
 from configs.Query import Query
-from custom_components.st_dataframe_component import st_custom_dataframe
-from custom_components.tag_list import outstanding_tag_list
-from utils.draw_chart import draw_chart_by_check_data, draw_chart_by_raw_data
+from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table)
 from utils.tag_utils import load_tag_specs
-from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
-                              visualize_data_by_raw_data)
+from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
 
-# def render_configurations():
-#   with st.expander("SETTINGS", True):
-#     if st.session_state["time_range"] == 0:
-#       start_date, end_date = st.columns([1, 1])
-#       with start_date:
-#         st.date_input("Start Date", value=st.session_state["start_time"], key="start_date", on_change=cal_different_time_range)
-#       with end_date:
-#         st.date_input("End Date", value=st.session_state["end_time"], key="end_date", on_change=cal_different_time_range)
-#     tCols = st.columns([1, 1, 1, 1, 1, 1])
-#     with tCols[0]:
-#       # Check if raw_data is True, user can view raw data
-#       st.selectbox("Check", CHECKS_LIST.keys() if st.session_state["raw_data"] else list(CHECKS_LIST.keys())[1:], format_func=lambda check_mode: CHECKS_LIST[check_mode], key="check_mode", disabled=st.session_state["raw_data"])
-#     with tCols[1]:
-#       st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw", on_change=update_interpolated_calldb_session, disabled=not st.session_state["raw_data"])
-#     with tCols[2]:
-#       st.selectbox("Time Range", options=TIME_STRINGS.keys(), format_func=lambda sec: TIME_STRINGS[sec], key="time_range")
-#     with tCols[3]:
-#       st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data", disabled=not st.session_state["raw_data"])
-#     with tCols[4]:
-#       st.selectbox("Chart Style", ("all", "merge"), key="chart_mode")
-#     with tCols[5]:
-#       st.selectbox("Raw data", (True, False), key="raw_data")
-
+import json
 
 def render_overview():
   draw_chart_by_check_data(st.session_state["data"])
 
 
 def inside(v, b1, b2):
+  if b1 is None:
+    b1 = 0
+  if b2 is None:
+    b2 = 0
   return (v - b1) * (v - b2) < 0
 
+attributes = ["low3", "low2", "low", "high", "high2", "high3"]
 
-__INFINITIES = (-999999.0, 999999.0)
-__LABELS = ("LOW", "HIGH")
-
-
-def irv_diagnose(min_max, tagSpec):
+def irv_diagnose(min_max, tagSpec, tag):
   if tagSpec is None:
-    return ""
-
+    return "NA", ""
+  if all([ (tagSpec[a] == "NA" ) for a in attributes ]):
+    return "NA", ""
+  print(tag, tagSpec)
   shutdown_limits = [tagSpec["low3"], tagSpec["high3"]]
   alarm_limits = [tagSpec["low2"], tagSpec["high2"]]
   prealarm_limits = [tagSpec["low"], tagSpec["high"]]
@@ -61,70 +43,139 @@ def irv_diagnose(min_max, tagSpec):
   output = ""
 
   for i in range(0, 2):
-    if inside(min_max[i], __INFINITIES[i], shutdown_limits[i]):
+    if inside(min_max[i], INFINITIES[i], shutdown_limits[i]):
       if shutdown_limits[i] != alarm_limits[i]:
         flags[i] = 3
-        comment = f"{__LABELS[i]} - SHUTDOWN;"
+        comment = f"{LABELS[i]} - SHUTDOWN;"
       elif alarm_limits[i] != prealarm_limits[i]:
         flags[i] = 2
-        comment = f"{__LABELS[i]} - ALARM;"
+        comment = f"{LABELS[i]} - ALARM;"
       else:
         flags[i] = 1
-        comment = f"{__LABELS[i]} - PREALARM;"
+        comment = f"{LABELS[i]} - PREALARM;"
       output = output + comment
     elif inside(min_max[i], shutdown_limits[i], alarm_limits[i]):
       # results["alarms"][i] = True
       flags[i] = 2
-      output = output + f"{__LABELS[i]} - ALARM;"
+      output = output + f"{LABELS[i]} - ALARM;"
     elif inside(min_max[i], alarm_limits[i], prealarm_limits[i]):
       # results["prealarms"][i] = True
       flags[i] = 1
-      output = output + f"{__LABELS[i]} - PREALARM;"
+      output = output + f"{LABELS[i]} - PREALARM;"
     elif inside(min_max[i], prealarm_limits[0], prealarm_limits[1]):
       # results["normals"][i] = True
       flags[i] = 0
-      output = output + f"{__LABELS[i]} - NORMAL;"
+      output = output + f"{LABELS[i]} - NORMAL;"
   return max(flags[0], flags[1]), output
 
-
-def render_irv_report():
+def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=False, key=0):
   tagDict = load_tag_specs()
+  df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
+
+  df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
+      tagDict.get(row["_field"], {}).get("device", "NA"),
+      tagDict.get(row["_field"], {}).get("description", "NA"),
+      tagDict.get(row["_field"], {}).get("unit", "NA"),
+      tagDict.get(row["_field"], {}).get("low3", "NA"),
+      tagDict.get(row["_field"], {}).get("low2", "NA"),
+      tagDict.get(row["_field"], {}).get("low", "NA"),
+      tagDict.get(row["_field"], {}).get("high", "NA"),
+      tagDict.get(row["_field"], {}).get("high2", "NA"),
+      tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None), row["_field"])
+  ]),axis=1)
+
+  df.rename(columns={"_field": "Field"}, inplace=True)
+
+  df = df.sort_values("Group")
+  records = df.to_dict("records")
+  # draw_table(df, height=700, title="MP Routing Monitoring")
+  st_custom_dataframe(data=records, header=header, withSearch=withSearch, withComment=withComment, withDownload=withDownload, key=key)
+  
+def render_irv_report():
   if st.session_state.data is not None:
     df = st.session_state.data[["_field", "_value"]]
+    __irvTable(df, header="MP Routing Monitoring", withSearch=True, withComment=True, withDownload=True)
+    
 
-    df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
+def render_roc_report():
+  tagDict = load_tag_specs()
+  st.subheader("MP Startup report")
+  if st.session_state["data"] is not None:
+    #df = st.session_state.data.sort_values("_time")
+    groups = st.session_state.data.groupby("group")
+    for name, group in groups:
+      print(group)
+      print("............")
+      start = group["_start"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
+      end = group["_stop"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
+      
+      header = {
+          "alert_type": "START" if group["sign"].tolist()[0] > 0 else "STOP",
+          "start": start,
+          "end": end,
+      }
+      header = json.dumps(header)
+      __irvTable(group, header=header, key=name)
+      
+def render_roc_report_old():
+  tagDict = load_tag_specs()
+  if st.session_state["data"] is not None:
+    df = st.session_state.data.sort_values("_time")
+    df.to_csv("temp.csv")
+    tables = st.session_state["data"].groupby("_field")
+    iters = None
+    for _idx, table in tables:
+      table = table.reset_index()
+      iters = table.iterrows()
+      st.subheader(f"{_idx}")
+      for idx, row in iters:
+        start = idx
+        end = None
+        alert_type = None
+        for i in range(idx + 1, len(table)):
+          if row["derivative"] >= START_DERIVATIVE_VALUE:
+            if table.at[i, "derivative"] < START_DERIVATIVE_VALUE:
+              end = i
+              alert_type = "START"
+              next(islice(iters, end - start - 1, end - start + 1))
+              break
+          elif row["derivative"] <= -STOP_DERIVATIVE_VALUE:
+            if table.at[i, "derivative"] > -STOP_DERIVATIVE_VALUE:
+              end = i
+              alert_type = "STOP"
+              next(islice(iters, end - start - 1, end - start + 1))
+              break
+        if end is not None:
+          df = table[start:end][["_field", "_value"]]
 
-    df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
-        tagDict.get(row["_field"], {}).get("device", "NA"),
-        tagDict.get(row["_field"], {}).get("description"),
-        tagDict.get(row["_field"], {}).get("unit", "NA"),
-        tagDict.get(row["_field"], {}).get("low3", "NA"),
-        tagDict.get(row["_field"], {}).get("low2", "NA"),
-        tagDict.get(row["_field"], {}).get("low", "NA"),
-        tagDict.get(row["_field"], {}).get("high", "NA"),
-        tagDict.get(row["_field"], {}).get("high2", "NA"),
-        tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))
-    ]),
-                                                                                                              axis=1)
+          df = (df.groupby("_field", as_index=False)["_value"].agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
 
-    df.rename(columns={"_field": "Field"}, inplace=True)
+          df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
+              tagDict.get(row["_field"], {}).get("device", "NA"),
+              tagDict.get(row["_field"], {}).get("description"),
+              tagDict.get(row["_field"], {}).get("unit", "NA"),
+              tagDict.get(row["_field"], {}).get("low3", "NA"),
+              tagDict.get(row["_field"], {}).get("low2", "NA"),
+              tagDict.get(row["_field"], {}).get("low", "NA"),
+              tagDict.get(row["_field"], {}).get("high", "NA"),
+              tagDict.get(row["_field"], {}).get("high2", "NA"),
+              tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))
+          ]),
+                                                                                                                    axis=1)
 
-    # df = df[['_field',
-    #              'group',
-    #              "description",
-    #              'unit',
-    #              'lll',
-    #              'll',
-    #              'l',
-    #              'h',
-    #              'hh',
-    #              'hhh',
-    #              'min',
-    #              'max']]
-    df = df.sort_values("Group")
-    records = df.to_dict("records")
-    # draw_table(df, height=700, title="MP Routing Monitoring")
-    st_custom_dataframe(records)
+          df.rename(columns={"_field": "Field"}, inplace=True)
+
+          df = df.sort_values("Group")
+          records = df.to_dict("records")
+          # print(records)
+          # draw_table(df, height=700, title="MP Routing Monitoring")
+          header = {
+              "alert_type": alert_type,
+              "start": table.at[start, "_time"].strftime("%Y-%m-%d %H:%M:%S"),
+              "end": table.at[end, "_time"].strftime("%Y-%m-%d %H:%M:%S"),
+          }
+          header = json.dumps(header)
+          st_custom_dataframe(data=records, header=header, key=f"{_idx}.{start}.{end if end is not None else 0}")
 
 
 def render_columns(devices, deviation_checks):
@@ -146,9 +197,9 @@ def render_columns(devices, deviation_checks):
 
 
 def render_outstanding_tags(container):
-  print('render_outstanding_tags')
   if st.session_state["data"] is None:
     return
+  print('render_outstanding_tags')
   df = st.session_state["data"].drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
   df = df.pivot(index='_field', columns='_measurement')
   df = df['_time'].reset_index()
@@ -214,7 +265,7 @@ def render_inspection():
   query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields([st.session_state._selected_tag]).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()
 
   raw_data = query_api.query_data_frame(query, org=ORG)
-  print(raw_data)
+  # print(raw_data)
   raw_data["_time"] = raw_data["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
   raw_data["_start"] = raw_data["_start"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
   raw_data["_stop"] = raw_data["_stop"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))

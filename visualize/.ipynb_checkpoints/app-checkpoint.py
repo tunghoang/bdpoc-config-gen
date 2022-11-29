@@ -6,8 +6,8 @@ from utils.css_utils import local_css
 from utils.influx_utils import check_status, collector_status
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
-from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, visualize_data_by_raw_data)
-from views.container import (render_inspection, render_outstanding_tags, render_overview,render_irv_report)
+from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, load_roc_tags, visualize_data_by_raw_data)
+from views.container import (render_inspection, render_irv_report, render_outstanding_tags, render_overview, render_roc_report)
 from views.sidebar import render_sidebar
 
 
@@ -48,15 +48,17 @@ def apply():
   st.session_state._selected_checks.clear()
   st.session_state["call_influx"] = True
 
+
 def reset_session():
   st.session_state["tags"] = []
   st.session_state._selected_tag = None
   st.session_state._selected_checks = {}
   st.session_state["data"] = None
 
+
 def setting_controls():
-  st.button("Fetch & View", on_click=apply)
-  st.selectbox("View Mode", (0, 1, 2), format_func=lambda viewModeIdx: VIEW_MODES[viewModeIdx], key="raw_data", on_change=reset_session)
+  st.button("Fetch & View", on_click=apply, type="primary")
+  st.selectbox("View Mode", (0, 1, 2, 3), format_func=lambda viewModeIdx: VIEW_MODES[viewModeIdx], key="raw_data", on_change=reset_session)
 
   with st.expander("⚙ SETTINGS", True):
     if st.session_state["time_range"] == 0:
@@ -69,10 +71,7 @@ def setting_controls():
     st.selectbox("Time Range", options=TIME_STRINGS.keys(), format_func=lambda sec: TIME_STRINGS[sec], key="time_range", on_change=reset_session)
 
     if st.session_state["raw_data"] == 1:
-      st.selectbox("Preprocessing", 
-                   (True, False), 
-                   index=0 if st.session_state["interpolated"] else 1, 
-                   format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
+      st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
 
       st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data")
 
@@ -107,13 +106,16 @@ def main():
           load_all_check()
       elif st.session_state["raw_data"] == 2:
         load_irv_tags()
+      elif st.session_state["raw_data"] == 3:
+        load_roc_tags()
 
     with st.container():
       st.markdown(f"""<div id='info'>
         <div><b>Server time </b>: {st.session_state['server_time']}</div>
         <div><b>Harvest rate</b>: {st.session_state['harvest_rate']} tags/s</div>
         <div><b>Check rate</b>: {st.session_state['check_rate']} check/min</div>
-      </div>""", unsafe_allow_html=True)
+      </div>""",
+                  unsafe_allow_html=True)
 
       #render_configurations()
       if st.session_state["raw_data"] == 1:
@@ -122,6 +124,8 @@ def main():
         render_overview()
       elif st.session_state["raw_data"] == 2:
         render_irv_report()
+      elif st.session_state["raw_data"] == 3:
+        render_roc_report()
       st.empty()
 
     if st.session_state["raw_data"] == 0:

@@ -16,10 +16,11 @@ __TRAVELLING_CHECK_NAME = ["travelling_check", "travelling_check"]
 __DEVIATION_CHECK_NAME = ["cross_ref.__(deviation_check)__number", "deviation_check"]
 __CONTROL_LOGIC_CHECK_NAME = ["control_logic_check__number", "control_logic_check"]
 __DESCRIPTION = ["measuring_point", "description"]
+__MP_STARTUP = ["mp_startup", "mp_startup"]
 
 _YAML_FILE = "tags.yaml"
-_TAG_LIST_FILE = "tag_list.csv"
 
+_TAG_LIST_FILE = "tag_list.csv"
 # PARAMETER NAME CONSTANTS ###
 __OVERANGE_CHECK_PARAM_NAMES = ["low", "high"]
 __IRV_CHECK_PARAM_NAMES = ["low3", "low2", "low", "high", "high2", "high3"]
@@ -120,6 +121,13 @@ def process_control_logic_check(tagObject, tagInfor):
   tagObject[__CONTROL_LOGIC_CHECK_NAME[1]] = tagInfor[__CONTROL_LOGIC_CHECK_NAME[0]]
 
 
+def process_mp_startup(tagObject, tagInfor):
+  if tagInfor[__MP_STARTUP[0]] == "x":
+    tagObject[__MP_STARTUP[1]] = True
+  else:
+    tagObject[__MP_STARTUP[1]] = False
+
+
 def add_tag_info(tags, tagInfor):
   tagName = tagInfor["phd_tag"]
   if tagName not in tags:
@@ -134,6 +142,7 @@ def add_tag_info(tags, tagInfor):
   process_deviation_check(tagObject, tagInfor)
   process_control_logic_check(tagObject, tagInfor)
   process_description(tagObject, tagInfor)
+  process_mp_startup(tagObject, tagInfor)
   return tags[tagName]
 
 
@@ -142,7 +151,7 @@ def transform(devices):
   for deviceName, deviceTags in devices.items():
     tags = []
     for tagName, detail in deviceTags.items():
-      thisTag = {"tag_number": tagName, "description": detail["description"], "checks": {key: detail[key] for key in detail if key != "description"}}
+      thisTag = {"tag_number": tagName, "description": detail["description"], "mp_startup": detail["mp_startup"], "checks": {key: detail[key] for key in detail if key != "description" and key != "mp_startup"}}
       tags.append(thisTag)
     thisDevice = {"name": deviceName, "label": deviceName, "tags": tags}
     outputDevices.append(thisDevice)
