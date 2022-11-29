@@ -1,4 +1,5 @@
 import sys
+import time
 import warnings
 from os import path
 from threading import Thread
@@ -6,7 +7,6 @@ from threading import Thread
 import numpy as np
 import pandas as pd
 import schedule
-import time
 from influxdb_client.client.warnings import MissingPivotFunction
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
@@ -25,7 +25,9 @@ def job():
   print("Querying ...")
   query = Query().from_bucket(BUCKET).range(f"{2 * CHECK_PERIOD}m").keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
   print(query)
-  table = query_api.query_data_frame(query, org=ORG).assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
+  table = query_api.query_data_frame(query, org=ORG)
+  if (table.empty): return
+  table = table.assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
   print("Query done")
 
   t1 = Thread(target=do_nan_check, args=(table, tags))
@@ -57,7 +59,7 @@ def job():
 
 schedule.every(CHECK_PERIOD).minute.do(job)
 
-while True:
-  schedule.run_pending()
-  time.sleep(200./1000)
-# job()
+# while True:
+#   schedule.run_pending()
+#   time.sleep(200./1000)
+job()
