@@ -110,7 +110,7 @@ def main():
         load_roc_tags()
 
     with st.container():
-      st.markdown(f"""<div id='info'>
+      st.markdown(f"""<div id='app-title'>Instrument Health Monitoring</div><div id='info'>
         <div><b>Server time </b>: {st.session_state['server_time']}</div>
         <div><b>Harvest rate</b>: {st.session_state['harvest_rate']} tags/s</div>
         <div><b>Check rate</b>: {st.session_state['check_rate']} check/min</div>

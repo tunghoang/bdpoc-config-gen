@@ -18,7 +18,7 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
 86,Compressor,VE_2188B,HT_VI_2188B.PV,RD COMP. JOURN. BRG. NDE,μm,,,Y,"0, 200","_,_,0,15,26,52",Y,Vibration,,,,,,,x
 102,Compressor,ZT_2181A,HT_ZI_2181A.PV,RD COMP. SHAFT AXIAL DISPLACEMENT,mm,,19,Y,"-1, 1","-0.4,-0.3,-0.22,0.22,0.3,0.4",Y,Vibration,,ZE-2181A/B,,,,,x
 103,Compressor,ZT_2181B,HT_ZI_2181B.PV,RD COMP. SHAFT AXIAL DISPLACEMENT,mm,,19,Y,"-1, 1","-0.4,-0.3,-0.22,0.22,0.3,0.4",Y,Vibration,,ZE-2181A/B,,,,,x
-115,Compressor,FY_2180,HT_FY_2180.PV,Positioner Flow Control Valve,%,1,,Y,"0, 100",,Y,Pressure,,,FT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,,,x
+115,Compressor,FY_2180,HT_FY_2180.PV,Positioner Flow Control Valve,%,1,,Y,"0, 100",,Y,Pressure,,,FT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,,,
 3,Dry Gas Seal,FIT_2190,HT_FI_2190.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,mbar,2,,Y,"0, 1000","0,0,0,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FI-2190 tăng,,,
 4,Dry Gas Seal,FIT_2191,HT_FI_2191.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,mbar,2,,Y,"0, 1000","0,0,0,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,
 7,Dry Gas Seal,PDIT_2183,HT_PDI_2183.PV,RD COMP. SEAL GAS FILTER,bar,,,Y,"0, 1.5","0,0,0,0.6,0.8,1",Y,Pressure,,,,,,,
@@ -88,7 +88,7 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
 61,Main Motor,TE_2186D,HT_TI_2186D.PV,MOTOR WINDINGS V,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,
 62,Main Motor,TE_2186E,HT_TI_2186E.PV,MOTOR WINDINGS W,°C,,,Y,"-40, 200","_,_,0,75,90,125",Y,Temperature,,,,,,,
 63,Main Motor,TE_2186F,HT_TI_2186F.PV,MOTOR WINDINGS W,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,
-1,Process,FIT_2180,HT_FI_2180.PV,RD COMP. SUCTION,mbar,1,,Y,"0, 1000",,Y,Pressure,,,FCV-2180/FIT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,,,
+1,Process,FIT_2180,HT_FI_2180.PV,RD COMP. SUCTION,mbar,1,,Y,"0, 1000",,Y,Pressure,,,FCV-2180/FIT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,,,x
 10,Process,PDT_2163,HT_PDI_2163.PV,RD COMP. DISCHARGE,???,3,,Y,"0, 2",,Y,Pressure,,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,y,
 11,Process,PDT_2180,HT_PDI_2180.PV,RD COMP. SUCTION,mBar,,,Y,"0, 2",,Y,Pressure,,,,,,,
