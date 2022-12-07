@@ -2,6 +2,7 @@ import yaml
 
 from config_gen import csv_to_array_full_objects
 
+
 def __fill_missing(array):
   count = 0
   result = []
@@ -10,7 +11,7 @@ def __fill_missing(array):
     if f"{a}".isnumeric():
       currentVal = float(a)
       if count > 0:
-        result = result + [currentVal]*count
+        result = result + [currentVal] * count
         count = 0
       result.append(currentVal)
     else:
@@ -18,12 +19,14 @@ def __fill_missing(array):
   if count > 0:
     result = result + [currentVal] * count
   return result
-          
-def myfloat(s): 
+
+
+def myfloat(s):
   try:
     return float(s)
   except:
     return "NA"
+
 
 def parse_irv_levels(irv_string, tagInfo, verbose=False):
   if irv_string is None or len(irv_string) == 0:
@@ -54,7 +57,7 @@ def parse_irv_levels(irv_string, tagInfo, verbose=False):
       tagInfo['high3'] = "NA"
 
 
-tags = csv_to_array_full_objects('assets/files/tag_list.csv')
+tags = csv_to_array_full_objects('assets/files/mp_startup.csv')
 
 cleanTags = {}
 for tag in tags:

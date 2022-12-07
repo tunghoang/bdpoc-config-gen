@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, ORG, PIVOT, SECOND)
 from configs.influx_client import query_api
 from configs.module_loader import *
@@ -36,41 +36,46 @@ def query_irv_tags(time: int) -> DataFrame:
     return pd.concat(results)
   return results
 
+
 SPEED_TAG = "HT_XE_2180A.PV"
+
 
 def query_roc_tags(time: int) -> DataFrame:
   tagDict = load_tag_specs()
   tagDict = {k: v for k, v in tagDict.items() if v["mp_startup"]}
-  
+
   fields = list(tagDict.keys())
   fields.append(SPEED_TAG)
-  
+
   #query = Query().from_bucket(BUCKET).range(time).filter_fields(list(tagDict.keys())).aggregate_window(True, "1m").keep_columns("_time", "_value", "_field").duplicate("_value", "derivative").derivative(columns=["derivative"]).to_str()
 
   query = Query().from_bucket(BUCKET).range(time).filter_fields(fields).keep_columns("_time", "_value", "_field").aggregate_window(False, "10s").pivot("_time", "_field", "_value").duplicate(SPEED_TAG, 'derivative').derivative(non_negative=False, unit="1s", columns=["derivative"]).to_str()
   table = query_api.query_data_frame(query, org=ORG)
   fields.append('derivative')
+  fields = [f for f in fields if f in table.columns]
   table1 = table[fields]
   table1 = table1.interpolate(method='linear', limit_direction='both')
   for f in fields:
     table[f] = table1[f]
+
   def transformDerivative(i_v):
     i, v = i_v
     speed = table.at[i, SPEED_TAG]
-    return v/speed if speed != 0 else v
-  
-  table['derivative'] = pd.Series(map(transformDerivative, enumerate(table['derivative'].tolist())) )
-  
+    return v / speed if speed != 0 else v
+
+  table['derivative'] = pd.Series(map(transformDerivative, enumerate(table['derivative'].tolist())))
+
   # table = table[table["_value"].notna()]
+
   """
   Fake data for testing
   """
-  table = fake_mp_startup(table)
+  # table = fake_mp_startup(table)
   cols = table.columns.tolist()
   # Detecting start/stop periods
   table["sign"] = np.sign(table["derivative"])
   table["group"] = None
-  
+
   def transition(info, target):
     if info["state"] == target:
       pass
@@ -78,8 +83,9 @@ def query_roc_tags(time: int) -> DataFrame:
       if info["state"] == 'normal':
         info["cnt"] = info["cnt"] + 1
       info["state"] = target
-  _info = dict(state = "normal", cnt = 0)
-  
+
+  _info = dict(state="normal", cnt=0)
+
   for rowIdx, row in table.iterrows():
     if abs(row[cols.index("derivative")]) < 0.1:
       transition(_info, "normal")
@@ -89,10 +95,10 @@ def query_roc_tags(time: int) -> DataFrame:
     elif row[cols.index("derivative")] < 0:
       transition(_info, 'decreasing')
       table.at[rowIdx, 'group'] = _info["cnt"]
-  table = table[table.group > 0] 
-  
+  table = table[table.group > 0]
+
   #return table
-  return pd.melt( table, id_vars=["_time", "_start", "_stop", "group", "sign"], value_vars=list(tagDict.keys()), var_name="_field", value_name="_value")
+  return pd.melt(table, id_vars=["_time", "_start", "_stop", "group", "sign"], value_vars=[f for f in fields if f != "derivative"], var_name="_field", value_name="_value")
 
 
 def query_check_data(time: int, device: str, tags: list = [], check_mode='none') -> DataFrame:

@@ -1,19 +1,22 @@
+import json
 from itertools import islice
 
-import traceback
 import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS)
+from configs.constants import (BUCKET, INFINITIES, LABELS, ORG,
+                               START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE,
+                               TIME_STRINGS)
 from configs.custom_components import outstanding_tag_list, st_custom_dataframe
 from configs.influx_client import query_api
 from configs.Query import Query
-from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table)
+from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data,
+                              draw_table)
 from utils.tag_utils import load_tag_specs
-from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
+from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
+                              visualize_data_by_raw_data)
 
-import json
 
 def render_overview():
   draw_chart_by_check_data(st.session_state["data"])
@@ -26,12 +29,14 @@ def inside(v, b1, b2):
     b2 = 0
   return (v - b1) * (v - b2) < 0
 
+
 attributes = ["low3", "low2", "low", "high", "high2", "high3"]
+
 
 def irv_diagnose(min_max, tagSpec, tag):
   if tagSpec is None:
     return "NA", ""
-  if all([ (tagSpec[a] == "NA" ) for a in attributes ]):
+  if all([(tagSpec[a] == "NA") for a in attributes]):
     return "NA", ""
   print(tag, tagSpec)
   shutdown_limits = [tagSpec["low3"], tagSpec["high3"]]
@@ -68,6 +73,7 @@ def irv_diagnose(min_max, tagSpec, tag):
       output = output + f"{LABELS[i]} - NORMAL;"
   return max(flags[0], flags[1]), output
 
+
 def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=False, key=0):
   tagDict = load_tag_specs()
   df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
@@ -82,7 +88,8 @@ def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=
       tagDict.get(row["_field"], {}).get("high", "NA"),
       tagDict.get(row["_field"], {}).get("high2", "NA"),
       tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None), row["_field"])
-  ]),axis=1)
+  ]),
+                                                                                                            axis=1)
 
   df.rename(columns={"_field": "Field"}, inplace=True)
 
@@ -90,17 +97,19 @@ def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=
   records = df.to_dict("records")
   # draw_table(df, height=700, title="MP Routing Monitoring")
   st_custom_dataframe(data=records, header=header, withSearch=withSearch, withComment=withComment, withDownload=withDownload, key=key)
-  
+
+
 def render_irv_report():
   if st.session_state.data is not None:
     df = st.session_state.data[["_field", "_value"]]
     __irvTable(df, header="MP Routing Monitoring", withSearch=True, withComment=True, withDownload=True)
-    
+
 
 def render_roc_report():
-  tagDict = load_tag_specs()
   st.subheader("MP Startup report")
   if st.session_state["data"] is not None:
+    if st.session_state["data"].empty:
+      return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
     #df = st.session_state.data.sort_values("_time")
     groups = st.session_state.data.groupby("group")
     for name, group in groups:
@@ -108,7 +117,7 @@ def render_roc_report():
       print("............")
       start = group["_start"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
       end = group["_stop"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
-      
+
       header = {
           "alert_type": "START" if group["sign"].tolist()[0] > 0 else "STOP",
           "start": start,
@@ -116,7 +125,8 @@ def render_roc_report():
       }
       header = json.dumps(header)
       __irvTable(group, header=header, key=name)
-      
+
+
 def render_roc_report_old():
   tagDict = load_tag_specs()
   if st.session_state["data"] is not None:
