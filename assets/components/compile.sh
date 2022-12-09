@@ -5,7 +5,7 @@ cd $SCRIPT_DIR
 # This script will compile components into a wheel file
 echo "Compiling components..."
 python setup.py bdist_wheel
-exit 0
+#exit 0
 rm -rf build
 rm -rf *.egg-info
 echo "Done compiling components."

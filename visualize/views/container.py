@@ -223,11 +223,14 @@ def render_outstanding_tags(container):
       style="background:white;">⚙ 💗 🔥 OUTSTANDING TAGS</div>
     ''',
                 unsafe_allow_html=True)
-    nMasks = list(map(lambda x: pd.isnull(x), df['nan_check'].tolist())) if 'nan_check' in df.columns else [False] * _nTags
-    oMasks = list(map(lambda x: pd.isnull(x), df['overange_check'].tolist())) if 'overange_check' in df.columns else [False] * _nTags
-    iMasks = list(map(lambda x: pd.isnull(x), df['irv_check'].tolist())) if 'irv_check' in df.columns else [False] * _nTags
-    fMasks = list(map(lambda x: pd.isnull(x), df['frozen_check'].tolist())) if 'frozen_check' in df.columns else [False] * _nTags
-
+    nMasks = list(map(lambda x: pd.isnull(x), df['nan_check'].tolist())) if 'nan_check' in df.columns else [True] * _nTags
+    oMasks = list(map(lambda x: pd.isnull(x), df['overange_check'].tolist())) if 'overange_check' in df.columns else [True] * _nTags
+    iMasks = list(map(lambda x: pd.isnull(x), df['irv_check'].tolist())) if 'irv_check' in df.columns else [True] * _nTags
+    fMasks = list(map(lambda x: pd.isnull(x), df['frozen_check'].tolist())) if 'frozen_check' in df.columns else [True] * _nTags
+    print(df.columns)
+    print(fMasks)
+    #print(df['frozen_check'])
+    
     tags = df["_field"].tolist()
     tagDict = load_tag_specs()
 

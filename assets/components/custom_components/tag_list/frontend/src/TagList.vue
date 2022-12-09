@@ -113,12 +113,6 @@ export default {
     }
   },
   mounted() {
-    /*
-    this.dNFlags = [...this.args.nFlags];
-    this.dOFlags = [...this.args.oFlags];
-    this.dIFlags = [...this.args.iFlags];
-    this.dFFlags = [...this.args.fFlags];
-    */
     this.dNFlags = new Array(this.args.nMasks.length).fill(false);
     this.dOFlags = new Array(this.args.nMasks.length).fill(false);
     this.dIFlags = new Array(this.args.nMasks.length).fill(false);
