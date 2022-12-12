@@ -202,7 +202,7 @@ def render_columns(devices, deviation_checks):
     st.write(st.session_state["tags"])
     # st.write(st.session_state)
 
-    if st.session_state["raw_data"]:
+    if st.session_state["view_mode"] > 0:
       visualize_data_by_raw_data()
 
 
@@ -271,8 +271,8 @@ def render_inspection():
     df1 = df[df['_measurement'] == check]
     st.markdown(f"#### _{check}_")
     st.write(df1)
-
-  time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
+  time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
   startStr, stopStr = getRange(st.session_state["data"])
 
   query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields([st.session_state._selected_tag]).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()

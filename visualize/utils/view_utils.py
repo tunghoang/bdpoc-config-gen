@@ -37,8 +37,9 @@ def get_data_by_device_name(data, devices, device_name):
 
 def load_data():
   print('load_dataaaaaa')
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
   with st.spinner('Loading ...'):
-    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
     if st.session_state["raw_data"]:
       st.session_state["data"] = query_raw_data(time, st.session_state['selected_device_name'], st.session_state["tags"], interpolated=st.session_state["interpolated"], missing_data=st.session_state["missing_data"])
     st.session_state['harvest_rate'] = collector_status()
@@ -48,8 +49,9 @@ def load_data():
 
 def load_all_check():
   print('load_all_check')
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
   with st.spinner('Loading ...'):
-    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
     st.session_state['data'] = query_check_all(time)
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
@@ -57,16 +59,18 @@ def load_all_check():
 
 def load_irv_tags():
   tagDict = load_tag_specs()
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
   with st.spinner("Loading irv tags ..."):
-    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
     st.session_state["data"] = query_irv_tags(time)
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def load_roc_tags():
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
   with st.spinner("Loading irv tags ..."):
-    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else TIME_STRINGS[st.session_state["time_range"]]
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
     st.session_state["data"] = query_roc_tags(time)
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")

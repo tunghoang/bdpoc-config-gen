@@ -18,11 +18,11 @@ def init():
   # Init session
   init_session("tags", [])
   init_session("missing_data", "NaN")
-  init_session("raw_data", False)
+  init_session("view_mode", 0)
   init_session("search_tags", "")
   init_session("selected_device_name", "")
   init_session("interpolated", False)
-  init_session("time_range", 10)
+  init_session("time_range", 300)
   init_session("start_time", DATE_NOW() - dt.timedelta(days=1))
   init_session("end_time", DATE_NOW())
   init_session("difference_time_range", cal_different_time_range())
@@ -58,7 +58,7 @@ def reset_session():
 
 def setting_controls():
   st.button("Fetch & View", on_click=apply, type="primary")
-  st.selectbox("View Mode", (0, 1, 2, 3), format_func=lambda viewModeIdx: VIEW_MODES[viewModeIdx], key="raw_data", on_change=reset_session)
+  st.selectbox("View Mode", (0, 1, 2, 3), format_func=lambda viewModeIdx: VIEW_MODES[viewModeIdx], key="view_mode", on_change=reset_session)
 
   with st.expander("⚙ SETTINGS", True):
     if st.session_state["time_range"] == 0:
@@ -67,24 +67,16 @@ def setting_controls():
         st.date_input("Start Date", value=st.session_state["start_time"], key="start_date", on_change=cal_different_time_range)
       with end_date:
         st.date_input("End Date", value=st.session_state["end_time"], key="end_date", on_change=cal_different_time_range)
+    time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
+    print(time_range_settings)
+    st.selectbox("Time Range", options=time_range_settings.keys(), format_func=lambda sec: time_range_settings[sec], key="time_range", on_change=reset_session)
 
-    st.selectbox("Time Range", options=TIME_STRINGS.keys(), format_func=lambda sec: TIME_STRINGS[sec], key="time_range", on_change=reset_session)
-
-    if st.session_state["raw_data"] == 1:
+    if st.session_state["view_mode"] == 1:
       st.selectbox("Preprocessing", (True, False), index=0 if st.session_state["interpolated"] else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
 
       st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data")
 
       st.selectbox("Chart Style", ("all", "merge"), key="chart_mode")
-
-    #else:
-    #  # Check if raw_data is True, user can view raw data
-    #  st.selectbox("Check",
-    #               CHECKS_LIST.keys() if st.session_state["raw_data"] else list(CHECKS_LIST.keys())[1:],
-    #               format_func=lambda check_mode: CHECKS_LIST[check_mode],
-    #               key="check_mode",
-    #               disabled=st.session_state["raw_data"])
-
 
 def main():
   init()
@@ -92,21 +84,21 @@ def main():
   control_logic_checks, deviation_checks, devices = load_tag_config()
   with st.sidebar:
     setting_controls()
-    if st.session_state["raw_data"] == 1:
+    if st.session_state["view_mode"] == 1:
       render_sidebar(devices)
 
   try:
     if st.session_state["call_influx"]:
       print("query data")
       st.session_state["call_influx"] = False
-      if st.session_state["raw_data"] < 2:
+      if st.session_state["view_mode"] < 2:
         if len(st.session_state["tags"]) > 0:
           load_data()
         else:
           load_all_check()
-      elif st.session_state["raw_data"] == 2:
+      elif st.session_state["view_mode"] == 2:
         load_irv_tags()
-      elif st.session_state["raw_data"] == 3:
+      elif st.session_state["view_mode"] == 3:
         load_roc_tags()
 
     with st.container():
@@ -118,17 +110,17 @@ def main():
                   unsafe_allow_html=True)
 
       #render_configurations()
-      if st.session_state["raw_data"] == 1:
+      if st.session_state["view_mode"] == 1:
         visualize_data_by_raw_data()
-      elif st.session_state["raw_data"] == 0:
+      elif st.session_state["view_mode"] == 0:
         render_overview()
-      elif st.session_state["raw_data"] == 2:
+      elif st.session_state["view_mode"] == 2:
         render_irv_report()
-      elif st.session_state["raw_data"] == 3:
+      elif st.session_state["view_mode"] == 3:
         render_roc_report()
       st.empty()
 
-    if st.session_state["raw_data"] == 0:
+    if st.session_state["view_mode"] == 0:
       render_outstanding_tags(st.sidebar)
 
     if st.session_state["data"] is not None and st.session_state["_selected_tag"] is not None:

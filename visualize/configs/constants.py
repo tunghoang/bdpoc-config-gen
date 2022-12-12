@@ -13,7 +13,13 @@ SECOND = 60
 # DEFAULT CHART STYLE
 # LINE_SHAPE = 'hv'
 LINE_SHAPE = 'linear'
-TIME_STRINGS = {10: '10s', 30: '30s', 60: '1m', 120: '2m', 300: '5m', 600: '10m', 1800: '30m', 0: 'Custom...'}
+#TIME_STRINGS = {10: '10s', 30: '30s', 60: '1m', 120: '2m', 300: '5m', 600: '10m', 1800: '30m', 0: 'Custom...'}
+TIME_STRINGS = [
+  {300: '5m', 600: '10m', 1800: '30m', 0: 'Custom...'},
+  {30: '30s', 60: '1m', 120: '2m', 300: '5m', 600: '10m', 1800: '30m', 0: 'Custom...'},
+  {600: '10m', 1800: '30m', 3600: '60m', 7200: '2h', 14400: '4h', 86400: '1d', 172800: '2d', 0: 'Custom...'},
+  {600: '10m', 1800: '30m', 3600: '60m', 0: 'Custom...'}
+]
 # DATE TIME NOW
 DATE_NOW = lambda: dt.datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))
 DATE_NOW_IN_NS = lambda: int(DATE_NOW().strftime('%s')) * 10**9
@@ -21,7 +27,8 @@ DATE_NOW_IN_NS = lambda: int(DATE_NOW().strftime('%s')) * 10**9
 PIVOT = True
 # CHECKS LIST
 CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'frozen_check': 'Frozen-Check', 'roc_check': 'Rate-Of-Change-Check'}
-CHECK_PERIOD = 1
+CHECK_PERIOD = 1 # in minutes
+MP_SPEED_CHECK_PERIOD = 10 # in minutes
 # INFLUX
 BUCKET = "datahub"
 CHECK_BUCKET = "check-datahub"
@@ -42,6 +49,7 @@ START_DERIVATIVE_VALUE = 0.1
 STOP_DERIVATIVE_VALUE = -0.1
 
 MONITORING_BUCKET = "monitoring"
+MP_EVENTS_BUCKET = 'mp-events'
 CHECK_MONITORING_PERIOD = "30m"
 MONITORING_PERIOD = "5m"
 MONITORING_MEASUREMENT = "collector_metric"

@@ -29,8 +29,19 @@ def query_irv_tags(time: int) -> DataFrame:
   tagDict = load_tag_specs()
 
   irv_fields = list(filter(lambda x: tagDict[x]["high"] is not None, tagDict.keys()))
-  query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").aggregate_window(False).to_str()
+  #query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").aggregate_window(False).to_str()
+  query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").to_str()
 
+  query = f"""
+    data = {query}
+
+    maxTable = data
+      |> max()
+    minTable = data
+      |> min()
+    union(tables: [maxTable, minTable])
+  """
+  print(query)
   results = query_api.query_data_frame(query, org=ORG)
   if type(results) == list:
     return pd.concat(results)
