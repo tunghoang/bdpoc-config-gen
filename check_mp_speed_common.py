@@ -15,6 +15,15 @@ from visualize.configs.influx_client import query_api, write_api
 warnings.simplefilter("ignore", MissingPivotFunction)
 from visualize.utils.fake_data import fake_mp_startup
 
+def writeEvent(firstEvent):
+  print(firstEvent["_time"], firstEvent["_time"].isoformat())
+  sTime = firstEvent["_time"].isoformat()
+  p = Point(MP_EVENTS_BUCKET).tag(
+          "start", sTime
+  ).field(
+          "startup" if firstEvent['sign'] > 0 else "shutdown", 1
+  ).time(sTime)
+  write_api.write(MP_EVENTS_BUCKET, ORG, p, 's')
 
 def process(query):
   table = query_api.query_data_frame(query, org=ORG)
@@ -40,49 +49,18 @@ def process(query):
   table["sign"] = np.sign(table["derivative"])
   table["group"] = None
 
-  def transition(info, target):
-    if info["state"] == target:
-      pass
-    else:
-      if info["state"] == 'normal':
-        info["cnt"] = info["cnt"] + 1
-      info["state"] = target
+  table['sign_shift'] = table['sign'].shift()
+  table['cumsum'] = (table['sign'] != table['sign_shift']).cumsum()
 
-  _info = dict(state="normal", cnt=0)
-
-  for rowIdx, row in table.iterrows():
-    if abs(row[cols.index("derivative")]) < 0.1:
-      transition(_info, "normal")
-    elif row[cols.index("derivative")] > 0:
-      transition(_info, 'increasing')
-      table.at[rowIdx, 'group'] = _info["cnt"]
-    elif row[cols.index("derivative")] < 0:
-      transition(_info, 'decreasing')
-      table.at[rowIdx, 'group'] = _info["cnt"]
-  for _, row in table.iterrows():
-    print(row.to_dict())
-  print("........")
-  firstLineEvent = table.iloc[0].to_dict()
-  print(firstLineEvent)
-  lastLineEvent = table.iloc[-1].to_dict()
-  print(lastLineEvent)
-
-  table = table[table.group > 0]
-  table = pd.melt(table, id_vars=["_time", "_start", "_stop", "group", "sign"], value_vars=[SPEED_TAG], var_name="_field", value_name="_value")
-  groups = table.groupby('group')
-  for name, group in groups:
-    signList = group['sign'].tolist()
-    timeList = group['_time'].tolist()
-    print(timeList)
-    print(signList)
-    print(name, "............" )
-    print(group)
-    print("---")
-    if name != firstLineEvent['group'] and name != lastLineEvent['group']:
-      p = Point(MP_EVENTS_BUCKET).tag(
-        "start", timeList[0]
-      ).tag(
-        "stop", timeList[-1]
-      ).field("type", signList[0]).time(str(timeList[0]))
-      write_api.write(MP_EVENTS_BUCKET, ORG, p, 's')
-
+  groups = table.groupby('cumsum')
+  for g in groups:
+    firstEvent = g[1].iloc[0].to_dict()
+    lastEvent = g[1].iloc[-1].to_dict()
+    sign = firstEvent['sign']
+    if sign > 0:
+      normIncrease = ( lastEvent[SPEED_TAG] - firstEvent[SPEED_TAG] ) / lastEvent[SPEED_TAG]
+      if normIncrease > 0.7:
+        writeEvent(firstEvent)
+    elif sign < 0:
+      if lastEvent[SPEED_TAG] == 0:
+        writeEvent(firstEvent)

@@ -41,17 +41,20 @@ def job1(startTime, stopTime):
   ).derivative(
     non_negative=False, unit="1s", columns=["derivative"]
   ).to_str()
-  print(query)
+  print(startTime , " ----- ", stopTime)
   process(query)
 
 if len(sys.argv) > 1:
   ## Catching up from argv[1]
   startTime = sys.argv[1]
   print(startTime)
-  try: 
+  try:
     startTime = parser.isoparse(startTime)
-    stopTime = startTime + timedelta(minutes=2*MP_SPEED_CHECK_PERIOD)
-    job1(startTime.isoformat(), stopTime.isoformat())
+    while startTime.timestamp() < datetime.now().timestamp():
+      stopTime = startTime + timedelta(minutes=18*MP_SPEED_CHECK_PERIOD)
+      job1(startTime.isoformat(), stopTime.isoformat())
+      startTime = stopTime
+      time.sleep(0.5)
   except:
     traceback.print_exc()
     print("Wrong datetime format")
