@@ -6,8 +6,8 @@ from utils.css_utils import local_css
 from utils.influx_utils import check_status, collector_status
 from utils.session import init_session
 from utils.tag_utils import load_tag_config
-from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, load_roc_tags, visualize_data_by_raw_data)
-from views.container import (render_inspection, render_irv_report, render_outstanding_tags, render_overview, render_roc_report)
+from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, load_mp_transient_periods, visualize_data_by_raw_data)
+from views.container import (render_inspection, render_irv_report, render_outstanding_tags, render_overview, render_mp_transient_report)
 from views.sidebar import render_sidebar
 
 
@@ -99,7 +99,8 @@ def main():
       elif st.session_state["view_mode"] == 2:
         load_irv_tags()
       elif st.session_state["view_mode"] == 3:
-        load_roc_tags()
+        load_mp_transient_periods()
+        #load_roc_tags()
 
     with st.container():
       st.markdown(f"""<div id='app-title'>Instrument Health Monitoring</div><div id='info'>
@@ -108,6 +109,7 @@ def main():
         <div><b>Check rate</b>: {st.session_state['check_rate']} check/min</div>
       </div>""",
                   unsafe_allow_html=True)
+      #st.session_state.time_range
 
       #render_configurations()
       if st.session_state["view_mode"] == 1:
@@ -117,7 +119,8 @@ def main():
       elif st.session_state["view_mode"] == 2:
         render_irv_report()
       elif st.session_state["view_mode"] == 3:
-        render_roc_report()
+        #render_roc_report()
+        render_mp_transient_report()
       st.empty()
 
     if st.session_state["view_mode"] == 0:

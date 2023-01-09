@@ -1,5 +1,8 @@
 import json
 from itertools import islice
+import dateutil.parser as parser
+
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
@@ -17,6 +20,7 @@ from utils.tag_utils import load_tag_specs
 from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
                               visualize_data_by_raw_data)
 
+from utils.influx_utils import query_irv_transient_tags
 
 def render_overview():
   draw_chart_by_check_data(st.session_state["data"])
@@ -103,6 +107,26 @@ def render_irv_report():
   if st.session_state.data is not None:
     df = st.session_state.data[["_field", "_value"]]
     __irvTable(df, header="MP Routing Monitoring", withSearch=True, withComment=True, withDownload=True)
+
+def render_mp_transient_report():
+  st.subheader("MP transient report")
+  if st.session_state["data"] is not None:
+    st.session_state["data"]
+
+    if st.session_state["data"].empty:
+      return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
+    for idx,row in st.session_state["data"].iterrows():
+      startTime = parser.isoparse(row["start"])
+      length = 5 if row["_field"] == "shutdown" else 10
+      print(length)
+      stopTime = startTime + timedelta(minutes=length)
+      df = query_irv_transient_tags(startTime, stopTime)
+      header = {
+          "alert_type": "STOP" if row["_field"] == "shutdown" else "START",
+          "start": str(startTime),
+          "end": str(stopTime),
+      }
+      __irvTable(df, header=header, key = idx)
 
 
 def render_roc_report():

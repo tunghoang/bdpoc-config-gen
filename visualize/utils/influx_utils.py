@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, ORG, PIVOT, SECOND)
+from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, ORG, PIVOT, SECOND, MP_EVENTS_BUCKET)
 from configs.influx_client import query_api
 from configs.module_loader import *
 from configs.Query import Query
@@ -49,6 +49,27 @@ def query_irv_tags(time: int) -> DataFrame:
 
 
 SPEED_TAG = "HT_XE_2180A.PV"
+
+def query_mp_transient_periods(time):
+  query = Query().from_bucket(MP_EVENTS_BUCKET).range(time).filter_measurement("mp-events").to_str()
+  print(query)
+  table = query_api.query_data_frame(query, org=ORG)
+  if type(table) == list:
+    results = pd.concat(table)
+    print(results, "..")
+    return results
+  print(table)
+  return table
+
+
+def query_irv_transient_tags(fromTime, toTime):
+  tagDict = load_tag_specs()
+  tagDict = {k: v for k, v in tagDict.items() if v["mp_startup"]}
+
+  fields = list(tagDict.keys())
+  query = Query().from_bucket(BUCKET).range1(fromTime.isoformat(), toTime.isoformat()).filter_fields(fields).keep_columns("_time", "_value", "_field").to_str()
+  table = query_api.query_data_frame(query, org=ORG)
+  return table
 
 
 def query_roc_tags(time: int) -> DataFrame:

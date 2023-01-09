@@ -1,7 +1,7 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (check_status, collector_status, query_check_all, query_check_data, query_irv_tags, query_raw_data, query_roc_tags)
+from utils.influx_utils import (check_status, collector_status, query_check_all, query_check_data, query_irv_tags, query_raw_data, query_roc_tags, query_mp_transient_periods)
 from utils.tag_utils import load_tag_specs
 
 
@@ -66,6 +66,14 @@ def load_irv_tags():
     st.session_state['harvest_rate'] = collector_status()
     st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
+def load_mp_transient_periods():
+  print("load_mp_transient_periods")
+  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
+  with st.spinner("Loading transient periods ..."):
+    time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
+    st.session_state["data"] = query_mp_transient_periods(time)
+    st.session_state['harvest_rate'] = collector_status()
+    st.session_state['server_time'] = DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
 
 def load_roc_tags():
   time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
