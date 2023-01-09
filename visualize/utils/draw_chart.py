@@ -79,7 +79,7 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   #st.plotly_chart(chart, use_container_width=True)
 
   chart1 = px.line(data, x="_time", y="_field", labels=labels, range_x=range_x, color="_measurement", height=height, markers=True) if connected else px.scatter(data, x="_time", y="_field", labels=labels, color="_measurement", height=height)
-  chart1.update_layout(xaxis={'side': 'top'})
+  chart1.update_layout(xaxis={'side': 'top'}, yaxis={'side': 'left'})
 
   csv_all = data.to_csv().encode('utf-8')
 

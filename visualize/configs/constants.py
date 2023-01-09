@@ -29,6 +29,8 @@ PIVOT = True
 CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'frozen_check': 'Frozen-Check', 'roc_check': 'Rate-Of-Change-Check'}
 CHECK_PERIOD = 1 # in minutes
 MP_SPEED_CHECK_PERIOD = 10 # in minutes
+SPEED_TAG = "HT_XE_2180A.PV"
+
 # INFLUX
 BUCKET = "datahub"
 CHECK_BUCKET = "check-datahub"
