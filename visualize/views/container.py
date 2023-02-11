@@ -1,29 +1,25 @@
 import json
-from itertools import islice
-import dateutil.parser as parser
-
 from datetime import timedelta
+from itertools import islice
 
+import dateutil.parser as parser
 import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import (BUCKET, INFINITIES, LABELS, ORG,
-                               START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE,
-                               TIME_STRINGS)
+from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS)
 from configs.custom_components import outstanding_tag_list, st_custom_dataframe
 from configs.influx_client import query_api
-from configs.Query import Query
-from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data,
-                              draw_table)
-from utils.tag_utils import load_tag_specs
-from utils.view_utils import (get_device_by_name, select_tag_update_calldb,
-                              visualize_data_by_raw_data)
-
+from configs.query import Query
+from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table)
 from utils.influx_utils import query_irv_transient_tags
+from utils.session import sess, update_session
+from utils.tag_utils import load_tag_specs
+from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
+
 
 def render_overview():
-  draw_chart_by_check_data(st.session_state["data"])
+  draw_chart_by_check_data(sess("data"))
 
 
 def inside(v, b1, b2):
@@ -104,18 +100,19 @@ def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=
 
 
 def render_irv_report():
-  if st.session_state.data is not None:
-    df = st.session_state.data[["_field", "_value"]]
+  if sess("data") is not None:
+    df = sess("data")[["_field", "_value"]]
     __irvTable(df, header="MP Routing Monitoring", withSearch=True, withComment=True, withDownload=True)
+
 
 def render_mp_transient_report():
   st.subheader("MP transient report")
-  if st.session_state["data"] is not None:
-    st.session_state["data"]
+  if sess("data") is not None:
+    sess("data")
 
-    if st.session_state["data"].empty:
+    if sess("data").empty:
       return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
-    for idx,row in st.session_state["data"].iterrows():
+    for idx, row in sess("data").iterrows():
       startTime = parser.isoparse(row["start"])
       length = 5 if row["_field"] == "shutdown" else 10
       print(length)
@@ -126,16 +123,16 @@ def render_mp_transient_report():
           "start": str(startTime),
           "end": str(stopTime),
       }
-      __irvTable(df, header=header, key = idx)
+      __irvTable(df, header=header, key=idx)
 
 
 def render_roc_report():
   st.subheader("MP Startup report")
-  if st.session_state["data"] is not None:
-    if st.session_state["data"].empty:
+  if sess("data") is not None:
+    if sess("data").empty:
       return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
-    #df = st.session_state.data.sort_values("_time")
-    groups = st.session_state.data.groupby("group")
+    #df = sess("data.sort_values("_time")")
+    groups = sess("data").groupby("group")
     for name, group in groups:
       print(group)
       print("............")
@@ -153,10 +150,10 @@ def render_roc_report():
 
 def render_roc_report_old():
   tagDict = load_tag_specs()
-  if st.session_state["data"] is not None:
-    df = st.session_state.data.sort_values("_time")
+  if sess("data") is not None:
+    df = sess("data").sort_values("_time")
     df.to_csv("temp.csv")
-    tables = st.session_state["data"].groupby("_field")
+    tables = sess("data").groupby("_field")
     iters = None
     for _idx, table in tables:
       table = table.reset_index()
@@ -216,25 +213,30 @@ def render_columns(devices, deviation_checks):
   print('render columns')
   col1, col2 = st.columns([1.5, 6])
   with col1:
-    selected_device = get_device_by_name(devices, st.session_state["selected_device_name"])
+    selected_device = get_device_by_name(devices, sess("selected_device_name"))
     tags = selected_device["tags"] if selected_device is not None else []
-    tags = filter(lambda tag: st.session_state["search_tags"].lower() in tag["tag_number"].lower(), tags)
+    tags = filter(lambda tag: sess("search_tags").lower() in tag["tag_number"].lower(), tags)
     for tag in tags:
-      st.checkbox(tag["tag_number"], True if tag["tag_number"] in st.session_state["tags"] else False, on_change=select_tag_update_calldb, args=(tag["tag_number"], ))
+      st.checkbox(
+          tag["tag_number"],
+          True if tag["tag_number"] in sess("tags") else False,
+          on_change=select_tag_update_calldb,
+          args=(tag["tag_number"]),
+      )
 
   with col2:
-    st.write(st.session_state["tags"])
+    st.write(sess("tags"))
     # st.write(st.session_state)
 
-    if st.session_state["view_mode"] > 0:
+    if sess("view_mode") > 0:
       visualize_data_by_raw_data()
 
 
 def render_outstanding_tags(container):
-  if st.session_state["data"] is None:
+  if sess("data") is None:
     return
   print('render_outstanding_tags')
-  df = st.session_state["data"].drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
+  df = sess("data").drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
   df = df.pivot(index='_field', columns='_measurement')
   df = df['_time'].reset_index()
   df.columns.name = None
@@ -254,29 +256,29 @@ def render_outstanding_tags(container):
     print(df.columns)
     print(fMasks)
     #print(df['frozen_check'])
-    
+
     tags = df["_field"].tolist()
     tagDict = load_tag_specs()
 
     selected_check_indices = outstanding_tag_list("Dummy", tags=tags, tagDescriptions=[tagDict.get(tag, {}).get('description', "") for tag in tags], nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks)
     try:
-      st.session_state._selected_tag = None
-      st.session_state._selected_checks = []
+      update_session("_selected_tag", None)
+      update_session("_selected_checks", [])
       if selected_check_indices['nIdx'] >= 0:
-        st.session_state._selected_tag = df['_field'][selected_check_indices['nIdx']]
-        st.session_state._selected_checks.append('nan_check')
+        update_session("_selected_tag", df['_field'][selected_check_indices['nIdx']])
+        sess("_selected_checks").append('nan_check')
 
       if selected_check_indices['oIdx'] >= 0:
-        st.session_state._selected_tag = df['_field'][selected_check_indices['oIdx']]
-        st.session_state._selected_checks.append('overange_check')
+        update_session("_selected_tag", df['_field'][selected_check_indices['oIdx']])
+        sess("_selected_checks").append('overange_check')
 
       if selected_check_indices['iIdx'] >= 0:
-        st.session_state._selected_tag = df['_field'][selected_check_indices['iIdx']]
-        st.session_state._selected_checks.append('irv_check')
+        update_session("_selected_tag", df['_field'][selected_check_indices['iIdx']])
+        sess("_selected_checks").append('irv_check')
 
       if selected_check_indices['fIdx'] >= 0:
-        st.session_state._selected_tag = df['_field'][selected_check_indices['fIdx']]
-        st.session_state._selected_checks.append('frozen_check')
+        update_session("_selected_tag", df['_field'][selected_check_indices['fIdx']])
+        sess("_selected_checks").append('frozen_check')
 
     except:
       pass
@@ -289,17 +291,17 @@ def getRange(data):
 
 
 def render_inspection():
-  df = st.session_state.data
-  df = df[(df["_field"] == st.session_state._selected_tag)][['_time', '_field', "_value", '_measurement']]
-  for check in st.session_state._selected_checks:
+  df = sess("data")
+  df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', "_value", '_measurement']]
+  for check in sess("_selected_checks"):
     df1 = df[df['_measurement'] == check]
     st.markdown(f"#### _{check}_")
     st.write(df1)
-  time_range_settings = TIME_STRINGS[st.session_state['view_mode']]
-  time = f"{int(st.session_state['difference_time_range'])}s" if st.session_state["time_range"] == 0 else time_range_settings[st.session_state["time_range"]]
-  startStr, stopStr = getRange(st.session_state["data"])
+  time_range_settings = TIME_STRINGS[sess('view_mode')]
+  time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
+  startStr, stopStr = getRange(sess("data"))
 
-  query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields([st.session_state._selected_tag]).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()
+  query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields(sess("_selected_tag")).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()
 
   raw_data = query_api.query_data_frame(query, org=ORG)
   # print(raw_data)
@@ -308,4 +310,4 @@ def render_inspection():
   raw_data["_stop"] = raw_data["_stop"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
 
   if raw_data is not None:
-    draw_chart_by_raw_data(raw_data, height=450, title=st.session_state._selected_tag, connected=True)
+    draw_chart_by_raw_data(raw_data, height=450, title=sess("_selected_tag"), connected=True)

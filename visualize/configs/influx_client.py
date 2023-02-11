@@ -1,4 +1,4 @@
-from os import path,environ
+from os import environ, path
 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS

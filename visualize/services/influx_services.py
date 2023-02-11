@@ -1,19 +1,14 @@
-import datetime as dt
-from typing import List
-
-import numpy as np
-import pandas as pd
-import pytz
-import streamlit as st
 from configs.constants import ORG
 from configs.influx_client import query_api
+from configs.module_loader import *
+from utils.session import sess
 
 
 def get_database(query: str) -> pd.DataFrame:
   table = query_api.query_data_frame(query, org=ORG)
   # FORMAT TABLE
   # Add missing tags
-  missing_tags_in_table = st.session_state["tags"] if "_field" not in table else [tag for tag in st.session_state["tags"] if tag not in table["_field"].values]
+  missing_tags_in_table = sess("tags") if "_field" not in table else [tag for tag in sess("tags") if tag not in table["_field"].values]
   table = pd.concat([table, pd.DataFrame({"_field": missing_tags_in_table, "_time": [table["_time"][0] for _ in missing_tags_in_table]})], join="outer", ignore_index=True)
 
   if "_time" in table:
@@ -35,14 +30,20 @@ def get_check(query: str) -> pd.DataFrame:
 
 
 def get_tag_harvest_rate(query: str) -> float:
-  table = query_api.query_data_frame(query, org=ORG)
+  try:
+    table = query_api.query_data_frame(query, org=ORG)
+  except Exception as _:
+    return 0
   if table is None or table.empty:
     return 0
   return table["_value"].values[-1]
 
 
 def get_check_harvest_rate(query: str) -> float:
-  table = query_api.query_data_frame(query, org=ORG)
+  try:
+    table = query_api.query_data_frame(query, org=ORG)
+  except Exception as _:
+    return 0
   if table is None or table.empty:
     return 0
   return table["_value"].mean()

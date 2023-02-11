@@ -120,7 +120,7 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
 125,Process,PT_3011,HT_PIC_3011.DACA.PV,Pressure Transmitter 2nd Stage Separator HT-V-3010,Bar,9,23,Y,Y,,Y,Pressure,,PT-3011/PZT-3010,PT-3011/PCV-3011,PCV-3011 Open but PT-3011 not decrease,x,y,
 126,Process,SDV_2160_GSC,HT_SDV_2160_GSC.PV,SHUTDOWN VALVE,Status,3,,Y,Y,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,x,
-127,Process,SDV_2160_GSC,HT_SDV_2160_GSC.PV,SHUTDOWN VALVE,Status,3,,Y,Y,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
+127,Process,SDV_2160_GSO,HT_SDV_2160_GSO.PV,SHUTDOWN VALVE,Status,3,,Y,Y,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",,x,
 128,Process,SDV_2161_GSC,HT_SDV_2161_GSC.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,2,,X,,x,x,
 129,Process,SDV_2161_GSO,HT_SDV_2161_GSO.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,2,,X,,x,x,

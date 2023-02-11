@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, ORG, PIVOT, SECOND, MP_EVENTS_BUCKET)
+from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, MP_EVENTS_BUCKET, ORG, PIVOT, SECOND)
 from configs.influx_client import query_api
 from configs.module_loader import *
-from configs.Query import Query
+from configs.query import Query
 from services.influx_services import (get_check, get_check_harvest_rate, get_database, get_tag_harvest_rate)
 from utils.fake_data import fake_mp_startup
 from utils.tag_utils import load_tag_specs
@@ -15,8 +15,8 @@ def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool =
   if len(tags) == 0:
     return DataFrame()
   query = Query().from_bucket(BUCKET).range(time)
-  if device:
-    query = query.filter_measurement(device)
+  # if device:
+  #   query = query.filter_measurement(device)
   query = query.filter_fields(tags).keep_columns("_time", "_value", "_field").aggregate_window(True if missing_data == "NaN" else False).to_str()
   table = get_database(query)
   if interpolated:
@@ -49,6 +49,7 @@ def query_irv_tags(time: int) -> DataFrame:
 
 
 SPEED_TAG = "HT_XE_2180A.PV"
+
 
 def query_mp_transient_periods(time):
   query = Query().from_bucket(MP_EVENTS_BUCKET).range(time).filter_measurement("mp-events").to_str()

@@ -10,10 +10,11 @@ import schedule
 from influxdb_client.client.warnings import MissingPivotFunction
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
+from configs.query import Query
+
 from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG)
 from visualize.configs.influx_client import query_api, write_api
 from visualize.configs.logger import check_logger
-from visualize.configs.Query import Query
 from visualize.services.check_services import (do_deviation_check, do_frozen_check, do_irv_check, do_nan_check, do_overange_check, do_roc_check)
 from visualize.utils.tag_utils import load_tag_config
 

@@ -8,9 +8,10 @@ import pandas as pd
 import yaml
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
+from configs.query import Query
+
 from visualize.configs.constants import BUCKET, CHECK_PERIOD, ORG
 from visualize.configs.influx_client import query_api
-from visualize.configs.Query import Query
 from visualize.utils.influx_utils import check_status
 
 with open("test.yaml", "r") as yaml_file:
