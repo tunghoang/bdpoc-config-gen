@@ -17,5 +17,5 @@ def st_custom_dataframe(data, header = "", key = 0, withSearch=False, withCommen
   return custom_component(com_name="st_custom_dataframe", url=CUSTOM_DATAFRAME_PREVIEW, component_lib=st_custom_dataframe_lib, release=CUSTOM_DATAFRAME_RELEASE, data=data, header=header, key=key, withSearch=withSearch, withComment=withComment, withDownload=withDownload)
 
 
-def outstanding_tag_list(name, key=None, nMasks=[], oMasks=[], iMasks=[], fMasks=[], tags=[], tagDescriptions=[]):
-  return custom_component(com_name="out_standing_tag", component_lib=outstanding_tag_list_lib, release=OUTSTANDING_TAG_RELEASE, name=name, key=key, nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks, tags=tags, tagDescriptions=tagDescriptions)
+def outstanding_tag_list(name, key=None, nMasks=[], oMasks=[], iMasks=[], fMasks=[], rMasks=[], tags=[], tagDescriptions=[]):
+  return custom_component(com_name="out_standing_tag", component_lib=outstanding_tag_list_lib, release=OUTSTANDING_TAG_RELEASE, name=name, key=key, nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks, rMasks=rMasks, tags=tags, tagDescriptions=tagDescriptions)

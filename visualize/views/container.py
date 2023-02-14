@@ -1,4 +1,4 @@
-import json
+import json, traceback
 from datetime import timedelta
 from itertools import islice
 
@@ -16,6 +16,8 @@ from utils.influx_utils import query_irv_transient_tags
 from utils.session import sess, update_session
 from utils.tag_utils import load_tag_specs
 from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
+
+from influx import Influx
 
 
 def render_overview():
@@ -233,6 +235,7 @@ def render_columns(devices, deviation_checks):
 
 
 def render_outstanding_tags(container):
+  print("render_outstanding_tags")
   if sess("data") is None:
     return
   print('render_outstanding_tags')
@@ -249,38 +252,46 @@ def render_outstanding_tags(container):
       style="background:white;">⚙ 💗 🔥 OUTSTANDING TAGS</div>
     ''',
                 unsafe_allow_html=True)
-    nMasks = list(map(lambda x: pd.isnull(x), df['nan_check'].tolist())) if 'nan_check' in df.columns else [True] * _nTags
+    nMasks = list(
+      map(lambda x: pd.isnull(x), df['nan_check'].tolist())
+    ) if 'nan_check' in df.columns else [True] * _nTags
     oMasks = list(map(lambda x: pd.isnull(x), df['overange_check'].tolist())) if 'overange_check' in df.columns else [True] * _nTags
     iMasks = list(map(lambda x: pd.isnull(x), df['irv_check'].tolist())) if 'irv_check' in df.columns else [True] * _nTags
     fMasks = list(map(lambda x: pd.isnull(x), df['frozen_check'].tolist())) if 'frozen_check' in df.columns else [True] * _nTags
-    print(df.columns)
-    print(fMasks)
+    rMasks = list(map(lambda x: pd.isnull(x), df['roc_check'].tolist())) if 'roc_check' in df.columns else [True] * _nTags
+    
     #print(df['frozen_check'])
 
     tags = df["_field"].tolist()
     tagDict = load_tag_specs()
 
-    selected_check_indices = outstanding_tag_list("Dummy", tags=tags, tagDescriptions=[tagDict.get(tag, {}).get('description', "") for tag in tags], nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks)
+    selected_check_indices = outstanding_tag_list("Dummy", tags=tags, tagDescriptions=[tagDict.get(tag, {}).get('description', "") for tag in tags], nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks, rMasks=rMasks)
     try:
+      print(selected_check_indices)
       update_session("_selected_tag", None)
       update_session("_selected_checks", [])
-      if selected_check_indices['nIdx'] >= 0:
+      if selected_check_indices.get('nIdx', -1) >= 0:
         update_session("_selected_tag", df['_field'][selected_check_indices['nIdx']])
         sess("_selected_checks").append('nan_check')
 
-      if selected_check_indices['oIdx'] >= 0:
+      if selected_check_indices.get('oIdx', -1) >= 0:
         update_session("_selected_tag", df['_field'][selected_check_indices['oIdx']])
         sess("_selected_checks").append('overange_check')
 
-      if selected_check_indices['iIdx'] >= 0:
+      if selected_check_indices.get('iIdx', -1) >= 0:
         update_session("_selected_tag", df['_field'][selected_check_indices['iIdx']])
         sess("_selected_checks").append('irv_check')
 
-      if selected_check_indices['fIdx'] >= 0:
+      if selected_check_indices.get('fIdx', -1) >= 0:
         update_session("_selected_tag", df['_field'][selected_check_indices['fIdx']])
         sess("_selected_checks").append('frozen_check')
-
+        
+      if selected_check_indices.get('rIdx', -1) >= 0:
+        update_session("_selected_tag", df['_field'][selected_check_indices['rIdx']])
+        sess("_selected_checks").append('roc_check')
+      print(sess("_selected_checks"))
     except:
+      traceback.print_exc()
       pass
 
 
@@ -293,21 +304,28 @@ def getRange(data):
 def render_inspection():
   df = sess("data")
   df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', "_value", '_measurement']]
+  st.write(df)
   for check in sess("_selected_checks"):
     df1 = df[df['_measurement'] == check]
     st.markdown(f"#### _{check}_")
     st.write(df1)
-  time_range_settings = TIME_STRINGS[sess('view_mode')]
-  time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
-  startStr, stopStr = getRange(sess("data"))
+  raw_data = Influx().addField(
+    sess("_selected_tag")
+  ).setStart(
+    parser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00')
+  ).setStop(
+    parser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')
+  ).asDataFrame()
+  #time_range_settings = TIME_STRINGS[sess('view_mode')]
+  #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
+  #startStr, stopStr = getRange(sess("data"))
 
-  query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields(sess("_selected_tag")).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()
+  #query = Query().from_bucket(BUCKET).range1(startStr, stopStr).filter_fields(sess("_selected_tag")).keep_columns("_time", "_value", "_field").aggregate_window(True).to_str()
 
-  raw_data = query_api.query_data_frame(query, org=ORG)
-  # print(raw_data)
-  raw_data["_time"] = raw_data["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
-  raw_data["_start"] = raw_data["_start"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
-  raw_data["_stop"] = raw_data["_stop"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+  #raw_data = query_api.query_data_frame(query, org=ORG)
+  #raw_data["_time"] = raw_data["_time"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+  #raw_data["_start"] = raw_data["_start"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
+  #raw_data["_stop"] = raw_data["_stop"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
 
-  if raw_data is not None:
+  if (raw_data is not None) and (not raw_data.empty):
     draw_chart_by_raw_data(raw_data, height=450, title=sess("_selected_tag"), connected=True)

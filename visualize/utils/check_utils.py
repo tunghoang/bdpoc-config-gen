@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 
 
-def check_gen(type: str, checks: pd.DataFrame):
+def check_gen(type, checks: pd.DataFrame, selectF = lambda x: True):
+  if not checks.empty:
+    print(checks)
   for time, row in checks.iterrows():
     points = []
     for col in checks.columns:
-      if row[col] != 0 and col != "_time" and col != "_measurement":
-        points.append({"measurement": f"{type}", "time": time, "fields": {col: row[col]}})
-    yield points
+      if row[col] != 0 and col != "_time" and col != "_measurement" and selectF(row[col]):
+        points.append({"measurement": f"{type(row[col])}", "time": time, "fields": {col: row[col]}})
+    if len(points) > 0:
+      yield points
 
 
 def find_low_high_oc_by_series(col: pd.Series) -> tuple:

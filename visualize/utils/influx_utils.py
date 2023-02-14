@@ -7,10 +7,23 @@ from configs.query import Query
 from services.influx_services import (get_check, get_check_harvest_rate, get_database, get_tag_harvest_rate)
 from utils.fake_data import fake_mp_startup
 from utils.tag_utils import load_tag_specs
+from influx import Influx
+from dateutil import parser as dparser
+
+from influx import Influx
 
 warnings.simplefilter("ignore", MissingPivotFunction)
 
+def get_raw_data(start_date, start_time, end_date, end_time, tags, rate = '30s'):
+  __start = dparser.isoparse(f"{start_date}T{start_time}+07:00")
+  __end = dparser.isoparse(f"{end_date}T{end_time}+07:00")
+  print(__start, __end, tags)
 
+  if len(tags) == 0:
+    return
+  df = Influx().addFields(tags).setDebug(True).setStart(__start).setStop(__end).setRate(rate).asDataFrame()
+  return df
+  
 def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool = False, missing_data: str = "NaN") -> DataFrame:
   if len(tags) == 0:
     return DataFrame()
@@ -24,8 +37,32 @@ def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool =
     table = table.drop(columns=["_time", "_start", "_stop"]).interpolate(method='linear', limit_direction='both', axis=0).assign(_time=test)
   return table
 
+def query_irv_tags(start, end):
+  tagDict = load_tag_specs()
 
-def query_irv_tags(time: int) -> DataFrame:
+  irv_fields = list(filter(lambda x: tagDict[x]["high"] is not None, tagDict.keys()))
+  table = Influx().setDebug(True).addFields(irv_fields).setStart(start).setStop(end).asMinMaxDataFrame()
+  print(table)
+  return table
+  #query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").aggregate_window(False).to_str()
+  query = Query().from_bucket(BUCKET).range(time).filter_fields(irv_fields).keep_columns("_time", "_measurement", "_value", "_field").to_str()
+
+  query = f"""
+    data = {query}
+
+    maxTable = data
+      |> max()
+    minTable = data
+      |> min()
+    union(tables: [maxTable, minTable])
+  """
+  print(query)
+  results = query_api.query_data_frame(query, org=ORG)
+  if type(results) == list:
+    return pd.concat(results)
+  return results
+
+def query_irv_tags_old(time: int) -> DataFrame:
   tagDict = load_tag_specs()
 
   irv_fields = list(filter(lambda x: tagDict[x]["high"] is not None, tagDict.keys()))
@@ -50,8 +87,10 @@ def query_irv_tags(time: int) -> DataFrame:
 
 SPEED_TAG = "HT_XE_2180A.PV"
 
+def query_mp_transient_periods(start, end):
+  return Influx(measurement="mp-events").setStart(start).setStop(end).setBucket(MP_EVENTS_BUCKET).addFields(['startup', 'shutdown']).asDataFrame()
 
-def query_mp_transient_periods(time):
+def query_mp_transient_periods_old(time):
   query = Query().from_bucket(MP_EVENTS_BUCKET).range(time).filter_measurement("mp-events").to_str()
   print(query)
   table = query_api.query_data_frame(query, org=ORG)
@@ -146,8 +185,13 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
     assert Exception("No data found")
   return table
 
-
-def query_check_all(time: int) -> DataFrame:
+def query_check_all(start, end):
+  print("Query check all")
+  table = Influx().setDebug(True).setBucket(CHECK_BUCKET).setStart(start).setStop(end).asDataFrame()
+  print(table)
+  return table
+  
+def query_check_all_old(time: int) -> DataFrame:
   print('Query_check_all')
   query = Query().from_bucket(CHECK_BUCKET).range(time).to_str()
   print(query)

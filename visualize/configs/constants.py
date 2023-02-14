@@ -3,10 +3,16 @@ import datetime as dt
 import pytz
 from utils.env_utils import get_env
 
+OVERVIEW = 0
+RAW_DATA = 1
+ROUTINE_REPORT = 2
+TRANSIENT_REPORT = 3
+
 # ENVIRONMENT VARIABLES
 CUSTOM_DATAFRAME_PREVIEW = get_env("CUSTOM_DATAFRAME_PREVIEW")
 CUSTOM_DATAFRAME_RELEASE = get_env("CUSTOM_DATAFRAME_RELEASE") == "True"
 OUTSTANDING_TAG_RELEASE = get_env("OUTSTANDING_TAG_RELEASE") == "True"
+
 
 VIEW_MODES = {"mp": ("Overview", "Raw Data", "MP Routine Report", "MP Startup Report"), "lip": ("Overview", "Raw Data", "LIP Routine Report", "LIP Startup Report")}
 MACHINES = ["mp", "lip"]
@@ -58,7 +64,7 @@ SPEED_TAG = "HT_XE_2180A.PV"
 
 # INFLUX
 BUCKET = "datahub-test"
-CHECK_BUCKET = "check-datahub"
+CHECK_BUCKET = "check-datahub-test"
 ORG = "BDPOC"
 # MIN NUMBER OF NAN VALUE ALLOWED: more than 118 nan samples per 2*CHECK_PERIOD minutes
 MINIMUM_RATIO_NAN_ALLOW = 118 / (CHECK_PERIOD * 2 * SECOND)
@@ -69,7 +75,7 @@ ROC_CHECK_VALUE = 0.05
 # DEVIATION CHECK VALUE
 DEVIATION_CHECK_VALUE = 0.05
 # FROZEN CHECK VALUE
-FROZEN_CHECK_VALUE = 0.05 / 100
+FROZEN_CHECK_VALUE = 5e-12
 
 # START STOP ROC ROUTINE
 START_DERIVATIVE_VALUE = 0.1

@@ -24,6 +24,8 @@
             @click="toggle(idx, 3)">I</div>
         <div class='tag-item' :class="{'tag-active': dFFlags[idx], 'tag-disabled': args.fMasks[idx]}"
             @click="toggle(idx, 4)">F</div>
+        <div class='tag-item' :class="{'tag-active': dRFlags[idx], 'tag-disabled': args.rMasks[idx]}"
+            @click="toggle(idx, 5)">R</div>
       </div>
     </div>
   </div>
@@ -110,6 +112,7 @@ export default {
       dOFlags: [],
       dIFlags: [],
       dFFlags: [],
+      dRFlags: []
     }
   },
   mounted() {
@@ -117,6 +120,7 @@ export default {
     this.dOFlags = new Array(this.args.nMasks.length).fill(false);
     this.dIFlags = new Array(this.args.nMasks.length).fill(false);
     this.dFFlags = new Array(this.args.nMasks.length).fill(false);
+    this.dRFlags = new Array(this.args.rMasks.length).fill(false);
   },
   methods: {
     toggle(tagIdx, checkIdx) {
@@ -126,6 +130,7 @@ export default {
         this.dOFlags[i] = false;
         this.dIFlags[i] = false;
         this.dFFlags[i] = false;
+        this.dRFlags[i] = false;
       }
       switch(checkIdx) {
         case 1: 
@@ -140,6 +145,9 @@ export default {
         case 4: 
           this.dFFlags[tagIdx] = !this.dFFlags[tagIdx];
           return;
+        case 5:
+          this.dRFlags[tagIdx] = !this.dRFlags[tagIdx];
+          return;
       }
     },
     doApply() {
@@ -147,7 +155,8 @@ export default {
       const oIdx = this.dOFlags.findIndex(flag => flag);
       const iIdx = this.dIFlags.findIndex(flag => flag);
       const fIdx = this.dFFlags.findIndex(flag => flag);
-      Streamlit.setComponentValue({nIdx, oIdx, iIdx, fIdx });
+      const rIdx = this.dRFlags.findIndex(flag => flag);
+      Streamlit.setComponentValue({nIdx, oIdx, iIdx, fIdx, rIdx });
     }
   },
   setup() {

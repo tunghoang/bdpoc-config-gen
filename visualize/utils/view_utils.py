@@ -1,9 +1,10 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_mp_transient_periods, query_raw_data, query_roc_tags)
+from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_mp_transient_periods, query_raw_data, get_raw_data, query_roc_tags)
 from utils.session import apply, sess, update_session
 from utils.tag_utils import load_tag_specs
+from dateutil import parser as dparser
 
 
 def cal_different_time_range():
@@ -43,33 +44,54 @@ def load_data():
   time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner('Loading ...'):
     time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
-    if sess("raw_data"):
-      update_session("data", query_raw_data(time, sess('selected_device_name'), sess("tags"), interpolated=sess("interpolated"), missing_data=sess("missing_data")))
-    apply(harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"), check_rate=check_status())
-
+    apply(
+      data=get_raw_data(
+        sess("start_date"), sess("start_time"),
+        sess("end_date"), sess("end_time"), 
+        sess("tags"),
+        sess("sampling_rate")
+      ), 
+      harvest_rate=collector_status(), 
+      server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"), 
+      check_rate=check_status()
+    )
 
 def load_all_check():
   print('load_all_check')
   time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner('Loading ...'):
     time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
-    apply(data=query_check_all(time), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
+    start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
+    end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+    apply(
+      data=query_check_all(start, end), 
+      harvest_rate=collector_status(), 
+      server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
+    )
 
 
 def load_irv_tags():
   # tagDict = load_tag_specs()
-  time_range_settings = TIME_STRINGS[sess('view_mode')]
+  #time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner("Loading irv tags ..."):
-    time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
-    apply(data=query_irv_tags(time), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
+    start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
+    end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+    #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
+    apply(data=query_irv_tags(start, end), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
 
 
 def load_mp_transient_periods():
   print("load_mp_transient_periods")
   time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner("Loading transient periods ..."):
-    time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
-    apply(data=query_mp_transient_periods(time), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
+    start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
+    end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+    #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
+    apply(
+      data=query_mp_transient_periods(start, end), 
+      harvest_rate=collector_status(), 
+      server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
+    )
 
 
 def load_roc_tags():

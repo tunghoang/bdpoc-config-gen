@@ -6,7 +6,7 @@ import streamlit as st
 from components.container import Container
 from components.navbar import Navbar
 from components.sidebar import Sidebar
-from configs.constants import DATE_NOW, TIME_STRINGS, VIEW_MODES
+from configs.constants import DATE_NOW, TIME_STRINGS, VIEW_MODES, OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT
 from configs.module_loader import *
 from configs.tag_config import TagConfig
 from utils.css_utils import local_css
@@ -36,19 +36,20 @@ class App:
     self.tag_configs["lip"] = TagConfig("assets/files/lip_tags.yaml")
 
   def init_sessions(self):
+    now = DATE_NOW()
     init_session(self, "tags", [])
     init_session(self, "missing_data", "NaN")
-    init_session(self, "view_mode", 0)
+    init_session(self, "view_mode", OVERVIEW)
     init_session(self, "search_tags", "")
     init_session(self, "selected_device_name", "")
     init_session(self, "interpolated", False)
     init_session(self, "time_range", 0)
-    init_session(self, "start_date", DATE_NOW())
-    init_session(self, "end_date", DATE_NOW())
-    init_session(self, "start_time", datetime.time(0, 0))
-    init_session(self, "end_time", datetime.time(23, 45))
+    init_session(self, "start_date", now)
+    init_session(self, "end_date", now)
+    init_session(self, "start_time", now.time())
+    init_session(self, "end_time", now.time())
     init_session(self, "difference_time_range", cal_different_time_range())
-    init_session(self, "chart_mode", "all")
+    init_session(self, "chart_mode", "merge")
     init_session(self, "call_influx", False)
     init_session(self, "data", None)
     init_session(self, "harvest_rate", collector_status())
@@ -61,6 +62,7 @@ class App:
     init_session(self, "iFlags", None)
     init_session(self, "fFlags", None)
     init_session(self, "current_machine", "mp")
+    init_session(self, "sampling_rate", "30s")
 
   def init(self):
     # Configuration
@@ -72,35 +74,32 @@ class App:
     self.init_tag_configs()
 
   def render(self):
-    self.sidebar.render(self, sess("current_machine"), self.tag_configs[sess("current_machine")].devices)
+    with st.sidebar:
+      self.sidebar.render(self, sess("current_machine"), self.tag_configs[sess("current_machine")].devices)
 
     try:
       if sess("call_influx"):
         print(sess("call_influx"))
         print("query data")
         update_session("call_influx", False)
-        if sess("view_mode") < 2:
+        if sess("view_mode") == OVERVIEW or sess("view_mode") == RAW_DATA:
           if len(sess("tags")) > 0:
             load_data()
           else:
             load_all_check()
-        elif sess("view_mode") == 2:
+        elif sess("view_mode") == ROUTINE_REPORT:
           load_irv_tags()
-        elif sess("view_mode") == 3:
+        elif sess("view_mode") == TRANSIENT_REPORT:
           load_mp_transient_periods()
           #load_roc_tags()
 
       with st.container():
         self.navbar.render()
         self.container.render()
-        # st.empty()
+        st.empty()
 
-      if sess("view_mode") == 0:
-        render_outstanding_tags(st.sidebar)
-
-      if sess("data") is not None and sess("_selected_tag") is not None:
-        st.subheader(f"Alert inspection for {sess('_selected_tag')}")
-        render_inspection()
+      
+        
     except Exception:
       traceback.print_exc()
       st.error("Noooo data found. Extend 'Time Range' to retrieve more data", icon="❗")

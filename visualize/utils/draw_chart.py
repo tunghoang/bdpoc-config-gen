@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from configs.constants import CHECKS_LIST, DATE_NOW, LINE_SHAPE, PIVOT
 from utils.session import sess
+from dateutil import parser as dparser
 
 
 def set_middle_title(chart: plotly.graph_objs.Figure, title_name, yanchor="top", xanchor="center"):
@@ -21,47 +22,51 @@ def set_middle_title(chart: plotly.graph_objs.Figure, title_name, yanchor="top",
   })
 
 
-def draw_line_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator]:
+def draw_line_chart_by_data_frame(data, height=700, title="RAW DATA"):
   if data is None or data.empty or len(sess("tags")) == 0:
     return
-  range_x = [data["_start"].values[0], data["_stop"].values[0]]
-  if sess("chart_mode") == "merge":
-    range_y = [0, 1.1 * data["_value"].max()]
-    chart = px.line(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', line_shape=LINE_SHAPE, markers=True, range_x=range_x, range_y=range_y)
-    return st.plotly_chart(chart, use_container_width=True)
-  charts = []
-  st.write(data)
-  for tag in sess("tags"):
-    if tag in data["_field"].values:
-      draw_data = data[data["_field"] == tag]
-      range_y = [0, 1.1 * draw_data["_value"].max()]
-      chart = px.line(draw_data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": tag, "_field": "Tag"}, line_shape=LINE_SHAPE, markers=True, range_x=range_x, range_y=range_y)
-      charts.append(st.plotly_chart(chart, use_container_width=True))
-  return charts
+  
+  range_x = [
+    dparser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00'), 
+    dparser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')
+  ]
+  range_y = [0, 1.1 * data["_value"].max()]
+  
+  chart = px.line(
+    data, x="_time", y="_value", 
+    labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, 
+    color='_field', 
+    line_shape=LINE_SHAPE, 
+    markers=True, 
+    range_x=range_x, 
+    range_y=range_y
+  )
+  csv_all = data.to_csv().encode('utf-8')
+  col1, col2 = st.columns([5, 1])
+  col1.subheader(title)
+  col2.download_button("Download CSV", csv_all, 'all-raw.csv', 'text/csv', key="csv_all")
+  st.plotly_chart(chart, use_container_width=True)
 
-
-def draw_bar_chart_by_data_frame(data: pd.DataFrame, type: str = "") -> List[st._DeltaGenerator]:
+def draw_bar_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator]:
   if data is None or data.empty:
     return
   if PIVOT and "_field" not in data.columns:
     # Convert pivot to normal dataframe
     data = pd.melt(data, id_vars=["_time", "_measurement"], value_vars=sess("tags"), value_name="_value", var_name="_field", ignore_index=False)
-  # if data.empty and type:
-  #   tags = sess("tags")
-  #   data = pd.DataFrame({"_measurement": [type for _ in tags], "_field": tags, "_value": [np.nan for _ in tags], "_time": [DATE_NOW() for _ in tags]})
   range = sess("difference_time_range") if sess("time_range") == 0 else int(sess("time_range"))
   time_range_in_datetime = [DATE_NOW() - dt.timedelta(seconds=range), DATE_NOW()]
-  if sess("chart_mode") == "merge":
-    chart = px.bar(data, x="_time", y="_value", labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, color='_field', range_x=time_range_in_datetime)
-    set_middle_title(chart, CHECKS_LIST[data["_measurement"].values[0]])
-    return st.plotly_chart(chart, use_container_width=True)
+  #if sess("chart_mode") == "merge":
+  chart = px.bar(
+    data, 
+    x="_time", y="_value", 
+    labels={"_time": "Time (s)", "_value": "Value", "_field": "Tag"}, 
+    color='_field', 
+    range_x=time_range_in_datetime,
+    height=height, 
+  )
+  set_middle_title(chart, CHECKS_LIST[data["_measurement"].values[0]])
+  return st.plotly_chart(chart, use_container_width=True)
 
-  charts = []
-  for tag in sess("tags"):
-    chart = px.bar(data[data["_field"] == tag], x="_time", y="_value", labels={"_time": "Time (s)", "_value": data[data["_field"] == tag]["_measurement"].values[0], "_field": "Tag"}, range_x=time_range_in_datetime)
-    set_middle_title(chart, tag)
-    charts.append(st.plotly_chart(chart, use_container_width=True))
-  return charts
 
 
 def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVIEW", connected=False):
@@ -79,7 +84,24 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   #chart = px.scatter(data, x = "_time", y = "_measurement", labels=labels, range_x = time_range_in_datetime, color = "_field", height=height)
   #st.plotly_chart(chart, use_container_width=True)
 
-  chart1 = px.line(data, x="_time", y="_field", labels=labels, range_x=range_x, color="_measurement", height=height, markers=True) if connected else px.scatter(data, x="_time", y="_field", labels=labels, color="_measurement", height=height)
+  chart1 = px.line(
+    data, 
+    x="_time", 
+    y="_field", 
+    labels=labels, 
+    range_x=range_x, 
+    color="_measurement", 
+    height=height, 
+    markers=True
+  ) if connected else px.scatter(
+    data, 
+    x="_time", 
+    y="_field", 
+    labels=labels, 
+    color="_measurement", 
+    height=height
+  )
+  
   chart1.update_layout(xaxis={'side': 'top'}, yaxis={'side': 'left'})
 
   csv_all = data.to_csv().encode('utf-8')
@@ -97,12 +119,29 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
   if data.empty:
     raise Exception('No data')
 
-  range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
+  #range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
+  range_x = [
+    dparser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00'), 
+    dparser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')
+  ]
   print(range_x)
   range_y = [0, 1.1 * data["_value"].max()]
   labels = {"_time": "Time (s)", "_value": data["_field"][0]}
 
-  chart1 = px.line(data, x="_time", y="_value", labels=labels, range_x=range_x, range_y=range_y, height=height, markers=True) if connected else px.scatter(data, x="_time", y="_value", range_x=range_x, range_y=range_y, labels=labels, height=height)
+  chart1 = px.line(
+    data, x="_time", y="_value", 
+    labels=labels, 
+    range_x=range_x, 
+    range_y=range_y, 
+    height=height, 
+    markers=True
+  ) if connected else px.scatter(
+    data, x="_time", y="_value", 
+    range_x=range_x, 
+    range_y=range_y, 
+    labels=labels, 
+    height=height
+  )
   chart1.update_layout(xaxis={'side': 'top'})
 
   csv_tag_raw = data.to_csv().encode('utf-8')

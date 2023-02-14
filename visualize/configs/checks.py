@@ -31,8 +31,7 @@ def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd
       res["_value"] = [np.nan if math.isnan(row["_value"]) else 1 if row["_value"] >= max else 0 if row["_value"] < max and row["_value"] > min else -1 for _, row in res.iterrows()]
   res = res.assign(_measurement="overange_check")
   return res
-
-
+  
 def nan_check(df: pd.DataFrame, tags: list = []) -> pd.DataFrame:
   if df is None or df.empty or len(tags) == 0:
     return
@@ -43,11 +42,26 @@ def nan_check(df: pd.DataFrame, tags: list = []) -> pd.DataFrame:
       count_nan = res[tag].isnull().sum()
       count_total = len(res.index)
       if count_nan / count_total > MINIMUM_RATIO_NAN_ALLOW:
-        nan_check_with_data = pd.concat([pd.DataFrame({"_measurement": "nan_check", tag: 1, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], join="outer")
+        nan_check_with_data = pd.concat(
+          [
+            pd.DataFrame(
+              {
+                "_measurement": "nan_check", 
+                tag: 1, 
+                "_time": DATE_NOW()
+              }, 
+              index=[ res.index[-1] ]
+            ), nan_check_with_data
+          ], 
+          join="outer"
+        )
       # Add missing tags data
       for t in tags:
         if t not in res.columns:
-          nan_check_with_data = pd.concat([pd.DataFrame({"_measurement": "nan_check", t: np.nan, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], join="outer")
+          nan_check_with_data = pd.concat(
+            [pd.DataFrame({"_measurement": "nan_check", t: np.nan, "_time": DATE_NOW()}, index=[res.index[-1]]), nan_check_with_data], 
+            join="outer"
+          )
     return nan_check_with_data
   res["_value"] = [1 if math.isnan(row["_value"]) else 0 for _, row in df.iterrows()]
   return res
