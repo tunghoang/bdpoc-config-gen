@@ -16,7 +16,8 @@ def setting_controls(app):
       "_selected_tag": None, 
       "_selected_checks": [], 
       "call_influx": True
-    }
+    },
+    type='primary'
   )
   st.selectbox(
       "Machine",
