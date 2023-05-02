@@ -1,4 +1,4 @@
-import json, traceback
+import json, copy, traceback
 from datetime import timedelta
 from itertools import islice
 
@@ -11,18 +11,53 @@ from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE
 from configs.custom_components import outstanding_tag_list, st_custom_dataframe
 from configs.influx_client import query_api
 from configs.query import Query
-from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table)
+from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table, draw_barchart, draw_wet_seal_chart)
 from utils.influx_utils import query_irv_transient_tags
 from utils.session import sess, update_session
 from utils.tag_utils import load_tag_specs
 from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
 
+from configs.logger import check_logger
+
 from influx import Influx
 
 
 def render_overview():
-  draw_chart_by_check_data(sess("data"))
+  filename = tagSpecFile(sess("current_machine"))
+  check_logger.info(filename)
+  tag_dict = load_tag_specs(filename)
+  df = sess("data")
+  if df is None:
+    return
+  df = df[df._field.isin(tag_dict.keys())]
+  check_logger.info("0000000000000000000000000")
+  check_logger.info(df._field)
+  draw_chart_by_check_data(df, title=f"{sess('current_machine').upper()} Alert Overview")
 
+def render_wet_seals():
+  df = sess("data")
+  if df is None:
+    return
+  df = df[df._field.isin(['LP_Seal', "IP_Seal"])]
+  check_logger.info(df._field)
+  #draw_chart_by_check_data(df, title=f"{sess('current_machine').upper()} Wet Seals Alarms/PreAlarms")
+  draw_wet_seal_chart(df, title="Wet Seals Alarms/PreAlarms")
+  st.markdown("""----
+### LP WetGas Rules: 
+- Alarm if: discharge_count_in_1day >= 5 and drop_level_in_1day > 0.5%
+- PreAlarm if: 
+  1. discharge_count_in_1day >= 5 and drop_level_in_1day < 0.5%
+  2. or discharge_count_in_1day > 2 and drop_level_in_1day > 0.4%
+- Normal: otherwise
+----
+### IP WetGas Rules: 
+- Alarm if: discharge_count_in_13day >= 4 and drop_level_in_1day >= 0.3% 
+- PreAlarm if : 
+  1. discharge_count_in_13day >= 4 and drop_level_in_1day < 0.3% 
+  2. discharge_count_in_13day >= 2 and drop_level_in_1day >= 0.15%
+- Normal if: otherwise
+"""
+  )
 
 def inside(v, b1, b2):
   if b1 is None:
@@ -40,12 +75,10 @@ def irv_diagnose(min_max, tagSpec, tag):
     return "NA", ""
   if all([(tagSpec[a] == "NA") for a in attributes]):
     return "NA", ""
-  print(tag, tagSpec)
   shutdown_limits = [tagSpec["low3"], tagSpec["high3"]]
   alarm_limits = [tagSpec["low2"], tagSpec["high2"]]
   prealarm_limits = [tagSpec["low"], tagSpec["high"]]
 
-  # results = dict(shutdowns = [False, False], alarms = [False, False], prealams = [False, False], normals = [False, False])
   flags = [0, 0]
   output = ""
 
@@ -75,12 +108,17 @@ def irv_diagnose(min_max, tagSpec, tag):
       output = output + f"{LABELS[i]} - NORMAL;"
   return max(flags[0], flags[1]), output
 
+def tagSpecFile(device = "mp"):
+  return 'assets/files/tag-specs.yaml' if device == "mp" else 'assets/files/lip-tag-specs.yaml'
 
-def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=False, key=0):
-  tagDict = load_tag_specs()
-  df = (df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
+def irvTableData(df, device="mp"):
+  filename = tagSpecFile(device)
+  check_logger.info(filename)
+  tagDict = load_tag_specs(filename)
+  df = df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))})
 
-  df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
+  df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(
+    lambda row: pd.Series([
       tagDict.get(row["_field"], {}).get("device", "NA"),
       tagDict.get(row["_field"], {}).get("description", "NA"),
       tagDict.get(row["_field"], {}).get("unit", "NA"),
@@ -90,129 +128,81 @@ def __irvTable(df, header="", withSearch=False, withComment=False, withDownload=
       tagDict.get(row["_field"], {}).get("high", "NA"),
       tagDict.get(row["_field"], {}).get("high2", "NA"),
       tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None), row["_field"])
-  ]),
-                                                                                                            axis=1)
+    ]), axis=1
+  )
 
   df.rename(columns={"_field": "Field"}, inplace=True)
 
   df = df.sort_values("Group")
   records = df.to_dict("records")
-  # draw_table(df, height=700, title="MP Routing Monitoring")
+  return records
+
+
+def __irvTable(df, header="", device="mp", withSearch=False, withComment=False, withDownload=False, key=0):
+  records = irvTableData(df, device)
   st_custom_dataframe(data=records, header=header, withSearch=withSearch, withComment=withComment, withDownload=withDownload, key=key)
 
-
-def render_irv_report():
+def render_irv_report(device = "mp"):
   if sess("data") is not None:
     df = sess("data")[["_field", "_value"]]
-    __irvTable(df, header="MP Routing Monitoring", withSearch=True, withComment=True, withDownload=True)
-
-
-def render_mp_transient_report():
-  st.subheader("MP transient report")
+    __irvTable(df, header=f"{device.upper()} Routing Monitoring", device=device, withSearch=True, withComment=True, withDownload=True)
+  
+def render_transient_report(device = 'mp'):
+  check_logger.info("render_transient_report")
+  st.subheader(f"{device.upper()} Transient Report")
   if sess("data") is not None:
-    sess("data")
-
     if sess("data").empty:
       return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
+
+    all_df = pd.DataFrame()
     for idx, row in sess("data").iterrows():
-      startTime = parser.isoparse(row["start"])
-      length = 5 if row["_field"] == "shutdown" else 10
-      print(length)
+      offset = 0 if row._value < 0 else 2
+      length = 5 if row._value < 0 else 10
+      check_logger.info(f"{length}")
+      startTime = row._time.to_pydatetime() + timedelta(minutes=offset)
       stopTime = startTime + timedelta(minutes=length)
-      df = query_irv_transient_tags(startTime, stopTime)
+      check_logger.info("++++++++++000++++++++++++")
+      check_logger.info(f"{startTime}, {stopTime}")
+      alert_type = "STOP" if row["_value"] < 0 else "START"
+
+      df = query_irv_transient_tags(startTime, stopTime, alert_type)
+      all_df = pd.concat([all_df, copy.deepcopy(df)])
       header = {
-          "alert_type": "STOP" if row["_field"] == "shutdown" else "START",
+          "alert_type": "STOP" if row["_value"] < 0 else "START",
           "start": str(startTime),
           "end": str(stopTime),
       }
-      __irvTable(df, header=header, key=idx)
-
-
-def render_roc_report():
-  st.subheader("MP Startup report")
-  if sess("data") is not None:
-    if sess("data").empty:
-      return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
-    #df = sess("data.sort_values("_time")")
-    groups = sess("data").groupby("group")
-    for name, group in groups:
-      print(group)
-      print("............")
-      start = group["_start"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
-      end = group["_stop"].tolist()[0].strftime("%Y-%m-%d %H:%M:%S")
-
-      header = {
-          "alert_type": "START" if group["sign"].tolist()[0] > 0 else "STOP",
-          "start": start,
-          "end": end,
-      }
-      header = json.dumps(header)
-      __irvTable(group, header=header, key=name)
-
-
-def render_roc_report_old():
-  tagDict = load_tag_specs()
-  if sess("data") is not None:
-    df = sess("data").sort_values("_time")
-    df.to_csv("temp.csv")
-    tables = sess("data").groupby("_field")
-    iters = None
-    for _idx, table in tables:
-      table = table.reset_index()
-      iters = table.iterrows()
-      st.subheader(f"{_idx}")
-      for idx, row in iters:
-        start = idx
-        end = None
-        alert_type = None
-        for i in range(idx + 1, len(table)):
-          if row["derivative"] >= START_DERIVATIVE_VALUE:
-            if table.at[i, "derivative"] < START_DERIVATIVE_VALUE:
-              end = i
-              alert_type = "START"
-              next(islice(iters, end - start - 1, end - start + 1))
-              break
-          elif row["derivative"] <= -STOP_DERIVATIVE_VALUE:
-            if table.at[i, "derivative"] > -STOP_DERIVATIVE_VALUE:
-              end = i
-              alert_type = "STOP"
-              next(islice(iters, end - start - 1, end - start + 1))
-              break
-        if end is not None:
-          df = table[start:end][["_field", "_value"]]
-
-          df = (df.groupby("_field", as_index=False)["_value"].agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))}))
-
-          df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
-              tagDict.get(row["_field"], {}).get("device", "NA"),
-              tagDict.get(row["_field"], {}).get("description"),
-              tagDict.get(row["_field"], {}).get("unit", "NA"),
-              tagDict.get(row["_field"], {}).get("low3", "NA"),
-              tagDict.get(row["_field"], {}).get("low2", "NA"),
-              tagDict.get(row["_field"], {}).get("low", "NA"),
-              tagDict.get(row["_field"], {}).get("high", "NA"),
-              tagDict.get(row["_field"], {}).get("high2", "NA"),
-              tagDict.get(row["_field"], {}).get("high3", "NA"), *irv_diagnose((row["Min"], row["Max"]), tagDict.get(row["_field"], None))
-          ]),
-                                                                                                                    axis=1)
-
-          df.rename(columns={"_field": "Field"}, inplace=True)
-
-          df = df.sort_values("Group")
-          records = df.to_dict("records")
-          # print(records)
-          # draw_table(df, height=700, title="MP Routing Monitoring")
-          header = {
-              "alert_type": alert_type,
-              "start": table.at[start, "_time"].strftime("%Y-%m-%d %H:%M:%S"),
-              "end": table.at[end, "_time"].strftime("%Y-%m-%d %H:%M:%S"),
-          }
-          header = json.dumps(header)
-          st_custom_dataframe(data=records, header=header, key=f"{_idx}.{start}.{end if end is not None else 0}")
-
+      __irvTable(df, device=device, header=header, key=idx)
+    
+    all_df = all_df[["startTime", "_value", "_field", "alert_type"]]
+    all_df.sort_values(["startTime", "_field", "_value"], inplace=True)
+    all_df.reset_index(inplace=True, drop=True)
+    all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
+    labels = {
+      "startTime": "Time",
+      "_value": "Value",
+      "minmax": "Threshold",
+      "_field": "Tag",
+      "alert_type": "Type"
+    }
+    draw_barchart(
+      all_df, 
+      x = 'startTime', 
+      y = '_value', 
+      color='minmax', 
+      facet="_field",
+      labels=labels,
+      hover_data={"_value": ":.3f"},
+      height = 13 * 150 if device == 'mp' else 14 * 150,
+      col_num=1 if device == 'mp' else 3,
+      domain=[
+        parser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00"),
+        parser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+      ]
+    )
 
 def render_columns(devices, deviation_checks):
-  print('render columns')
+  check_logger.info('render columns')
   col1, col2 = st.columns([1.5, 6])
   with col1:
     selected_device = get_device_by_name(devices, sess("selected_device_name"))
@@ -235,14 +225,21 @@ def render_columns(devices, deviation_checks):
 
 
 def render_outstanding_tags(container):
-  print("render_outstanding_tags")
+  device = sess("current_machine")
+  check_logger.info(f"render_outstanding_tags, {device}")
   if sess("data") is None:
     return
-  print('render_outstanding_tags')
-  df = sess("data").drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
+  filename = tagSpecFile(device)
+  tagDict = load_tag_specs(filename)
+  df = sess("data")
+  df = df[df._field.isin(tagDict.keys())]
+  df = df.drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
   df = df.pivot(index='_field', columns='_measurement')
   df = df['_time'].reset_index()
   df.columns.name = None
+
+  check_logger.info("111111111111111111111111111")
+  check_logger.info(df._field)
 
   _nTags = df['_field'].count()
 
@@ -260,14 +257,14 @@ def render_outstanding_tags(container):
     fMasks = list(map(lambda x: pd.isnull(x), df['frozen_check'].tolist())) if 'frozen_check' in df.columns else [True] * _nTags
     rMasks = list(map(lambda x: pd.isnull(x), df['roc_check'].tolist())) if 'roc_check' in df.columns else [True] * _nTags
     
-    #print(df['frozen_check'])
+    #check_logger.info(df['frozen_check'])
 
     tags = df["_field"].tolist()
-    tagDict = load_tag_specs()
+    #tagDict = load_tag_specs(tagSpecFile(device))
 
     selected_check_indices = outstanding_tag_list("Dummy", tags=tags, tagDescriptions=[tagDict.get(tag, {}).get('description', "") for tag in tags], nMasks=nMasks, oMasks=oMasks, iMasks=iMasks, fMasks=fMasks, rMasks=rMasks)
     try:
-      print(selected_check_indices)
+      check_logger.info(f"{selected_check_indices}")
       update_session("_selected_tag", None)
       update_session("_selected_checks", [])
       if selected_check_indices.get('nIdx', -1) >= 0:
@@ -289,7 +286,7 @@ def render_outstanding_tags(container):
       if selected_check_indices.get('rIdx', -1) >= 0:
         update_session("_selected_tag", df['_field'][selected_check_indices['rIdx']])
         sess("_selected_checks").append('roc_check')
-      print(sess("_selected_checks"))
+      check_logger.info(sess("_selected_checks"))
     except:
       traceback.print_exc()
       pass

@@ -1,16 +1,17 @@
 import warnings
 
+from configs.logger import check_logger
 import numpy as np
 import pandas as pd
 
 
-def check_gen(type, checks: pd.DataFrame, selectF = lambda x: True):
+def check_gen(type, checks: pd.DataFrame, selectF = lambda col, x: True):
   if not checks.empty:
-    print(checks)
+    check_logger.info(checks)
   for time, row in checks.iterrows():
     points = []
     for col in checks.columns:
-      if row[col] != 0 and col != "_time" and col != "_measurement" and selectF(row[col]):
+      if row[col] != 0 and col != "_time" and col != "_measurement" and selectF(col, row[col]):
         points.append({"measurement": f"{type(row[col])}", "time": time, "fields": {col: row[col]}})
     if len(points) > 0:
       yield points

@@ -9,7 +9,7 @@ import pytz
 import streamlit as st
 from utils.check_utils import (find_low_high_irv_by_devices, find_low_high_oc_by_devices, get_frozen_check_roc_check_by_tag)
 
-from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, PIVOT, ROC_CHECK_VALUE, SECOND)
+from configs.constants import (AVAILABLE_DEVIATION, CHECK_PERIOD, DATE_NOW, DEVIATION_CHECK_VALUE, FROZEN_CHECK_VALUE, MINIMUM_RATIO_NAN_ALLOW, PIVOT, SECOND)
 
 
 def overange_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd.DataFrame:
@@ -110,7 +110,7 @@ def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[d
             deviation_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "deviation_checks", key: value, **_tags, "_time": DATE_NOW()}, index=[table.index[-1]]), deviation_checks_with_data], join="outer")
   return deviation_checks_with_data
 
-
+'''
 def roc_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)
   roc_checks_with_data = pd.DataFrame()
@@ -126,7 +126,7 @@ def roc_check(table: pd.DataFrame, devices: List[dict]):
       if rroc > ROC_CHECK_VALUE:
         roc_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "roc_check", col: 1, "_time": DATE_NOW()}, index=[table.index[-1]]), roc_checks_with_data], join="outer")
   return roc_checks_with_data
-
+'''
 
 def frozen_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)

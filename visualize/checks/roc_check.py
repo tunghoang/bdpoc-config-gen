@@ -1,4 +1,4 @@
-from configs.constants import CHECK_BUCKET, CHECK_PERIOD, ROC_CHECK_VALUE, FROZEN_CHECK_VALUE
+from configs.constants import CHECK_BUCKET, CHECK_PERIOD, FROZEN_CHECK_VALUE, ROC_CHECK_VALUES, TAG_CLASSIFIER
 from configs.logger import check_logger
 from utils.check_utils import check_gen
 from influx import InfluxWriter
@@ -7,20 +7,16 @@ import pandas as pd
 import re
 import warnings
 
-def __tagType(tag):
-  if tag.startswith('HT_T'):
-    return "T"
-  if re.search("^HT_[LPF]", tag) is not None:
-    return "P"
-  if re.search("^HT_[VZX]", tag) is not None:
-    return "V"
+def tag_class(tag):
+  tokens = tag.split("_")
+  if len(tokens) >= 2:
+    return TAG_CLASSIFIER.get(f"{tokens[0]}_{tokens[1]}", None)
   return None
 
 def __check_roc(table):
   l = len(table)
   lseg = CHECK_PERIOD * 60
   n = math.ceil(l / lseg)
-  print(n)
   indexSeries = pd.Series([i // lseg for i in range(0, l)])
   table['segment'] = indexSeries
   table['mark'] = (indexSeries - indexSeries.shift()).fillna(1.0)
@@ -29,7 +25,8 @@ def __check_roc(table):
   roc_check_result = pd.DataFrame({"_time": timeSeries})
   segs = [ table[table.segment == sIdx] for sIdx in range(0, n) ]
   for col in table.columns:
-    tagType = __tagType(col)
+    tagType = tag_class(col)
+    #check_logger.info(tagType)
     if tagType is None:
       continue
     roc_check_result[col] = [(2*abs(abs(s[col].max()) - abs(s[col].min()))/( ( abs(s[col].max()) + abs(s[col].min()) ) * len(s) ) ) for s in segs]
@@ -42,14 +39,18 @@ def __check_roc(table):
           
 
 def do_roc_check(table):
+  # This function performs both roc check and frozen check
   dfcopy = copy.deepcopy(table)
   roc_checks = __check_roc(dfcopy)
-  for point in check_gen(
-    lambda x: "roc_check" if x > ROC_CHECK_VALUE else "frozen_check",
+  count = 0
+  check_logger.info(f"\n{roc_checks}")
+  for points in check_gen(
+    lambda x: "frozen_check" if x <= FROZEN_CHECK_VALUE else "roc_check",
     roc_checks, 
-    lambda x: x > ROC_CHECK_VALUE or x < FROZEN_CHECK_VALUE
+    lambda col, x: x > ROC_CHECK_VALUES[tag_class(col)] or x <= FROZEN_CHECK_VALUE
   ):
-    InfluxWriter().setBucket(CHECK_BUCKET).write(point)
-    #write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-    check_logger.info("roc_frozen_checking 1 point")
-  check_logger.info("roc_frozen checking done")
+    InfluxWriter().setBucket(CHECK_BUCKET).write(points)
+    count = count + len(points)
+    check_logger.info(points)
+    
+  check_logger.info(f"roc_frozen checking done: {count} events")

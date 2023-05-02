@@ -1,7 +1,7 @@
 from utils.session import sess
-from configs.constants import OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT
+from configs.constants import OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT, WET_SEALS
 from utils.view_utils import visualize_data_by_raw_data
-from views.container import (render_inspection, render_irv_report, render_mp_transient_report, render_overview, render_outstanding_tags)
+from views.container import (render_inspection, render_irv_report, render_transient_report, render_overview, render_outstanding_tags, render_wet_seals)
 import streamlit as st
 #from views.container import (render_inspection, render_irv_report,
 #                             render_mp_transient_report,
@@ -22,7 +22,8 @@ class Container:
         st.subheader(f"Alert inspection for {sess('_selected_tag')}")
         render_inspection()
     elif sess("view_mode") == ROUTINE_REPORT:
-      render_irv_report()
+      render_irv_report(sess('current_machine'))
     elif sess("view_mode") == TRANSIENT_REPORT:
-      #render_roc_report()
-      render_mp_transient_report()
+      render_transient_report(sess("current_machine"))
+    elif sess("view_mode") == WET_SEALS:
+      render_wet_seals()

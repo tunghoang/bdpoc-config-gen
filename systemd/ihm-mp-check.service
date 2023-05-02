@@ -1,0 +1,12 @@
+[Unit]
+Description=Instrument Health Monitoring MP Check service
+
+[Service]
+User=jupyter-admin
+WorkingDirectory=/home/jupyter-admin/bdpoc-datahub
+Environment=CHECK_MACHINE=mp.log
+ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/python check_schedule.py -m MP
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

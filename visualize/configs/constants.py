@@ -7,6 +7,7 @@ OVERVIEW = 0
 RAW_DATA = 1
 ROUTINE_REPORT = 2
 TRANSIENT_REPORT = 3
+WET_SEALS = 4
 
 # ENVIRONMENT VARIABLES
 CUSTOM_DATAFRAME_PREVIEW = get_env("CUSTOM_DATAFRAME_PREVIEW")
@@ -14,7 +15,10 @@ CUSTOM_DATAFRAME_RELEASE = get_env("CUSTOM_DATAFRAME_RELEASE") == "True"
 OUTSTANDING_TAG_RELEASE = get_env("OUTSTANDING_TAG_RELEASE") == "True"
 
 
-VIEW_MODES = {"mp": ("Overview", "Raw Data", "MP Routine Report", "MP Startup Report"), "lip": ("Overview", "Raw Data", "LIP Routine Report", "LIP Startup Report")}
+VIEW_MODES = {
+  "mp": ("Overview", "Raw Data", "MP Routine Report", "MP Transient Report"), 
+  "lip": ("Overview", "Raw Data", "LIP Routine Report", "LIP Transient Report", "Wet Seals")
+}
 MACHINES = ["mp", "lip"]
 SECOND = 60
 # DEFAULT CHART STYLE
@@ -58,20 +62,39 @@ DATE_NOW_IN_NS = lambda: int(DATE_NOW().strftime('%s')) * 10**9
 PIVOT = True
 # CHECKS LIST
 CHECKS_LIST = {'none': 'None', 'nan_check': 'NaN-Check', 'overange_check': 'Overange-Check', 'irv_check': 'Instrument-Range-Validation-Check', 'deviation_check': 'Deviation-Check', 'frozen_check': 'Frozen-Check', 'roc_check': 'Rate-Of-Change-Check'}
-CHECK_PERIOD = 1  # in minutes
+CHECK_PERIOD = 5  # in minutes
 MP_SPEED_CHECK_PERIOD = 10  # in minutes
+CHECK_IRV_PERIOD = 5
 SPEED_TAG = "HT_XE_2180A.PV"
 
 # INFLUX
 BUCKET = "datahub-test"
-CHECK_BUCKET = "check-datahub-test"
+CHECK_BUCKET = "check-datahub"
 ORG = "BDPOC"
 # MIN NUMBER OF NAN VALUE ALLOWED: more than 118 nan samples per 2*CHECK_PERIOD minutes
-MINIMUM_RATIO_NAN_ALLOW = 118 / (CHECK_PERIOD * 2 * SECOND)
+MINIMUM_RATIO_NAN_ALLOW = 590 / (CHECK_PERIOD * 2 * SECOND)
+#MINIMUM_RATIO_NAN_ALLOW = 118 / (CHECK_PERIOD * 2 * SECOND)
 # AVAILABLE DEVIATION CHECK
 AVAILABLE_DEVIATION = 2
 # ROC CHECK VALUE
-ROC_CHECK_VALUE = 0.05
+#ROC_CHECK_VALUE = 0.05
+ROC_CHECK_VALUES = {
+  "pressure": 0.1,
+  "temperature": 0.05,
+  "vibration": 0.3,
+  "valve": 0.3,
+  "flow": 0.3
+}
+TAG_CLASSIFIER = {
+  "HT_PI": "pressure",
+  "HT_PDI": "pressure",
+  "HT_TI": "temperature",
+  "HT_LI": "temperature",
+  "HT_ZI": "vibration", 
+  "HT_VI": "vibration",
+  "HT_PY": "valve",
+  "HT_FI": "flow"
+}
 # DEVIATION CHECK VALUE
 DEVIATION_CHECK_VALUE = 0.05
 # FROZEN CHECK VALUE
@@ -91,3 +114,9 @@ MONITORING_AGG_WINDOW = '1m'
 
 INFINITIES = (-999999.0, 999999.0)
 LABELS = ("LOW", "HIGH")
+
+RUNNING_INDICATORS = {
+  'mp': "HT_KM_2180.AND_RUNNING.OUT",
+  'lip': "HT_KM_2110.AND_RUNNING.OUT"
+}
+

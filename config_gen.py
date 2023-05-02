@@ -33,7 +33,7 @@ def csv_to_array_full_objects(fpath: string) -> list:
       content = dict()
       for cell_index, cell in enumerate(row):
         content[data_headings[cell_index]] = cell
-      if (content["not_now"] == ""):
+      if (content.get("not_now", "") == ""):
         result.append(content)
   return result
 

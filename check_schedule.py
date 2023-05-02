@@ -4,7 +4,7 @@ import warnings
 import traceback
 from os import path
 from threading import Thread
-
+from visualize.configs.logger import check_logger
 from dateutil import parser as dparser
 from datetime import datetime, timedelta
 
@@ -14,7 +14,7 @@ import schedule
 from influxdb_client.client.warnings import MissingPivotFunction
 
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
-from configs.query import Query
+#from configs.query import Query
 
 from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG)
 from visualize.configs.influx_client import query_api, write_api
@@ -28,7 +28,15 @@ from visualize.services.check_services import (do_deviation_check, do_irv_check)
 from visualize.utils.tag_utils import load_tag_config
 from influx import Influx
 
-control_logic_checks, deviation_checks, devices = load_tag_config()
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-m", "--machine")
+args = parser.parse_args()
+__tagFileName = "assets/files/tags.yaml" if args.machine == "MP" else 'assets/files/lip-tags.yaml'
+
+control_logic_checks, deviation_checks, devices = load_tag_config(__tagFileName)
+
 tags = [tag["tag_number"] for d in devices for tag in d["tags"]]
 warnings.simplefilter("ignore", MissingPivotFunction)
 
@@ -62,22 +70,15 @@ def processParallel(table, interpolated_table):
   t5.join()
   #t6.join()
   write_api.write(MONITORING_BUCKET, ORG, {"measurement": "check_harvest", "fields": {"rate": 1.0}})
-  print("All Done")
+  check_logger.info("All Done")
   
 def job():
-  print("Querying ...")
-  #query = Query().from_bucket(BUCKET).range(f"{2 * CHECK_PERIOD}m").keep_columns("_time", "_value", "_field").aggregate_window(True).pivot("_time", "_field", "_value").to_str()
-  #print(query)
-  #table = query_api.query_data_frame(query, org=ORG)
-  #if (table.empty):
-  #  check_logger.warning("No data found")
-  #  return
-  #table = table.assign(_time=lambda _df: pd.to_datetime(_df['_time'], errors='coerce').astype(np.int64)).drop(columns=["result", "table", "_start", "_stop"]).set_index("_time")
+  check_logger.info("Querying ...")
   
   instance = Influx().from_now(2 * CHECK_PERIOD).addFields(tags)
-  table = instance.setInterpolation(False).asPivotDataFrame()
-  interpolated_table = instance.setInterpolation(True).setRate('2s').asPivotDataFrame()
-  print("Query done")
+  table = instance.setInterpolation(False).setRate('1s').asPivotDataFrame()
+  interpolated_table = instance.setInterpolation(True).setRate('1s').asPivotDataFrame()
+  check_logger.info("Query done")
   processParallel(table, interpolated_table)
   
 def job1(startTime, stopTime):
@@ -85,25 +86,10 @@ def job1(startTime, stopTime):
   table = instance.setInterpolation(False).asPivotDataFrame()
   interpolated_table = instance.setInterpolation(True).setRate('1s').asPivotDataFrame()
   
-  print("Query done")
-  #print(table)
-  #print(interpolated_table)
+  check_logger.info("Query done")
   process(table, interpolated_table)
 
-if len(sys.argv) > 1:
-  try:
-    startTime = dparser.isoparse(sys.argv[1])
-    while startTime.timestamp() < datetime.now().timestamp():
-      stopTime = startTime + timedelta(minutes = 10 * CHECK_PERIOD)
-      job1(startTime, stopTime)
-      startTime = stopTime
-      #time.sleep(0.5)
-  except:
-    traceback.print_exc()
-    print("Wrong date time format")
-    exit(-1)
-    
-schedule.every(CHECK_PERIOD).minute.do(job)
+schedule.every(CHECK_PERIOD).minutes.do(job)
 
 while True:
   schedule.run_pending()

@@ -1,5 +1,5 @@
 from configs.checks import (deviation_check, frozen_check, irv_check,
-                            nan_check, overange_check, roc_check)
+                            nan_check, overange_check)
 from configs.constants import CHECK_BUCKET, ORG, CHECK_PERIOD, MINIMUM_RATIO_NAN_ALLOW
 from configs.influx_client import write_api
 from configs.logger import check_logger

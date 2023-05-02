@@ -1,6 +1,7 @@
 import datetime
 
 import streamlit as st
+from configs.logger import check_logger
 from configs.constants import MACHINES, TIME_STRINGS, VIEW_MODES, OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT
 from utils.session import apply, reset_session, sess
 from utils.view_utils import (cal_different_time_range, get_device_by_name,
@@ -17,7 +18,7 @@ def setting_controls(app):
       "_selected_checks": [], 
       "call_influx": True
     },
-    type='primary'
+    #type='primary'
   )
   st.selectbox(
       "Machine",
@@ -27,7 +28,8 @@ def setting_controls(app):
   )
   st.selectbox(
     "View Mode", 
-    (OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT), 
+    list(range(len(VIEW_MODES[sess("current_machine")]))),
+    #(OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT), 
     format_func=lambda viewModeIdx: VIEW_MODES[sess("current_machine")][viewModeIdx], 
     key="view_mode", 
     on_change=apply, 
@@ -61,6 +63,7 @@ def setting_controls(app):
 
 class Sidebar:
   def render(self, app, machine, devices):
+    check_logger.info(f"render sidebar -- {machine}")
     setting_controls(app)
     if sess("view_mode") == RAW_DATA:
       with st.expander("Devices", expanded=True):
@@ -71,4 +74,5 @@ class Sidebar:
             tags = selected_device["tags"] if selected_device is not None else []
             tags = filter(lambda tag: sess("search_tags").lower() in tag["tag_number"].lower(), tags)
             for tag in tags:
+              check_logger.info(tag["tag_number"]);
               st.checkbox(tag["tag_number"], True if tag["tag_number"] in sess("tags") else False, on_change=select_tag_update_calldb, args=(tag["tag_number"], ))

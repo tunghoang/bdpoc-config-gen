@@ -48,9 +48,10 @@ def __check_overange(df, devices, tags = []):
 def do_overange_check(table, tags, devices):
   dfcopy = copy.deepcopy(table)
   overange_checks = __check_overange(dfcopy, devices, tags)
+  count = len(overange_checks.index)
   for row in check_gen(lambda x: "overange_check", overange_checks, lambda x: not math.isnan(x)):
-    print(row)
+    check_logger.info(f"Overange check: {row}")
     InfluxWriter().setBucket(CHECK_BUCKET).write(row)
     #write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
     check_logger.info(f"At {row[0]['time']} overange_checking {len(row)} tags")
-  check_logger.info("overange_checking done")
+  check_logger.info(f"overange_checking done: {count} events")

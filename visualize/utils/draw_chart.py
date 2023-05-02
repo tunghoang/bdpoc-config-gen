@@ -10,7 +10,7 @@ import streamlit as st
 from configs.constants import CHECKS_LIST, DATE_NOW, LINE_SHAPE, PIVOT
 from utils.session import sess
 from dateutil import parser as dparser
-
+from configs.logger import check_logger
 
 def set_middle_title(chart: plotly.graph_objs.Figure, title_name, yanchor="top", xanchor="center"):
   chart.update_layout(title={
@@ -67,6 +67,42 @@ def draw_bar_chart_by_data_frame(data: pd.DataFrame) -> List[st._DeltaGenerator]
   set_middle_title(chart, CHECKS_LIST[data["_measurement"].values[0]])
   return st.plotly_chart(chart, use_container_width=True)
 
+def draw_wet_seal_chart(data: pd.DataFrame, height=700, title="WET SEALS"):
+  if data is None:
+    return
+  if data.empty:
+    raise Exception('No data')
+    #return
+  range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
+
+  labels = {
+    "_time": "Check At", 
+    "_measurement": "Severity", 
+    "_field": "Seal", 
+    "dropLevel": "Drop Level (1day)", 
+    "dischargeCount": "Drain count"
+  }
+
+  chart1 = px.scatter(
+    data, 
+    x="_time", 
+    y="_field", 
+    labels=labels, 
+    color="_measurement",
+    color_discrete_map={"Alarm": "#FF0000", "PreAlarm": "#FFA500"},
+    hover_data={"dischargeCount": ':.1f', "dropLevel":":.1f"},
+    height=height
+  )
+  
+  chart1.update_layout(xaxis={'side': 'top'}, yaxis={'side': 'left'})
+
+  csv_all = data.to_csv().encode('utf-8')
+
+  col1, col2 = st.columns([5, 1])
+  col1.subheader(title)
+  col2.download_button("Download CSV", csv_all, 'all-alerts.csv', 'text/csv', key="csv_all")
+
+  st.plotly_chart(chart1, use_container_width=True)
 
 
 def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVIEW", connected=False):
@@ -75,9 +111,6 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   if data.empty:
     raise Exception('No data')
     #return
-  print("draw_chart_by_check")
-  #print(data["_start"])
-  print(data["_start"].tolist()[0])
   range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
 
   labels = {"_time": "Time (s)", "_measurement": "Alert", "_field": "Tag"}
@@ -124,7 +157,6 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
     dparser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00'), 
     dparser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')
   ]
-  print(range_x)
   range_y = [0, 1.1 * data["_value"].max()]
   labels = {"_time": "Time (s)", "_value": data["_field"][0]}
 
@@ -175,3 +207,19 @@ def draw_table(data: pd.DataFrame, height=700, title=""):
   col2.download_button("Download CSV", irv_report, f'{title}.csv', 'text/csv', key="irv_report")
   st.plotly_chart(chart, use_container_width=True)
   st.text_input("Conclusion:", key="conclusion", on_change="")
+
+def draw_barchart(df, x = None, y = None, color = None, facet = None, domain = None, height=600, col_num=1, labels=None, hover_data=None):
+  check_logger.info(df)
+  fig = px.bar(df, x = x, y = y, color = color, facet_col=facet, facet_col_wrap=col_num,
+    range_x = domain,
+    text='alert_type',
+    barmode='group',
+    labels=labels,
+    hover_data=hover_data,
+    height=height, facet_row_spacing = 0.01
+  )
+  fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+  #fig.update_annotations(x=-0.05, textangle=-90)
+  #fig.update_annotations(x=-0.05, textangle=-90)
+  fig.update_yaxes(title=None)
+  st.plotly_chart(fig, use_container_width=True) 

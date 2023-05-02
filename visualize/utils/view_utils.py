@@ -1,11 +1,11 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_mp_transient_periods, query_raw_data, get_raw_data, query_roc_tags)
+from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_transient_periods, query_raw_data, get_raw_data, query_roc_tags)
 from utils.session import apply, sess, update_session
 from utils.tag_utils import load_tag_specs
 from dateutil import parser as dparser
-
+from configs.logger import check_logger
 
 def cal_different_time_range():
   # Calculate different time range
@@ -40,7 +40,7 @@ def get_data_by_device_name(data, devices, device_name):
 
 
 def load_data():
-  print('load_dataaaaaa')
+  check_logger.info('load_dataaaaaa')
   time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner('Loading ...'):
     time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
@@ -57,10 +57,10 @@ def load_data():
     )
 
 def load_all_check():
-  print('load_all_check')
-  time_range_settings = TIME_STRINGS[sess('view_mode')]
+  check_logger.info('load_all_check')
+  #time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner('Loading ...'):
-    time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
+    #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
     start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
     end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
     apply(
@@ -80,15 +80,14 @@ def load_irv_tags():
     apply(data=query_irv_tags(start, end), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
 
 
-def load_mp_transient_periods():
-  print("load_mp_transient_periods")
+def load_transient_periods(device="mp"):
   time_range_settings = TIME_STRINGS[sess('view_mode')]
   with st.spinner("Loading transient periods ..."):
     start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
     end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
     #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
     apply(
-      data=query_mp_transient_periods(start, end), 
+      data=query_transient_periods(start, end, device), 
       harvest_rate=collector_status(), 
       server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S")
     )
@@ -106,7 +105,7 @@ def visualize_data_by_raw_data():
     # st.write(sess("data)")
     draw_line_chart_by_data_frame(sess("data"))
   else:
-    print("No data-------")
+    check_logger.info("No data-------")
 
 
 def visualize_data_by_checks():

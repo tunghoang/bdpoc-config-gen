@@ -1,0 +1,12 @@
+[Unit]
+Description=Instrument Health Monitoring Streamlit
+
+[Service]
+User=jupyter-admin
+WorkingDirectory=/home/jupyter-admin/bdpoc-datahub
+Environment=CHECK_MACHINE=app.log
+ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/streamlit run visualize/main.py --server.enableCORS=False --server.enableXsrfProtection=False 
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
