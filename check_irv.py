@@ -59,18 +59,23 @@ def job(start, end, device='mp'):
 
   records = irvTableData(df, device)
 
-  criticals = list(filter(lambda r: (r['Flag'] > 1 and tagDict[r['Field']]['critical']), records))
-  urgents = list(filter(lambda r: (r['Flag'] > 1 and tagDict[r['Field']]['critical'] == False), records))
-  prealarms = list(filter(lambda r: (r['Flag'] == 1), records))
+  criticals = list(filter(lambda r: (r['Flag'] > 2 and tagDict[r['Field']]['critical']), records))
+  urgents = list(filter(lambda r: (r['Flag'] > 2 and tagDict[r['Field']]['critical'] == False), records))
+  prealarms = list(filter(lambda r: (r['Flag'] == 2), records))
+  lowprealarms = list(filter(lambda r: (r['Flag'] == 1), records))
 
   if len(criticals) > 0:
-    criticalMail(criticals, start, end,testing=(device == 'lip'))
-    saveToInflux(criticals, lambda r: "LL" if r["Min"] < r["LL"] else "HH")
+    criticalMail(criticals, start, end, device=device, testing=(device == 'lip'))
+    #criticalMail(criticals, start, end, device=device, testing=True)
+    saveToInflux(criticals, lambda r: "LLL" if r["Min"] < r["LLL"] else "HHH")
   if len(urgents) > 0:
-    urgentMail(urgents, start, end, testing=(device == 'lip'))
-    saveToInflux(urgents, lambda r: "LL" if r["Min"] < r["LL"] else "HH")
+    urgentMail(urgents, start, end, device=device, testing=(device == 'lip'))
+    #urgentMail(urgents, start, end, device=device, testing=True)
+    saveToInflux(urgents, lambda r: "LLL" if r["Min"] < r["LLL"] else "HHH")
   if len(prealarms) > 0:
-    saveToInflux(prealarms, lambda r: "L" if r["Min"] < r["L"] else "H")
+    saveToInflux(prealarms, lambda r: "LL" if r["Min"] < r["LL"] else "HH")
+  if len(lowprealarms) > 0:
+    saveToInflux(lowprealarms, lambda r: "L" if r["Min"] < r["L"] else "H")
 
 end = dparser.isoparse(args.end) if args.end else datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
 start = dparser.isoparse(args.start) if args.start else (end - timedelta(minutes=2*CHECK_IRV_PERIOD))

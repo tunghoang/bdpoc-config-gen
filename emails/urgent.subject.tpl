@@ -1,1 +1,1 @@
-[ALERT] PDM Alert Notification
+[ALERT.{{device|upper}}] PDM Alert Notification

@@ -41,6 +41,7 @@ def draw_line_chart_by_data_frame(data, height=700, title="RAW DATA"):
     range_x=range_x, 
     range_y=range_y
   )
+  chart.update_layout(hovermode="x unified")
   csv_all = data.to_csv().encode('utf-8')
   col1, col2 = st.columns([5, 1])
   col1.subheader(title)
@@ -111,9 +112,14 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   if data.empty:
     raise Exception('No data')
     #return
+
+  data["type"] = data.type.fillna("N/A")
   range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
 
-  labels = {"_time": "Time (s)", "_measurement": "Alert", "_field": "Tag"}
+  hover_data={
+    "type": True,
+  }
+  labels = {"_time": "Time (s)", "_measurement": "Alert", "_field": "Tag", "type": "IRV Alarm Type"}
   #chart = px.scatter(data, x = "_time", y = "_measurement", labels=labels, range_x = time_range_in_datetime, color = "_field", height=height)
   #st.plotly_chart(chart, use_container_width=True)
 
@@ -122,8 +128,10 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
     x="_time", 
     y="_field", 
     labels=labels, 
+    hover_data=hover_data,
     range_x=range_x, 
     color="_measurement", 
+    symbol="type",
     height=height, 
     markers=True
   ) if connected else px.scatter(
@@ -131,7 +139,9 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
     x="_time", 
     y="_field", 
     labels=labels, 
+    hover_data=hover_data,
     color="_measurement", 
+    symbol="type",
     height=height
   )
   
@@ -165,7 +175,7 @@ def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", con
     labels=labels, 
     range_x=range_x, 
     range_y=range_y, 
-    height=height, 
+    height=height,
     markers=True
   ) if connected else px.scatter(
     data, x="_time", y="_value", 

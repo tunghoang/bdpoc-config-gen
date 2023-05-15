@@ -49,21 +49,25 @@ def process(table, interpolated_table):
   do_deviation_check(interpolated_table, deviation_checks, devices)
   do_frozen_check(interpolated_table, devices)'''
 def processParallel(table, interpolated_table):
-  t1 = Thread(target=do_nan_check, args=(table, tags))
+  if args.machine == "MP":
+    t1 = Thread(target=do_nan_check, args=(table, tags))
   t2 = Thread(target=do_overange_check, args=(interpolated_table, tags, devices))
   #t3 = Thread(target=do_irv_check, args=(interpolated_table, devices, tags))
   #t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks, devices))
   t5 = Thread(target=do_roc_check, args=(interpolated_table, ))
   #t6 = Thread(target=do_frozen_check, args=(interpolated_table, devices))
 
-  t1.start()
+  if args.machine == "MP":
+    t1.start()
+
   t2.start()
   #t3.start()
   #t4.start()
   t5.start()
   #t6.start()
 
-  t1.join()
+  if args.machine == "MP":
+    t1.join()
   t2.join()
   #t3.join()
   #t4.join()

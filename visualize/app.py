@@ -71,7 +71,7 @@ class App:
   def init(self):
     check_logger.info("\tApp init")
     # Configuration
-    st.set_page_config(page_title="Home", page_icon=":house:", layout="wide")
+    st.set_page_config(page_title="ESS Instrument Health Monitoring", page_icon="http://pdmtools.biendongpoc.vn/images/bdpoc-logo.png", layout="wide")
     st.markdown(local_css(path.join(path.dirname(__file__), "assets", "style.css")), unsafe_allow_html=True)
     # Init session
     self.init_sessions()

@@ -82,8 +82,8 @@ Number","CONTROL LOGIC CHECK
 76,Lube/Seal oil,PT 2113,HT_PI_2113.PV,Lube Simulation Line Pressure,barg,,,Y,,,Y,0 -20 barg,,,,,1,"Pump start status (signal from Dynamo/PHD) but PIT-2113, PIT-2118, PZT-2119 not increase",,,,,
 77,Lube/Seal oil,PDZT 2117,HT_PDI_2117.PV,Compressor 1 Seal Oil Pressure Differentíal,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,X
 78,Lube/Seal oil,PDT 2115,HT_PDI_2115.PV,Compressor 1 Seal Oil  Control Pressure Differentíal,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,
-79,Lube/Seal oil,PDZT 2116,HT_PDI_2116.PV,Compressor 2 Seal Oil Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,X
-80,Lube/Seal oil,PDT 2114,HT_PDI_2114.PV,Compressor 2 Seal Oil  Control Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,
+79,Lube/Seal oil,PDZT 2116,HT_PDI_2116.PV,Compressor 2 Seal Oil Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,7,9.5",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,X
+80,Lube/Seal oil,PDT 2114,HT_PDI_2114.PV,Compressor 2 Seal Oil  Control Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,7,9.5",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,
 81,Lube/Seal oil,PDC 2114,HT_PDI_2114.PV,Comp 2 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,
 82,Lube/Seal oil,PDC 2115,HT_PDI_2115.PV,Comp 1 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,
 83,Lube/Seal oil,PT 2118,HT_PI_2118.PV,Lube Oil Header Pressure,barg,,,Y,,"1,1.2,1.6,3,3.5,4",Y,0 - 6 barg,,,5,PT-2118/PZT-2119,1,,,,,,
@@ -93,19 +93,14 @@ Number","CONTROL LOGIC CHECK
 87,Lube/Seal oil,LZT 2122,HT_LI_2122.PV,Seal oil level Comp 1,%,,,Y,,,Y,"0, 100",,,3,LT 2121/LZT-2122,2,LCV-2122 open but LI-2121 & LI-2122 not descrease ,,,,,X
 88,Lube/Seal oil,LT 2151,HT_LI_2151.PV,Seal oil level Comp 2,%,,,,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,
 89,Lube/Seal oil,LZT 2152,HT_LZI_2152.PV,Seal oil level Comp 2,%,,,Y,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,X
-90,Other,SDV_2120_GSO,HT_SDV_2120_GSO.PV,Suction Shutdown Valve,Status,,,Y,,,Y,,,1,,,5,SDV-2120 change from Close to open but PI-2120 and PDT-2120 does not increase,,,,,
-91,Other,SDV_2120_GSC,HT_SDV_2120_GSC.PV,Suction Shutdown Valve,Status,,,,,,,,,1,,,,,,,,,
-93,Other,SDV_2122_GSO,HT_SDV_2122_GSO.PV,Recycle Shutdown Valve,Status,,,Y,,,Y,,,2,,,,,,,,,
-94,Other,SDV_2122_GSC,HT_SDV_2122_GSC.PV,Recycle Shutdown Valve,Status,,,,,,,,,2,,,,,,,,,
-96,Other,BDV_2151_GSO,HT_BDV_2151_GSO.PV,Blow down valve,Status,,,Y,,,Y,,,4,,,4,BDV-2151 open but PI-2153 does not come to zero,,,,,
-97,Other,BDV_2151_GSC,HT_BDV_2151_GSC.PV,Blow down valve,Status,,,,,,,,,4,,,,,,,,,
-98,Other,SDV_2150_GSO,HT_SDV_2150_GSO.PV,Discharge Shutdown Valve,Status,,,Y,,,Y,,,3,,,,,,,,,
-99,Other,SDV_2150_GSC,HT_SDV_2150_GSC.PV,Discharge Shutdown Valve,Status,,,,,,,,,3,,,,,,,,,
+91,Other,HT_SDV_2120,HT_SDV_2120.PV,Suction Shutdown Valve,Status,,,,,,,,,1,,,,,,,,,
+94,Other,HT_SDV_2122,HT_SDV_2122.PV,Recycle Shutdown Valve,Status,,,,,,,,,2,,,,,,,,,
+96,Other,HT_BDV_2151,HT_BDV_2151.PV,Blow down valve,Status,,,Y,,,Y,,,4,,,4,BDV-2151 open but PI-2153 does not come to zero,,,,,
+98,Other,HT_SDV_2150,HT_SDV_2150.PV,Discharge Shutdown Valve,Status,,,Y,,,Y,,,3,,,,,,,,,
 100,Other,SDV_2152_GSO,HT_SDV_2152_GSO.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,
 101,Other,SDV_2152_GSC,HT_SDV_2152_GSC.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,
 102,Other,SDV_2123_GSO,HT_SDV_2123_GSO.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,
 103,Other,SDV_2123_GSC,HT_SDV_2123_GSC.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,
-104,Other,SDV_2140_GSO,HT_SDV_2140_GSO.PV,SHUTDOWN VALVE,Status,,,,,,,,,7,,,,,,,,,
-105,Other,SDV_2140_GSC,HT_SDV_2140_GSC.PV,SHUTDOWN VALVE,Status,,,,,,,,,7,,,,,,,,,
+104,Other,HT_SDV_2140,HT_SDV_2140.DEVCTLA.PV,SHUTDOWN VALVE,Status,,,,,,,,,7,,,,,,,,,
 106,Other,SDV_2121_GSO,HT_SDV_2121_GSO.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,
 107,Other,SDV_2121_GSC,HT_SDV_2121_GSC.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,

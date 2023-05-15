@@ -2,7 +2,7 @@ Dear Sir,
 
 This is an automated email to inform you of alerts received from the PDM system. Please review the details below:
 
-Alert Type: [Alert.Danger]
+Alert Type: [Alert.Danger.Critical]
 Alert Description: 
     - Check: Instrument Range Validation
     - Tags: 

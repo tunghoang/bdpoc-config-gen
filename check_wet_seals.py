@@ -58,16 +58,18 @@ def intepret(flush_count, dropLevel, seal="LP"):
   check_logger.info("-----------")
   check_logger.info(f"{dropLevel}, {flush_count}")
 
-  flush_count_threshold_alarm = 5
-  flush_count_threshold_prealarm = 2
+  flush_count_threshold_alarm = 5.
+  flush_count_threshold_prealarm = 2.
   dropLevel_threshold_alarm = 0.5
   dropLevel_threshold_prealarm = 0.4
 
+  start = end - timedelta(days=3)
   if seal == "IP":
-    flush_count_threshold_alarm = 4
-    flush_count_threshold_prealarm = 2
+    flush_count_threshold_alarm = 4./13
+    flush_count_threshold_prealarm = 2./13
     dropLevel_threshold_alarm = 0.3
     dropLevel_threshold_prealarm = 0.15
+    start = end - timedelta(days=13)
 
   if flush_count >= flush_count_threshold_alarm:
     if dropLevel > dropLevel_threshold_alarm :
@@ -94,7 +96,7 @@ def intepret(flush_count, dropLevel, seal="LP"):
         "fields": {f"{seal}_Seal": 1},
         "tags": {"dropLevel": dropLevel, "dischargeCount": flush_count}
       })
-  elif flush_count > flush_count_threshold_prealarm:
+  elif flush_count >= flush_count_threshold_prealarm:
     if dropLevel > dropLevel_threshold_prealarm :
       # PreAlarm
       check_logger.info("Prealarm");
@@ -144,50 +146,3 @@ intepret(flush_count, dropLevel)
 
 flush_count = findFlushCount(end, sealLevelTag="HT_LI_2152.PV", ndays = 13)
 intepret(flush_count, dropLevel, seal="IP")
-
-'''
-check_logger.info("-----------")
-check_logger.info(f"{yesterday_level}, {today_level}, {dropLevel}, {flush_count}")
-if flush_count >= 5:
-  if dropLevel > 0.5 :
-    # Alarm
-    check_logger.info("Alarm");
-    InfluxWriter().setBucket(CHECK_BUCKET).write({
-      "measurement": "Alarm", 
-      "time": end.isoformat(), 
-      "fields": {"LP_Seal": 1},
-      "tags": {"dropLevel": dropLevel, "dischargeCount": flush_count}
-    })
-    wetGasSealMail([{
-      "Field": "HT_LI_2122", 
-      "Description": "Lube Oil seal leak", 
-      "dropLevel": dropLevel,
-      "flush_count": flush_count
-    }], start, end, testing=True)
-  else:
-    # PreAlarm
-    check_logger.info("Prealarm");
-    InfluxWriter().setBucket(CHECK_BUCKET).write({
-      "measurement": "PreAlarm", 
-      "time": end.isoformat(), 
-      "fields": {"LP_Seal": 1},
-      "tags": {"dropLevel": dropLevel, "dischargeCount": flush_count}
-    })
-elif flush_count > 2:
-  if dropLevel > 0.4 :
-    # PreAlarm
-    check_logger.info("Prealarm");
-    InfluxWriter().setBucket(CHECK_BUCKET).write({
-      "measurement": "PreAlarm", 
-      "time": end.isoformat(), 
-      "fields": {"LP_Seal": 1},
-      "tags": {"dropLevel": dropLevel, "dischargeCount": flush_count}
-    })
-    pass
-  else:
-    # Normal
-    pass
-else:
-  # Normal
-  pass
-'''

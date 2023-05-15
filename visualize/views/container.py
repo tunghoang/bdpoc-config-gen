@@ -29,9 +29,11 @@ def render_overview():
   df = sess("data")
   if df is None:
     return
-  df = df[df._field.isin(tag_dict.keys())]
   check_logger.info("0000000000000000000000000")
-  check_logger.info(df._field)
+  check_logger.info(df.columns)
+  df = df[df._field.isin(tag_dict.keys())]
+  check_logger.info(df)
+  check_logger.info(df.columns)
   draw_chart_by_check_data(df, title=f"{sess('current_machine').upper()} Alert Overview")
 
 def render_wet_seals():
@@ -40,7 +42,6 @@ def render_wet_seals():
     return
   df = df[df._field.isin(['LP_Seal', "IP_Seal"])]
   check_logger.info(df._field)
-  #draw_chart_by_check_data(df, title=f"{sess('current_machine').upper()} Wet Seals Alarms/PreAlarms")
   draw_wet_seal_chart(df, title="Wet Seals Alarms/PreAlarms")
   st.markdown("""----
 ### LP WetGas Rules: 
@@ -86,22 +87,22 @@ def irv_diagnose(min_max, tagSpec, tag):
     if inside(min_max[i], INFINITIES[i], shutdown_limits[i]):
       if shutdown_limits[i] != alarm_limits[i]:
         flags[i] = 3
-        comment = f"{LABELS[i]} - SHUTDOWN;"
+        comment = f"{LABELS[i]} - ALARM;"
       elif alarm_limits[i] != prealarm_limits[i]:
         flags[i] = 2
-        comment = f"{LABELS[i]} - ALARM;"
+        comment = f"{LABELS[i]} - PREALARM;"
       else:
         flags[i] = 1
-        comment = f"{LABELS[i]} - PREALARM;"
+        comment = f"{LABELS[i]} - {'INCREASING' if i > 0 else 'DECREASING'};"
       output = output + comment
     elif inside(min_max[i], shutdown_limits[i], alarm_limits[i]):
       # results["alarms"][i] = True
       flags[i] = 2
-      output = output + f"{LABELS[i]} - ALARM;"
+      output = output + f"{LABELS[i]} - PREALARM;"
     elif inside(min_max[i], alarm_limits[i], prealarm_limits[i]):
       # results["prealarms"][i] = True
       flags[i] = 1
-      output = output + f"{LABELS[i]} - PREALARM;"
+      output = output + f"{LABELS[i]} - {'INCREASING' if i > 0 else 'DECREASING'};"
     elif inside(min_max[i], prealarm_limits[0], prealarm_limits[1]):
       # results["normals"][i] = True
       flags[i] = 0
@@ -140,6 +141,8 @@ def irvTableData(df, device="mp"):
 
 def __irvTable(df, header="", device="mp", withSearch=False, withComment=False, withDownload=False, key=0):
   records = irvTableData(df, device)
+  check_logger.info("^^^^^^^^^^")
+  check_logger.info(records)
   st_custom_dataframe(data=records, header=header, withSearch=withSearch, withComment=withComment, withDownload=withDownload, key=key)
 
 def render_irv_report(device = "mp"):
@@ -181,7 +184,7 @@ def render_transient_report(device = 'mp'):
     labels = {
       "startTime": "Time",
       "_value": "Value",
-      "minmax": "Threshold",
+      "minmax": "Legend",
       "_field": "Tag",
       "alert_type": "Type"
     }
@@ -300,7 +303,7 @@ def getRange(data):
 
 def render_inspection():
   df = sess("data")
-  df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', "_value", '_measurement']]
+  df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', "_value", '_measurement', "type"]]
   st.write(df)
   for check in sess("_selected_checks"):
     df1 = df[df['_measurement'] == check]

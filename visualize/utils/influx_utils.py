@@ -23,7 +23,10 @@ def get_raw_data(start_date, start_time, end_date, end_time, tags, rate = '30s')
 
   if len(tags) == 0:
     return
-  df = Influx().addFields(tags).setDebug(True).setStart(__start).setStop(__end).setRate(rate).asDataFrame()
+  inst = Influx().addFields(tags).setDebug(True).setStart(__start).setStop(__end).setRate(rate)
+  check_logger.info("---------- query ----------")
+  check_logger.info(inst.getQuery())
+  df = inst.asDataFrame()
   return df
   
 def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool = False, missing_data: str = "NaN") -> DataFrame:
@@ -220,33 +223,31 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
   return table
 
 def query_check_all(start, end):
-  table = Influx().setDebug(True).setBucket(CHECK_BUCKET).setStart(start).setStop(end).asDataFrame()
-  table.to_csv('/tmp/query.all.csv')
+  fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  tagDict = load_tag_specs(fileName)
+  fields = list(tagDict.keys())
+  check_logger.info("^+++++++++++++++++++^")
+  check_logger.info(fields)
+  inst = Influx(measurement=None).setBucket(CHECK_BUCKET).addFields(fields).setDebug(True).setStart(start).setStop(end)
+  check_logger.info(inst.getQuery())
+  table = inst.asDataFrame()
+  table.to_csv(f'/tmp/query.{sess("current_machine")}.csv')
   return table
   
-def query_check_all_old(time: int) -> DataFrame:
-  query = Query().from_bucket(CHECK_BUCKET).range(time).to_str()
-  table = get_check(query)
-  return table
-
-
 def dataframe_to_dictionary(df, measurement):
   df["_time"] = to_datetime(df['_time'], errors='coerce').astype(np.int64)
   lines = [{"measurement": f"{measurement}", "tags": {"device": row["_measurement"]}, "fields": {row["_field"]: float(row["_value"])}, "time": row["_time"]} for _, row in df.iterrows() if row["_value"] != 0 and not math.isnan(row["_value"])]
   return lines
 
 
-def collector_status() -> float:
-  df = Influx(measurement="collector_metric", bucket='monitoring').addField("collect_rate").from_now(5).asDataFrame()
-  result = None
-  if df is None or df.empty:
-    result = 0
-  else:
-    result = df["_value"].values[-1]
-  #query = Query().from_bucket(MONITORING_BUCKET).range(MONITORING_PERIOD).filter_measurement(MONITORING_MEASUREMENT).filter_fields([MONITORING_FIELD]).aggregate_window(False, MONITORING_AGG_WINDOW).to_str()
-  #result = get_tag_harvest_rate(query)
-  return "{:.2f}".format(result)
-
+def collector_status():
+  df = Influx(measurement="py_collector_metric", bucket='monitoring').addField("collect_rate").setRate("2m").from_now(5).asDataFrame()
+  df = df[["_time","_value", "location", "type"]]
+  df = df.pivot(index="_time", columns=("location", "type"), values="_value").reset_index()
+  df.columns = df.columns.to_flat_index().str.join("_")
+  values = df.values[-1][1:]
+  values1 = [ "{:.0f}".format(v if v else 0) for v in values ]
+  return ", ".join(values1)
 
 def check_status() -> float:
   df = Influx(measurement="check_harvest", bucket='monitoring').from_now(30).setRate('1m').setFillPrevious(True).asDataFrame()

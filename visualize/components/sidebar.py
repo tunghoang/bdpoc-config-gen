@@ -21,10 +21,19 @@ def setting_controls(app):
     #type='primary'
   )
   st.selectbox(
-      "Machine",
-      MACHINES,
-      key="current_machine",
-      format_func=lambda machine: machine.upper(),
+    "Machine",
+    MACHINES,
+    key="current_machine",
+    format_func=lambda machine: machine.upper(),
+    on_change=apply, 
+    kwargs={
+      "data": None, 
+      "_selected_tag": None, 
+      "_selected_checks": [], 
+      "time_range": 0,
+      "tags": []
+    }
+      
   )
   st.selectbox(
     "View Mode", 
@@ -37,7 +46,8 @@ def setting_controls(app):
       "data": None, 
       "_selected_tag": None, 
       "_selected_checks": [], 
-      "time_range": 0
+      "time_range": 0,
+      "tags": []
     }
   )
 
@@ -51,13 +61,7 @@ def setting_controls(app):
       with col2:
         st.time_input("Start Time", value=sess("start_time"), key="start_time", on_change=cal_different_time_range)
         st.time_input("End Time", value=sess("end_time"), key="end_time", on_change=cal_different_time_range)
-      #time_range_settings = TIME_STRINGS[sess('view_mode')]
-      #st.selectbox("Time Range", options=time_range_settings.keys(), format_func=lambda sec: time_range_settings[sec], key="time_range", on_change=reset_session, args=(app, "data", "_selected_tag", "_selected_checks", "tags"))
-
     if sess("view_mode") == RAW_DATA:
-      #st.selectbox("Preprocessing", (True, False), index=0 if sess("interpolated") else 1, format_func=lambda interpolated: "Interpolated" if interpolated else "Raw")
-      #st.selectbox("Fill missing data", ("NaN", "Last"), key="missing_data")
-      #st.selectbox("Chart Style", ("all", "merge"), key="chart_mode")
       st.selectbox("Rate", ('60s', '30s', '10s', '5s', '1s'), key="sampling_rate")
 
 

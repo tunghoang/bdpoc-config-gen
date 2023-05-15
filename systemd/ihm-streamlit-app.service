@@ -5,7 +5,7 @@ Description=Instrument Health Monitoring Streamlit
 User=jupyter-admin
 WorkingDirectory=/home/jupyter-admin/bdpoc-datahub
 Environment=CHECK_MACHINE=app.log
-ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/streamlit run visualize/main.py --server.enableCORS=False --server.enableXsrfProtection=False 
+ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/streamlit run visualize/main.py --server.enableCORS=false --server.enableXsrfProtection=false --server.enableStaticServing=true
 Restart=on-failure
 
 [Install]
