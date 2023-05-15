@@ -1,4 +1,7 @@
 [submodule "assets/components/custom_components/st_dataframe_component/frontend"]
-	path = assets/components/custom_components/st_dataframe_component/frontend
-	url = https://github.com/MrYasuo/st-custom-dataframe-component.git
-  branch = "cra"
+path = assets/components/custom_components/st_dataframe_component/frontend
+url = https://github.com/MrYasuo/st-custom-dataframe-component.git
+branch = "cra"
+[submodule "assets/components/custom_components/st_datetime_picker_component/frontend"]
+	path = assets/components/custom_components/st_datetime_picker_component/frontend
+	url = https://github.com/MrYasuo/st-datetime-picker-component.git
