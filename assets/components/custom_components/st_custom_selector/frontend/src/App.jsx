@@ -49,7 +49,11 @@ const filterTable = (table, condition) => {
 };
 
 function App({ args }) {
-	const { data, defaultTags, defaultAlertTime } = args;
+	const {
+		data,
+		default_tags: defaultTags,
+		default_alert_time: defaultAlertTime,
+	} = args;
 	const [tags, setTags] = useState(defaultTags);
 	const [alertTime, setAlertTime] = useState(defaultAlertTime);
 	const [applied, setApplied] = useState(false);
