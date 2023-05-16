@@ -189,7 +189,8 @@ def render_transient_report(device='mp'):
 			labels = {"startTime": "Time", "_value": "Value", "minmax": "Legend", "_field": "Tag", "alert_type": "Type"}
 
 			_dummy, value = st_custom_selector(key=1, data=all_df, default_tags=sess("default_tags"), default_alert_time=sess("default_alert_time"))
-			filtered_df, default_tags, default_alert_time = itemgetter("df", "defaultTags", "defaultAlertTime")(value)
+      if value is not None:
+        filtered_df, default_tags, default_alert_time = itemgetter("df", "defaultTags", "defaultAlertTime")(value)
 			check_logger.info(f'TYPE: {type(filtered_df)}')
 			check_logger.info(f'DEFAULT_TAGS: {default_tags}')
 			check_logger.info(f'DEFAULT_ALERT_TIME: {default_alert_time}')
