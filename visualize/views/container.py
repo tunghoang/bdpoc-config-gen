@@ -188,15 +188,12 @@ def render_transient_report(device='mp'):
 			all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
 			labels = {"startTime": "Time", "_value": "Value", "minmax": "Legend", "_field": "Tag", "alert_type": "Type"}
 
-			_dummy, value = st_custom_selector(key=1, data=all_df, default_tags=sess("default_tags"), default_alert_time=sess("default_alert_time"))
-      if value is not None:
-        filtered_df, default_tags, default_alert_time = itemgetter("df", "defaultTags", "defaultAlertTime")(value)
+
+			_dummy, filtered_df = st_custom_selector(key=1, data=all_df, filtered_table=sess("filtered_table"))
+			if filtered_df is None:
+				filtered_df = pd.DataFrame()
+			update_session("filtered_table", filtered_df)
 			check_logger.info(f'TYPE: {type(filtered_df)}')
-			check_logger.info(f'DEFAULT_TAGS: {default_tags}')
-			check_logger.info(f'DEFAULT_ALERT_TIME: {default_alert_time}')
-			# if filtered_df is None:
-			#   filtered_df = pd.DataFrame()
-			# check_logger.info(f'TYPE: {type(filtered_df)}')
 			all_df.to_csv('/tmp/all_df.csv')
 			if filtered_df is not None and not filtered_df.empty:
 				filtered_df.columns = filtered_df.columns.get_level_values(0)
