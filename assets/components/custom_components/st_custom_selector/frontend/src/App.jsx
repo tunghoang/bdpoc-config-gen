@@ -59,7 +59,7 @@ function App({ args }) {
 	let combinedArray = timeArray.map(
 		(item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`
 	);
-	let stopStartEventList = [...new Set(combinedArray)];
+	const stopStartEventList = [...new Set(combinedArray)];
 	const alertTimeOptions = [...new Set(timeArray)];
 	const handleSelectTags = (selectedTags) => {
 		setTags(selectedTags);
@@ -114,6 +114,7 @@ function App({ args }) {
 					onChange={handleSelectTags}
 					labels={tagOptions}
 					options={tagOptions}
+					value={tags}
 					span={6}
 				/>
 			</Col>
@@ -123,6 +124,7 @@ function App({ args }) {
 					onChange={handleSelectAlertType}
 					labels={stopStartEventList}
 					options={alertTimeOptions}
+					value={tags}
 					span={12}
 				/>
 			</Col>
