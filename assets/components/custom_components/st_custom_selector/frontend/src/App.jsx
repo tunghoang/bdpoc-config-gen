@@ -71,6 +71,26 @@ function App({ args }) {
 	useEffect(() => {
 		Streamlit.setFrameHeight();
 	});
+	useEffect(() => {
+		const _table = filterTable(data.table, (table, rowIndex) => {
+			return (
+				timeArray.slice(0, 3).includes(table.getColumnAt(3).get(rowIndex)) &&
+				timeArray.includes(table.getColumnAt(1).get(rowIndex))
+			);
+		});
+		const indexTable = Table.new({
+			index: data.table.getColumnAt(1).constructor.from({
+				values: Array.from({ length: _table.length }, (_, i) => i),
+				type: new Int(true, 64),
+			}),
+		});
+		const arrT = new ArrowTable(
+			_table.serialize(),
+			indexTable.serialize(),
+			data.columnsTable.serialize()
+		);
+		Streamlit.setComponentValue(arrT);
+	}, []);
 	const handleApply = () => {
 		const _table = filterTable(data.table, (table, rowIndex) => {
 			return (
