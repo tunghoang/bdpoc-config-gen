@@ -54,7 +54,6 @@ function App({ args }) {
 	const defaultAlertTime = [...new Set(filteredTable.table.getColumnAt(1))];
 	const [tags, setTags] = useState(defaultTags);
 	const [alertTime, setAlertTime] = useState(defaultAlertTime);
-	const [applied, setApplied] = useState(false);
 	const tagOptions = [...new Set(data.table.getColumnAt(3))];
 	let timeArray = [...data.table.getColumnAt(1)];
 	let typeArray = [...data.table.getColumnAt(4)];
@@ -72,38 +71,35 @@ function App({ args }) {
 	useEffect(() => {
 		Streamlit.setFrameHeight();
 	});
-	useEffect(() => {
-		if (applied) {
-			setApplied(false);
-			const _table = filterTable(data.table, (table, rowIndex) => {
-				return (
-					tags.includes(table.getColumnAt(3).get(rowIndex)) &&
-					alertTime.includes(table.getColumnAt(1).get(rowIndex))
-				);
-			});
-			const indexTable = Table.new({
-				index: data.table.getColumnAt(1).constructor.from({
-					values: Array.from({ length: _table.length }, (_, i) => i),
-					type: new Int(true, 64),
-				}),
-			});
-			// const columnTable = Table.new({
-			// 	columns: data.columnsTable.getColumnAt(0).constructor.from({
-			// 		values: data.columnsTable
-			// 			.toArray()
-			// 			.map((row) => row[0])
-			// 			.slice(1),
-			// 		type: data.columnsTable.getColumnAt(0).type,
-			// 	}),
-			// });
-			const arrT = new ArrowTable(
-				_table.serialize(),
-				indexTable.serialize(),
-				data.columnsTable.serialize()
+	const handleApply = () => {
+		const _table = filterTable(data.table, (table, rowIndex) => {
+			return (
+				tags.includes(table.getColumnAt(3).get(rowIndex)) &&
+				alertTime.includes(table.getColumnAt(1).get(rowIndex))
 			);
-			Streamlit.setComponentValue(arrT);
-		}
-	}, [applied]);
+		});
+		const indexTable = Table.new({
+			index: data.table.getColumnAt(1).constructor.from({
+				values: Array.from({ length: _table.length }, (_, i) => i),
+				type: new Int(true, 64),
+			}),
+		});
+		// const columnTable = Table.new({
+		// 	columns: data.columnsTable.getColumnAt(0).constructor.from({
+		// 		values: data.columnsTable
+		// 			.toArray()
+		// 			.map((row) => row[0])
+		// 			.slice(1),
+		// 		type: data.columnsTable.getColumnAt(0).type,
+		// 	}),
+		// });
+		const arrT = new ArrowTable(
+			_table.serialize(),
+			indexTable.serialize(),
+			data.columnsTable.serialize()
+		);
+		Streamlit.setComponentValue(arrT);
+	};
 	return (
 		<Row gutter={[16, 16]}>
 			<Col xs={24}>
@@ -127,7 +123,7 @@ function App({ args }) {
 				/>
 			</Col>
 			<Col xs={24}>
-				<Button onClick={() => setApplied(true)}>Apply</Button>
+				<Button onClick={handleApply}>Apply</Button>
 			</Col>
 		</Row>
 	);
