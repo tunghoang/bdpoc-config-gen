@@ -49,17 +49,15 @@ const filterTable = (table, condition) => {
 };
 
 function App({ args }) {
-	const {
-		data,
-		default_tags: defaultTags,
-		default_alert_time: defaultAlertTime,
-	} = args;
+	const { data, filtered_table: filteredTable } = args;
+	const defaultTags = [...new Set(filteredTable.table.getColumnAt(3))];
+	const defaultAlertTime = [...new Set(filteredTable.table.getColumnAt(1))];
 	const [tags, setTags] = useState(defaultTags);
 	const [alertTime, setAlertTime] = useState(defaultAlertTime);
 	const [applied, setApplied] = useState(false);
-	const tagOptions = [...new Set(data.table.getColumnAt(2))];
-	let timeArray = [...data.table.getColumnAt(0)];
-	let typeArray = [...data.table.getColumnAt(3)];
+	const tagOptions = [...new Set(data.table.getColumnAt(3))];
+	let timeArray = [...data.table.getColumnAt(1)];
+	let typeArray = [...data.table.getColumnAt(4)];
 	let combinedArray = timeArray.map(
 		(item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`
 	);
@@ -79,12 +77,12 @@ function App({ args }) {
 			setApplied(false);
 			const _table = filterTable(data.table, (table, rowIndex) => {
 				return (
-					tags.includes(table.getColumnAt(2).get(rowIndex)) &&
-					alertTime.includes(table.getColumnAt(0).get(rowIndex))
+					tags.includes(table.getColumnAt(3).get(rowIndex)) &&
+					alertTime.includes(table.getColumnAt(1).get(rowIndex))
 				);
 			});
 			const indexTable = Table.new({
-				index: data.table.getColumnAt(0).constructor.from({
+				index: data.table.getColumnAt(1).constructor.from({
 					values: Array.from({ length: _table.length }, (_, i) => i),
 					type: new Int(true, 64),
 				}),
@@ -103,11 +101,7 @@ function App({ args }) {
 				indexTable.serialize(),
 				data.columnsTable.serialize()
 			);
-			Streamlit.setComponentValue({
-				df: arrT,
-				defaultTags: tags,
-				defaultAlertTime: alertTime,
-			});
+			Streamlit.setComponentValue(arrT);
 		}
 	}, [applied]);
 	return (
@@ -128,7 +122,7 @@ function App({ args }) {
 					onChange={handleSelectAlertType}
 					labels={stopStartEventList}
 					options={alertTimeOptions}
-					value={tags}
+					value={alertTime}
 					span={12}
 				/>
 			</Col>
