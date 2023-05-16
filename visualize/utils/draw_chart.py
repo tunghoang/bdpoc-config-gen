@@ -226,7 +226,7 @@ def draw_barchart(df, x = None, y = None, color = None, facet = None, domain = N
     barmode='group',
     labels=labels,
     hover_data=hover_data,
-    height=height, facet_row_spacing = 0.01
+    height=height, facet_row_spacing = 0.07
   )
   fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
   #fig.update_annotations(x=-0.05, textangle=-90)

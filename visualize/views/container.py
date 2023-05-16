@@ -8,7 +8,10 @@ import pandas as pd
 import pytz
 import streamlit as st
 from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS)
+
 from configs.custom_components import outstanding_tag_list, st_custom_dataframe
+from custom_components.st_custom_selector import st_custom_selector
+
 from configs.influx_client import query_api
 from configs.query import Query
 from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table, draw_barchart, draw_wet_seal_chart)
@@ -29,11 +32,7 @@ def render_overview():
   df = sess("data")
   if df is None:
     return
-  check_logger.info("0000000000000000000000000")
-  check_logger.info(df.columns)
   df = df[df._field.isin(tag_dict.keys())]
-  check_logger.info(df)
-  check_logger.info(df.columns)
   draw_chart_by_check_data(df, title=f"{sess('current_machine').upper()} Alert Overview")
 
 def render_wet_seals():
@@ -67,9 +66,7 @@ def inside(v, b1, b2):
     b2 = 0
   return (v - b1) * (v - b2) < 0
 
-
 attributes = ["low3", "low2", "low", "high", "high2", "high3"]
-
 
 def irv_diagnose(min_max, tagSpec, tag):
   if tagSpec is None:
@@ -141,8 +138,6 @@ def irvTableData(df, device="mp"):
 
 def __irvTable(df, header="", device="mp", withSearch=False, withComment=False, withDownload=False, key=0):
   records = irvTableData(df, device)
-  check_logger.info("^^^^^^^^^^")
-  check_logger.info(records)
   st_custom_dataframe(data=records, header=header, withSearch=withSearch, withComment=withComment, withDownload=withDownload, key=key)
 
 def render_irv_report(device = "mp"):
@@ -157,52 +152,71 @@ def render_transient_report(device = 'mp'):
     if sess("data").empty:
       return st.markdown("<h3 class='no-mp-data'>No stop and start period</h3>", unsafe_allow_html=True)
 
+    tab1, tab2 = st.tabs(['Report', 'Analyse'])
     all_df = pd.DataFrame()
-    for idx, row in sess("data").iterrows():
-      offset = 0 if row._value < 0 else 2
-      length = 5 if row._value < 0 else 10
-      check_logger.info(f"{length}")
-      startTime = row._time.to_pydatetime() + timedelta(minutes=offset)
-      stopTime = startTime + timedelta(minutes=length)
-      check_logger.info("++++++++++000++++++++++++")
-      check_logger.info(f"{startTime}, {stopTime}")
-      alert_type = "STOP" if row["_value"] < 0 else "START"
+    with tab1:
+      for idx, row in sess("data").iterrows():
+        offset = 0 if row._value < 0 else 2
+        length = 5 if row._value < 0 else 10
+        check_logger.info(f"{length}")
+        startTime = row._time.to_pydatetime() + timedelta(minutes=offset)
+        stopTime = startTime + timedelta(minutes=length)
+        check_logger.info("++++++++++000++++++++++++")
+        check_logger.info(f"{startTime}, {stopTime}")
+        alert_type = "STOP" if row["_value"] < 0 else "START"
 
-      df = query_irv_transient_tags(startTime, stopTime, alert_type)
-      all_df = pd.concat([all_df, copy.deepcopy(df)])
-      header = {
-          "alert_type": "STOP" if row["_value"] < 0 else "START",
-          "start": str(startTime),
-          "end": str(stopTime),
-      }
-      __irvTable(df, device=device, header=header, key=idx)
+        df = query_irv_transient_tags(startTime, stopTime, alert_type)
+        all_df = pd.concat([all_df, copy.deepcopy(df)])
+        header = {
+            "alert_type": "STOP" if row["_value"] < 0 else "START",
+            "start": str(startTime),
+            "end": str(stopTime),
+        }
+        __irvTable(df, device=device, header=header, key=idx)
     
-    all_df = all_df[["startTime", "_value", "_field", "alert_type"]]
-    all_df.sort_values(["startTime", "_field", "_value"], inplace=True)
-    all_df.reset_index(inplace=True, drop=True)
-    all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
-    labels = {
-      "startTime": "Time",
-      "_value": "Value",
-      "minmax": "Legend",
-      "_field": "Tag",
-      "alert_type": "Type"
-    }
-    draw_barchart(
-      all_df, 
-      x = 'startTime', 
-      y = '_value', 
-      color='minmax', 
-      facet="_field",
-      labels=labels,
-      hover_data={"_value": ":.3f"},
-      height = 13 * 150 if device == 'mp' else 14 * 150,
-      col_num=1 if device == 'mp' else 3,
-      domain=[
-        parser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00"),
-        parser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
-      ]
-    )
+    with tab2:
+      all_df = all_df[["startTime", "_value", "_field", "alert_type"]]
+      all_df.sort_values(["startTime", "_field", "_value"], inplace=True)
+      all_df.reset_index(inplace=True, drop=True)
+      all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
+      labels = {
+        "startTime": "Time",
+        "_value": "Value",
+        "minmax": "Legend",
+        "_field": "Tag",
+        "alert_type": "Type"
+      }
+      _dummy, filtered_df = st_custom_selector(key=1, data=all_df)
+      check_logger.info(f'TYPE: {type(filtered_df)}')
+      if filtered_df is None:
+        filtered_df = pd.DataFrame()
+      check_logger.info(f'TYPE: {type(filtered_df)}')
+      all_df.to_csv('/tmp/all_df.csv')
+      if filtered_df is not None and not filtered_df.empty:
+        filtered_df.columns = filtered_df.columns.get_level_values(0)
+
+        filtered_df.to_csv('/tmp/filtered_df.csv')
+        #col_num=1 if device == 'mp' else 3,
+        col_num = 1
+        #height = 13 * 150 if device == 'mp' else 14 * 150
+        check_logger.info(filtered_df['_field'].unique())
+        height = len(filtered_df._field.unique()) * 150
+        draw_barchart(
+          filtered_df, 
+          x = 'startTime', 
+          y = '_value', 
+          color='minmax', 
+          facet="_field",
+          labels=labels,
+          hover_data={"_value": ":.3f"},
+          height = height,
+          col_num=col_num,
+          domain=[
+            parser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00"),
+            parser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+          ]
+        )
+      check_logger.info(_dummy);
 
 def render_columns(devices, deviation_checks):
   check_logger.info('render columns')

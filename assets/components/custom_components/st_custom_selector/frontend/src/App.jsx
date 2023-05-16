@@ -4,18 +4,18 @@ import {
 	withStreamlitConnection,
 	ArrowTable,
 } from "streamlit-component-lib";
-import { Checkbox, Row, Col, Typography } from "antd";
-import { Table } from "apache-arrow";
+import { Button, Checkbox, Row, Col, Typography } from "antd";
+import { Table, Int } from "apache-arrow";
 import "./App.css";
 
-const FilterOptions = ({ onChange, options, span }) => {
+const FilterOptions = ({ onChange, labels, options, span }) => {
 	return (
 		<Checkbox.Group onChange={onChange}>
 			<Row gutter={[16, 16]}>
 				{options.map((option, index) => {
 					return (
 						<Col span={span} key={index}>
-							<Checkbox value={option}>{option}</Checkbox>
+							<Checkbox value={option}>{labels[index]}</Checkbox>
 						</Col>
 					);
 				})}
@@ -53,64 +53,80 @@ function App({ args }) {
 		Streamlit.setFrameHeight();
 	});
 	const [tags, setTags] = useState([]);
-	const [alertType, setAlertType] = useState([]);
+	const [alertTime, setAlertTime] = useState([]);
+  const [applied, setApplied] = useState(false);
+  const [firstRender, setFirstRender] = useState(true)
 	useEffect(() => {
-		const _table = filterTable(data.table, (table, rowIndex) => {
-			return (
-				tags.includes(table.getColumnAt(3).get(rowIndex)) &&
-				alertType.includes(table.getColumnAt(4).get(rowIndex))
-			);
-		});
-		const indexTable = Table.new({
-			index: data.table.getColumnAt(0).constructor.from({
-				values: Array.from({ length: _table.length }, (_, i) => i),
-				type: data.table.getColumnAt(0).type,
-			}),
-		});
-		// const columnTable = Table.new({
-		// 	columns: data.columnsTable.getColumnAt(0).constructor.from({
-		// 		values: data.columnsTable
-		// 			.toArray()
-		// 			.map((row) => row[0])
-		// 			.slice(1),
-		// 		type: data.columnsTable.getColumnAt(0).type,
-		// 	}),
-		// });
-		const arrT = new ArrowTable(
-			_table.serialize(),
-			indexTable.serialize(),
-			data.columnsTable.serialize()
-		);
-		Streamlit.setComponentValue(arrT);
-	}, [tags, alertType]);
+    if (applied || firstRender) {
+      setFirstRender(false);
+      setApplied(false);
+      const _table = filterTable(data.table, (table, rowIndex) => {
+        return (
+          tags.includes(table.getColumnAt(2).get(rowIndex)) &&
+          alertTime.includes(table.getColumnAt(0).get(rowIndex))
+        );
+      });
+      const indexTable = Table.new({
+        index: data.table.getColumnAt(0).constructor.from({
+          values: Array.from({ length: _table.length }, (_, i) => i),
+          type: new Int(true, 64),
+        }),
+      });
+      // const columnTable = Table.new({
+      // 	columns: data.columnsTable.getColumnAt(0).constructor.from({
+      // 		values: data.columnsTable
+      // 			.toArray()
+      // 			.map((row) => row[0])
+      // 			.slice(1),
+      // 		type: data.columnsTable.getColumnAt(0).type,
+      // 	}),
+      // });
+      const arrT = new ArrowTable(
+        _table.serialize(),
+        indexTable.serialize(),
+        data.columnsTable.serialize()
+      );
+      Streamlit.setComponentValue(arrT);
+    }
+	}, [applied]);
 	const { data } = args;
-	const tagOptions = [...new Set(data.table.getColumnAt(3))];
-	const alertTypeOptions = [...new Set(data.table.getColumnAt(4))];
+	const tagOptions = [...new Set(data.table.getColumnAt(2))];
+  
+  let timeArray = [...data.table.getColumnAt(0)]
+  let typeArray = [...data.table.getColumnAt(3)]
+  let combinedArray = timeArray.map((item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`)
+  let stopStartEventList = [...new Set(combinedArray)]
+	const alertTimeOptions = [...new Set(timeArray)];
 	const handleSelectTags = (selectedTags) => {
 		setTags(selectedTags);
 	};
 	const handleSelectAlertType = (selectedAlertType) => {
-		setAlertType(selectedAlertType);
+		setAlertTime(selectedAlertType);
 	};
 
 	return (
 		<Row gutter={[16, 16]}>
 			<Col xs={24}>
-				<Typography.Title level={5}>Select tags:</Typography.Title>
+				<Typography.Title level={5}>Tags:</Typography.Title>
 				<FilterOptions
 					onChange={handleSelectTags}
+          labels={tagOptions}
 					options={tagOptions}
 					span={6}
 				/>
 			</Col>
 			<Col xs={24}>
-				<Typography.Title level={5}>Select type:</Typography.Title>
+				<Typography.Title level={5}>Events:</Typography.Title>
 				<FilterOptions
 					onChange={handleSelectAlertType}
-					options={alertTypeOptions}
+          labels={stopStartEventList}
+					options={alertTimeOptions}
 					span={12}
 				/>
 			</Col>
+      <Col xs={24}>
+        <Button onClick={() => setApplied(true)}>Apply</Button>
+      </Col>
 		</Row>
 	);
 }

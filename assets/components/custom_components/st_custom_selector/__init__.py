@@ -15,7 +15,7 @@ else:
 	_component_func = components.declare_component("st_custom_selector", path=build_dir)
 
 
-def st_custom_selector(key=None):
-	component_value = _component_func(key=key)
+def st_custom_selector(key=None, data=None):
+	component_value = _component_func(key=key, data=data)
 	component_name = _component_func.name
 	return component_name, component_value
