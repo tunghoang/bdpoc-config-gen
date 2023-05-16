@@ -68,6 +68,9 @@ class App:
     init_session(self, "current_machine", "mp")
     init_session(self, "sampling_rate", "30s")
 
+    init_session(self, "default_tags", [])
+    init_session(self, "default_alert_time", [])
+
   def init(self):
     check_logger.info("\tApp init")
     # Configuration
@@ -104,8 +107,8 @@ class App:
         self.container.render()
         st.empty()
 
-      
-        
+
+
     except Exception:
       check_logger.exception('ERROR')
       st.error("Noooo data found. Extend 'Time Range' to retrieve more data", icon="❗")
