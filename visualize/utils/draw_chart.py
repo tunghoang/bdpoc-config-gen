@@ -233,3 +233,18 @@ def draw_barchart(df, x = None, y = None, color = None, facet = None, domain = N
   #fig.update_annotations(x=-0.05, textangle=-90)
   fig.update_yaxes(title=None)
   st.plotly_chart(fig, use_container_width=True) 
+
+def draw_linechart(df, x = None, y = None, color = None, facet = None, domain = None, height=600, col_num=1, labels=None, hover_data=None):
+  check_logger.info(df)
+  fig = px.line(df, x = x, y = y, color = color, facet_col=facet, facet_col_wrap=col_num,
+    range_x = domain,
+    text='alert_type',
+    labels=labels,
+    hover_data=hover_data,
+    height=height, facet_row_spacing = 0.07
+  )
+  fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+  #fig.update_annotations(x=-0.05, textangle=-90)
+  #fig.update_annotations(x=-0.05, textangle=-90)
+  fig.update_yaxes(title=None)
+  st.plotly_chart(fig, use_container_width=True) 

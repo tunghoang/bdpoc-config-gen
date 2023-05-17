@@ -63,8 +63,6 @@ class App:
 		init_session(self, "current_machine", "mp")
 		init_session(self, "sampling_rate", "30s")
 
-		init_session(self, "filtered_table", pd.DataFrame())
-
 	def init(self):
 		check_logger.info("\tApp init")
 		# Configuration

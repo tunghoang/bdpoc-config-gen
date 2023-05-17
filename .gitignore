@@ -3,4 +3,13 @@ __pycache__
 .vscode
 .datahub
 .venv
-*.log
+*.log*
+.ipynb_checkpoints
+build
+dist
+*.egg-info
+*.flux
+out.txt
+*.csv
+visualize/static
+*.yaml.bk
