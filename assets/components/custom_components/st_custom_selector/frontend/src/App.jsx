@@ -54,46 +54,44 @@ function App({ args }) {
 	});
 	const [tags, setTags] = useState([]);
 	const [alertTime, setAlertTime] = useState([]);
-  const [applied, setApplied] = useState(false);
-	useEffect(() => {
-    if (applied) {
-      setApplied(false);
-      const _table = filterTable(data.table, (table, rowIndex) => {
-        return (
-          tags.includes(table.getColumnAt(2).get(rowIndex)) &&
-          alertTime.includes(table.getColumnAt(0).get(rowIndex))
-        );
-      });
-      const indexTable = Table.new({
-        index: data.table.getColumnAt(0).constructor.from({
-          values: Array.from({ length: _table.length }, (_, i) => i),
-          type: new Int(true, 64),
-        }),
-      });
-      // const columnTable = Table.new({
-      // 	columns: data.columnsTable.getColumnAt(0).constructor.from({
-      // 		values: data.columnsTable
-      // 			.toArray()
-      // 			.map((row) => row[0])
-      // 			.slice(1),
-      // 		type: data.columnsTable.getColumnAt(0).type,
-      // 	}),
-      // });
-      const arrT = new ArrowTable(
-        _table.serialize(),
-        indexTable.serialize(),
-        data.columnsTable.serialize()
-      );
-      Streamlit.setComponentValue(arrT);
-    }
-	}, [applied]);
+	const handleApply = () => {
+		const _table = filterTable(data.table, (table, rowIndex) => {
+			return (
+				tags.includes(table.getColumnAt(2).get(rowIndex)) &&
+				alertTime.includes(table.getColumnAt(0).get(rowIndex))
+			);
+		});
+		const indexTable = Table.new({
+			index: data.table.getColumnAt(0).constructor.from({
+				values: Array.from({ length: _table.length }, (_, i) => i),
+				type: new Int(true, 64),
+			}),
+		});
+		// const columnTable = Table.new({
+		// 	columns: data.columnsTable.getColumnAt(0).constructor.from({
+		// 		values: data.columnsTable
+		// 			.toArray()
+		// 			.map((row) => row[0])
+		// 			.slice(1),
+		// 		type: data.columnsTable.getColumnAt(0).type,
+		// 	}),
+		// });
+		const arrT = new ArrowTable(
+			_table.serialize(),
+			indexTable.serialize(),
+			data.columnsTable.serialize()
+		);
+		Streamlit.setComponentValue(arrT);
+	};
 	const { data } = args;
 	const tagOptions = [...new Set(data.table.getColumnAt(2))];
-  
-  let timeArray = [...data.table.getColumnAt(0)]
-  let typeArray = [...data.table.getColumnAt(3)]
-  let combinedArray = timeArray.map((item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`)
-  let stopStartEventList = [...new Set(combinedArray)]
+
+	let timeArray = [...data.table.getColumnAt(0)];
+	let typeArray = [...data.table.getColumnAt(3)];
+	let combinedArray = timeArray.map(
+		(item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`
+	);
+	const stopStartEventList = [...new Set(combinedArray)];
 	const alertTimeOptions = [...new Set(timeArray)];
 	const handleSelectTags = (selectedTags) => {
 		setTags(selectedTags);
@@ -108,7 +106,7 @@ function App({ args }) {
 				<Typography.Title level={5}>Tags:</Typography.Title>
 				<FilterOptions
 					onChange={handleSelectTags}
-          labels={tagOptions}
+					labels={tagOptions}
 					options={tagOptions}
 					span={6}
 				/>
@@ -117,14 +115,14 @@ function App({ args }) {
 				<Typography.Title level={5}>Events:</Typography.Title>
 				<FilterOptions
 					onChange={handleSelectAlertType}
-          labels={stopStartEventList}
+					labels={stopStartEventList}
 					options={alertTimeOptions}
 					span={12}
 				/>
 			</Col>
-      <Col xs={24}>
-        <Button onClick={() => setApplied(true)}>Apply</Button>
-      </Col>
+			<Col xs={24}>
+				<Button onClick={handleApply}>Apply</Button>
+			</Col>
 		</Row>
 	);
 }
