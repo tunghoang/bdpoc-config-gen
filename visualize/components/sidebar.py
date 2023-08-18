@@ -37,7 +37,8 @@ def setting_controls(app):
   )
   st.selectbox(
     "View Mode", 
-    list(range(len(VIEW_MODES[sess("current_machine")]))),
+    list(VIEW_MODES[sess("current_machine")].keys()),
+    #list(range(len(VIEW_MODES[sess("current_machine")]))),
     #(OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT), 
     format_func=lambda viewModeIdx: VIEW_MODES[sess("current_machine")][viewModeIdx], 
     key="view_mode", 

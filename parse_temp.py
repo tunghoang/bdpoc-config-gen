@@ -84,11 +84,13 @@ tags = csv_to_array_full_objects(inputFile)
 cleanTags = {}
 for tag in tags:
   tagInfo = {
+    'tag_no': tag['tag_no'],
     'device': tag['group'], 
     'description': tag['measuring_point'], 
     'unit': tag.get('unit', 'NA'), 
-    'mp_startup': True if tag['mp_startup'] == "x" or tag['critical'] == 'X' else False,
-    'critical': True if tag['critical'] == "x" or tag['critical'] == 'X' else False
+    'mp_startup': True if tag['mp_startup'].lower() == "x" or tag['critical'].lower() == 'x' else False,
+    'critical': True if tag['critical'] == "x" or tag['critical'] == 'X' else False,
+    'disabled': True if tag['disabled'].lower() == "x" else False
   }
   parse_irv_levels(tag['instrument_range_validation'], tagInfo)
   cleanTags[tag['phd_tag']] = tagInfo

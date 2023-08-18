@@ -112,8 +112,11 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   if data.empty:
     raise Exception('No data')
     #return
-
-  data["type"] = data.type.fillna("N/A")
+  
+  if "type" in data.columns:
+    data["type"] = data.type.fillna("N/A")
+  else:
+    data["type"] = "N/A"
   range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
 
   hover_data={
@@ -130,8 +133,24 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
     labels=labels, 
     hover_data=hover_data,
     range_x=range_x, 
-    color="_measurement", 
+    color="_measurement",
+    color_discrete_map={
+      "irv_check": 'blue',
+      "nan_check": "red",
+      "roc_check": "orange",
+      "frozen_check": "green",
+      "overange_check": "brown"
+    },
     symbol="type",
+    symbol_map={
+      "H": 'circle',
+      "HH": 'diamond',
+      "HHH": 'cross',
+      "L": 'square',
+      "LL": "triangle-up",
+      "LLL": "x",
+      "N/A": "circle"
+    },
     height=height, 
     markers=True
   ) if connected else px.scatter(
@@ -141,7 +160,23 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
     labels=labels, 
     hover_data=hover_data,
     color="_measurement", 
+    color_discrete_map={
+      "irv_check": 'blue',
+      "nan_check": "red",
+      "roc_check": "orange",
+      "frozen_check": "green",
+      "overange_check": "brown"
+    },
     symbol="type",
+    symbol_map={
+      "H": 'circle',
+      "HH": 'diamond',
+      "HHH": 'cross',
+      "L": 'square',
+      "LL": "triangle-up",
+      "LLL": "x",
+      "N/A": "circle"
+    },
     height=height
   )
   
@@ -218,11 +253,11 @@ def draw_table(data: pd.DataFrame, height=700, title=""):
   st.plotly_chart(chart, use_container_width=True)
   st.text_input("Conclusion:", key="conclusion", on_change="")
 
-def draw_barchart(df, x = None, y = None, color = None, facet = None, domain = None, height=600, col_num=1, labels=None, hover_data=None):
+def draw_barchart(df, x = None, y = None, color = None, text='alert_type', facet = None, domain = None, height=600, col_num=1, labels=None, hover_data=None):
   check_logger.info(df)
   fig = px.bar(df, x = x, y = y, color = color, facet_col=facet, facet_col_wrap=col_num,
     range_x = domain,
-    text='alert_type',
+    text=text,
     barmode='group',
     labels=labels,
     hover_data=hover_data,
@@ -232,6 +267,7 @@ def draw_barchart(df, x = None, y = None, color = None, facet = None, domain = N
   #fig.update_annotations(x=-0.05, textangle=-90)
   #fig.update_annotations(x=-0.05, textangle=-90)
   fig.update_yaxes(title=None)
+  fig.update_xaxes(type='category')
   st.plotly_chart(fig, use_container_width=True) 
 
 def draw_linechart(df, x = None, y = None, color = None, facet = None, domain = None, height=600, col_num=1, labels=None, hover_data=None):

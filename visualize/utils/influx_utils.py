@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, MP_EVENTS_BUCKET, ORG, PIVOT, SECOND, RUNNING_INDICATORS)
+from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, MP_EVENTS_BUCKET, ORG, PIVOT, SECOND, RUNNING_INDICATORS, TAGSPEC_FILES, RUL_WINDING_TEMP)
 from configs.influx_client import query_api
 from configs.module_loader import *
 from configs.query import Query
@@ -16,6 +16,20 @@ from configs.logger import check_logger
 from influx import Influx
 
 warnings.simplefilter("ignore", MissingPivotFunction)
+
+def get_rul_tags(start, end):
+  check_logger.info("-----------query RUL -----------")
+  tags = RUL_WINDING_TEMP.keys()
+  filter_str = " ".join([('or r._field == "' + f + '"') for f in tags])
+  inst = Influx().setDebug(True).setRawQuery(f'''from(bucket: "datahub-test")
+  |> range(start: {int(start.timestamp())}, stop: {int(end.timestamp())})
+  |> filter(fn: (r) => r["_field"] == "loremipsum" {filter_str})
+  |> mean()
+''')
+  check_logger.info(inst.getQuery())
+  check_logger.info(inst.getQuery())
+  df = inst.asDataFrame(convert_time=False)
+  return df
 
 def get_raw_data(start_date, start_time, end_date, end_time, tags, rate = '30s'):
   __start = dparser.isoparse(f"{start_date}T{start_time}+07:00")
@@ -43,11 +57,21 @@ def query_raw_data(time: int, device: str, tags: list = [], interpolated: bool =
   return table
 
 def query_irv_tags(start, end):
-  fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  #fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  fileName = TAGSPEC_FILES[sess("current_machine")]
   tagDict = load_tag_specs(fileName)
 
   irv_fields = list(filter(lambda x: isNumber(tagDict[x]["high"]), tagDict.keys()))
-  table = Influx().setDebug(True).addFields(irv_fields).setStart(start).setStop(end).asMinMaxDataFrame()
+  #table = Influx().setDebug(True).addFields(irv_fields).setStart(start).setStop(end).asMinMaxDataFrame()
+  filter_str = " ".join([('or r._field == "' + f + '"') for f in irv_fields])
+  table = Influx().setDebug(True).setRawQuery(f'''data = from(bucket: "datahub-test")
+  |> range(start: {int(start.timestamp())}, stop: {int(end.timestamp())})
+  |> filter(fn: (r) => r["_field"] == "loremipsum" {filter_str})
+  |> stateCount(fn: (r) => r._value == 0 )
+  |> filter(fn: (r) => r.stateCount == -1 or r.stateCount > 5)
+union(tables: [data |> min() , data |> max() ])
+''').asDataFrame()
+  
   return table
 
 def query_irv_tags_old(time: int) -> DataFrame:
@@ -135,7 +159,8 @@ def validFn(tagDict, x):
   return True
 
 def query_irv_transient_tags(start, end, alert_type="STOP"):
-  fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  #fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  fileName = TAGSPEC_FILES[sess("current_machine")]
   tagDict = load_tag_specs(fileName)
 
   irv_fields = list(filter(lambda x: validFn(tagDict, x), tagDict.keys()))
@@ -223,7 +248,8 @@ def query_check_data(time: int, device: str, tags: list = [], check_mode='none')
   return table
 
 def query_check_all(start, end):
-  fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  #fileName = 'assets/files/tag-specs.yaml' if sess("current_machine") == "mp" else 'assets/files/lip-tag-specs.yaml'
+  fileName = TAGSPEC_FILES[sess("current_machine")]
   tagDict = load_tag_specs(fileName)
   fields = list(tagDict.keys())
   check_logger.info("^+++++++++++++++++++^")

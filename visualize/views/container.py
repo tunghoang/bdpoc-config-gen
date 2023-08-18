@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pytz
 import streamlit as st
-from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS)
+from configs.constants import (BUCKET, INFINITIES, LABELS, ORG, START_DERIVATIVE_VALUE, STOP_DERIVATIVE_VALUE, TIME_STRINGS, TAGSPEC_FILES)
 
 from configs.custom_components import outstanding_tag_list, st_custom_dataframe
 from custom_components.st_custom_selector import st_custom_selector
@@ -21,6 +21,7 @@ from utils.session import sess, update_session
 from utils.tag_utils import load_tag_specs
 from utils.view_utils import (get_device_by_name, select_tag_update_calldb, visualize_data_by_raw_data)
 
+from utils.rul_utils import remaining_useful_life
 from configs.logger import check_logger
 
 from influx import Influx
@@ -40,10 +41,12 @@ def render_overview():
 
 def render_wet_seals():
   df = sess("data")
-  if df is None:
-    return
-  df = df[df._field.isin(['LP_Seal', "IP_Seal"])]
-  check_logger.info(df._field)
+  if df is not None:
+    df = df[df._field.isin(['LP_Seal', "IP_Seal"])]
+    check_logger.info(df._field)
+  else:
+    st.markdown('No data found')
+
   draw_wet_seal_chart(df, title="Wet Seals Alarms/PreAlarms")
   st.markdown("""----
 ### LP WetGas Rules:
@@ -113,7 +116,8 @@ def irv_diagnose(min_max, tagSpec, tag):
 
 
 def tagSpecFile(device="mp"):
-  return 'assets/files/tag-specs.yaml' if device == "mp" else 'assets/files/lip-tag-specs.yaml'
+  return TAGSPEC_FILES[device]
+  #return 'assets/files/tag-specs.yaml' if device == "mp" else 'assets/files/lip-tag-specs.yaml'
 
 
 def irvTableData(df, device="mp"):
@@ -122,7 +126,8 @@ def irvTableData(df, device="mp"):
   tagDict = load_tag_specs(filename)
   df = df.groupby("_field", as_index=False)._value.agg({"Min": lambda x: min(list(x)), "Max": lambda x: max(list(x))})
 
-  df[["Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
+  df[["TagNo", "Group", "Description", "Unit", "LLL", "LL", "L", "H", "HH", "HHH", "Flag", "Evaluation"]] = df.apply(lambda row: pd.Series([
+      tagDict.get(row["_field"], {}).get("tag_no", "NA"),
       tagDict.get(row["_field"], {}).get("device", "NA"),
       tagDict.get(row["_field"], {}).get("description", "NA"),
       tagDict.get(row["_field"], {}).get("unit", "NA"),
@@ -188,6 +193,7 @@ def render_transient_report(device='mp'):
       all_df.sort_values(["startTime", "_field", "_value"], inplace=True)
       all_df.reset_index(inplace=True, drop=True)
       all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
+      all_df['info'] = all_df["alert_type"].astype(str) + " (" + all_df["minmax"].astype(str) + ")"
       labels = {"startTime": "Time", "_value": "Value", "minmax": "Legend", "_field": "Tag", "alert_type": "Type"}
 
       _dummy, filtered_df = st_custom_selector(key=999, data=all_df)
@@ -206,11 +212,12 @@ def render_transient_report(device='mp'):
         col_num = 1
         #height = 13 * 150 if device == 'mp' else 14 * 150
         check_logger.info(filtered_df['_field'].unique())
-        height = len(filtered_df._field.unique()) * 150
-        draw_linechart(filtered_df,
+        height = len(filtered_df._field.unique()) * 200
+        draw_barchart(filtered_df,
                       x='startTime',
                       y='_value',
                       color='minmax',
+                      text="info",
                       facet="_field",
                       labels=labels,
                       hover_data={"_value": ":.3f"},
@@ -338,3 +345,16 @@ def render_inspection():
 
   if (raw_data is not None) and (not raw_data.empty):
     draw_chart_by_raw_data(raw_data, height=450, title=sess("_selected_tag"), connected=True)
+
+def render_rul():
+  df = sess("data")
+  if (df is None or df.empty ):
+    return
+
+  with st.spinner("Analysing RUL data ..."):
+    ruls = remaining_useful_life(df._field, df._value)
+    check_logger.info(ruls)
+    df1 = df[["_field", "_value"]]
+    df1["RUL (years)"] = ruls
+    df1["RUL (days)"] = ruls * 365
+    st.write(df1)

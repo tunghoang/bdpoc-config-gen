@@ -114,6 +114,7 @@ def process_frozen_check(tagObject, tagInfor):
 
 
 def process_deviation_check(tagObject, tagInfor):
+  print(tagInfor)
   if __DEVIATION_CHECK_NAME[0] in tagObject:
     if tagInfor[__DEVIATION_CHECK_NAME[0]] == "":
       return

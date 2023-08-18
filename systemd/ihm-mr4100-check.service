@@ -1,0 +1,12 @@
+[Unit]
+Description=Instrument Health Monitoring MR4100 Check service
+
+[Service]
+User=jupyter-admin
+Environment=CHECK_MACHINE=mr4100.log
+WorkingDirectory=/home/jupyter-admin/bdpoc-datahub
+ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/python check_schedule.py -m mr4100
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

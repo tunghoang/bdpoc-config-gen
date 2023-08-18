@@ -2,54 +2,48 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
  Number","CROSS REF.  (DEVIATION CHECK)
  Number",NaN Check,Overange Check,Instrument Range Validation,Frozen check (5 min configurable),Rate of Change check,Travelling Check,"CROSS REF. (DEVIATION CHECK)
  Tagname","CONTROL LOGIC CHECK
- Tagname",Remark (Điều kiện bình thường),Not now,Not now,MP Startup,Critical,,,,,Instrument Range Validation (backup)
+ Tagname",Remark (Điều kiện bình thường),Not now,Not now,MP Startup,Critical,Disabled,,,,@
 2,Compressor,FIT_2188,HT_FI_2188.PV,RD COMP. BALANCE PISTON LEAKAGE,mbar,,,Y,"0, 1000",,Y,Pressure,,,,,,,,,,,,,
 49,Compressor,TE_2178A,HT_TI_2178A.PV,RD COMP. JOURN. BRG. NDE,°C,,,Y,"-40, 200","_,_,0,65,80,110",Y,Temperature,,,,,,,,x,,,,,"_,_,0,65,80,110"
-50,Compressor,TE_2178B,HT_TI_2178B.PV,RD COMP. JOURN. BRG. NDE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
-51,Compressor,TE_2179A,HT_TI_2179A.PV,RD COMP. THRUST BRG. INBOARD,°C,,13,Y,"-40, 200","_,_,0,63,75,90",,Temperature,,TE-2179A/B,,,,,,x,,,,,"_,_,0,63,75,90"
-52,Compressor,TE_2179B,HT_TI_2179B.PV,RD COMP. THRUST BRG. INBOARD,°C,,13,Y,"-40, 200","_,_,0,63,75,90",Y,Temperature,,TE-2179A/B,,,,,,x,,,,,"_,_,0,63,75,90"
-53,Compressor,TE_2179C,HT_TI_2179C.PV,RD COMP. THRUST BRG. OUTBOARD,°C,,14,Y,"-40, 200","_,_,0,65,77,90",Y,Temperature,,TE-2179C/D,,,,,,x,,,,,"_,_,0,65,77,90"
-54,Compressor,TE_2179D,HT_TI_2179D.PV,RD COMP. THRUST BRG. OUTBOARD,°C,,14,Y,"-40, 200","_,_,0,65,77,90",Y,Temperature,,TE-2179C/D,,,,,,x,,,,,"_,_,0,65,77,90"
+51,Compressor,TE_2179A,HT_TI_2179A.PV,RD COMP. THRUST BRG. INBOARD,°C,,13,Y,"-40, 200","_,_,0,70,80,90",,Temperature,,TE-2179A/B,,,,,,x,,,,,"_,_,0,63,75,90"
+52,Compressor,TE_2179B,HT_TI_2179B.PV,RD COMP. THRUST BRG. INBOARD,°C,,13,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,TE-2179A/B,,,,,,x,,,,,"_,_,0,63,75,90"
+53,Compressor,TE_2179C,HT_TI_2179C.PV,RD COMP. THRUST BRG. OUTBOARD,°C,,14,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,TE-2179C/D,,,,,,x,,,,,"_,_,0,65,77,90"
+54,Compressor,TE_2179D,HT_TI_2179D.PV,RD COMP. THRUST BRG. OUTBOARD,°C,,14,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,TE-2179C/D,,,,,,x,,,,,"_,_,0,65,77,90"
 68,Compressor,TE_2189A,HT_TI_2189A.PV,RD COMP. JOURN. BRG. DE,°C,,,Y,"-40, 200","_,_,0,65,80,110",Y,Temperature,,,,,,,,x,,,,,"_,_,0,65,80,110"
-69,Compressor,TE_2189B,HT_TI_2189B.PV,RD COMP. JOURN. BRG. DE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
 81,Compressor,VE_2184A,HT_VI_2184A.PV,RD COMP. JOURN. BRG. DE,μm,,,Y,"0, 200","_,_,0,15,26,52",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,15,26,52"
 82,Compressor,VE_2184B,HT_VI_2184B.PV,RD COMP. JOURN. BRG. DE,μm,,,Y,"0, 200","_,_,0,15,26,52",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,15,26,52"
 85,Compressor,VE_2188A,HT_VI_2188A.PV,RD COMP. JOURN. BRG. NDE,μm,,,Y,"0, 200","_,_,0,15,26,52",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,15,26,52"
 86,Compressor,VE_2188B,HT_VI_2188B.PV,RD COMP. JOURN. BRG. NDE,μm,,,Y,"0, 200","_,_,0,15,26,52",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,15,26,52"
 102,Compressor,ZT_2181A,HT_ZI_2181A.PV,RD COMP. SHAFT AXIAL DISPLACEMENT,mm,,19,Y,"-1, 1","-0.4,-0.3,-0.22,0.22,0.3,0.4",Y,Vibration,,ZE-2181A/B,,,,,x,,,,,,"-0.4,-0.3,-0.22,0.22,0.3,0.4"
 103,Compressor,ZT_2181B,HT_ZI_2181B.PV,RD COMP. SHAFT AXIAL DISPLACEMENT,mm,,19,Y,"-1, 1","-0.4,-0.3,-0.22,0.22,0.3,0.4",Y,Vibration,,ZE-2181A/B,,,,,x,,,,,,"-0.4,-0.3,-0.22,0.22,0.3,0.4"
-3,Dry Gas Seal,FIT_2190,HT_FI_2190.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,mbar,2,,Y,"0, 1000","-1,-1,-1,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FI-2190 tăng,,,,,,,,,"0,0,0,100,300,790"
-4,Dry Gas Seal,FIT_2191,HT_FI_2191.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,mbar,2,,Y,"0, 1000","-1,-1,-1,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,,,,,,,"0,0,0,100,300,790"
-7,Dry Gas Seal,PDIT_2183,HT_PDI_2183.PV,RD COMP. SEAL GAS FILTER,bar,,,Y,"0, 1.5","0,0,0,0.6,0.8,1",Y,Pressure,,,,,,,,,,,,,"0,0,0,0.6,0.8,1"
-8,Dry Gas Seal,PDIT_2184,HT_PDI_2184.PV,RD COMP. INSTRUMENT AIR FILTER,bar,,,Y,"0, 1.5","0,0,0,0.5,0.7,1",Y,Pressure,,,,,x,x,,,,,,,"0,0,0,0.5,0.7,1"
-20,Dry Gas Seal,PIT_2184B,HT_PI_2184B.PV,RD COMP. SECONDARY SEAL DE,mbar,,2,Y,"0, 2000","0,0,0,30,55,80",Y,Pressure,,PIT-2184 A/B,,,x,x,,,,,,,"0,0,0,30,55,80"
-22,Dry Gas Seal,PIT_2185B,HT_PI_2185B.PV,RD COMP. SECONDARY SEAL NDE,mbar,,4,Y,"0, 2000","0,0,0,30,55,80",Y,Pressure,,PIT-2185 A/B,,,x,y,,,,,,,"0,0,0,30,55,80"
+3,Dry Gas Seal,FIT_2190,HT_FI_2190.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,mbar,2,,Y,"0, 1000","_,_,-1,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FI-2190 tăng,,,,,,,,,"0,0,0,100,300,790"
+4,Dry Gas Seal,FIT_2191,HT_FI_2191.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,mbar,2,,Y,"0, 1000","_,_,-1,100,300,790",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,,,,,,,"0,0,0,100,300,790"
+7,Dry Gas Seal,PDIT_2183,HT_PDI_2183.PV,RD COMP. SEAL GAS FILTER,bar,,,Y,"0, 1.5","_,_,0,0.6,0.8,1",Y,Pressure,,,,,,,,,,,,,"0,0,0,0.6,0.8,1"
+8,Dry Gas Seal,PDIT_2184,HT_PDI_2184.PV,RD COMP. INSTRUMENT AIR FILTER,bar,,,Y,"0, 1.5","_,_,0,0.5,0.7,1",Y,Pressure,,,,,x,x,,,,,,,"0,0,0,0.5,0.7,1"
+20,Dry Gas Seal,PIT_2184B,HT_PI_2184B.PV,RD COMP. SECONDARY SEAL DE,mbar,,,Y,"0, 2000","_,_,0,30,55,80",Y,Pressure,,PIT-2184 A/B,,,x,x,,,,,,,"0,0,0,30,55,80"
+22,Dry Gas Seal,PIT_2185B,HT_PI_2185B.PV,RD COMP. SECONDARY SEAL NDE,mbar,,,Y,"0, 2000","_,_,0,30,55,80",Y,Pressure,,PIT-2185 A/B,,,x,y,,,,,,,"0,0,0,30,55,80"
 25,Dry Gas Seal,PIT_2189A,HT_PI_2189A.PV,RD COMP. SEPARATION GAS SUPPLY,mbar,,6,Y,"0, 200","30,45,49,68,85,100",Y,Pressure,,PIT-2189 A/B,,,,,,,,,,,"30,45,49,68,85,100"
-26,Dry Gas Seal,PIT_2189B,HT_PI_2189B.PV,RD COMP. SEPARATION GAS SUPPLY,mbar,,6,Y,"0, 200","30,45,49,68,85,100",Y,Pressure,,PIT-2189 A/B,,,x,x,,,,,,,"30,45,49,68,85,100"
-28,Dry Gas Seal,PIT_2191A,HT_PI_2191A.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,bar,,7,Y,"0,10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2191A/B,,,x,x,,,,,,,"1,1.2,1.5,2.4,2.6,2.8"
+26,Dry Gas Seal,PIT_2189B,HT_PI_2189B.PV,RD COMP. SEPARATION GAS SUPPLY,mbar,,6,Y,"0, 200","30,45,49,68,85,100",Y,Pressure,,PIT-2189 A/B,,,,,,,,,,,"30,45,49,68,85,100"
+28,Dry Gas Seal,PIT_2191A,HT_PI_2191A.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,bar,,7,Y,"0,10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2191A/B,,,,,,,,,,,"1,1.2,1.5,2.4,2.6,2.8"
 29,Dry Gas Seal,PIT_2191B,HT_PI_2191B.PV,RD COMP. PRIMARY SEAL LEAKAGE DE,bar,,7,Y,"0, 10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2191A/B,,,,,,,,,,,"1,1.2,1.5,2.4,2.6,2.8"
-30,Dry Gas Seal,PIT_2191C,HT_PI_2191C.PV,RD COMP. PRIMARY SEAL LEAKAGE,bar,,,Y,"0, 10","0,0,0,2.5,5,7",Y,Pressure,,"PIT_2191C check với MAX(PIT_2191A, PIT_2191B)",,Làm riêng,,x,,,,,,,"0,0,0,2.5,5,7"
+30,Dry Gas Seal,PIT_2191C,HT_PI_2191C.PV,RD COMP. PRIMARY SEAL LEAKAGE,bar,,,Y,"0, 10","_,_,0,2.5,5,7",Y,Pressure,,"PIT_2191C check với MAX(PIT_2191A, PIT_2191B)",,Làm riêng,,x,,,,,,,"0,0,0,2.5,5,7"
 31,Dry Gas Seal,PIT_2192A,HT_PI_2192A.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,bar,,8,Y,"0, 10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2192A/B,,,,,,x,,,,,"1,1.2,1.5,2.4,2.6,2.8"
-32,Dry Gas Seal,PIT_2192B,HT_PI_2192B.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,bar,,8,Y,"0, 10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2192A/B,,,x,y,,,,,,,"1,1.2,1.5,2.4,2.6,2.8"
+32,Dry Gas Seal,PIT_2192B,HT_PI_2192B.PV,RD COMP. PRIMARY SEAL LEAKAGE NDE,bar,,8,Y,"0, 10","1,1.2,1.5,2.4,2.6,2.8",Y,Pressure,,PIT-2192A/B,,,,,,,,,,,"1,1.2,1.5,2.4,2.6,2.8"
 55,Dry Gas Seal,TE_2183A,HT_TI_2183A.PV,RD COMP. PRIMARY SEAL DE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,,,,,,,,,
-75,Dry Gas Seal,TT_2190,HT_TI_2190.PV,RD COMP. SEAL LEAKAGE DE,°C,,,Y,"-40, 200","_,_,0,50,65,80",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
-76,Dry Gas Seal,TT_2191,HT_TI_2191.PV,RD COMP. SEAL LEAKAGE NDE,°C,,,Y,"-40, 200","_,_,0,50,65,80",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
-118,Dry Gas Seal,PCV_2191C,HT_PY_2191C.PV,Pressure Control Valve MP Flash Gas Compressor Skid,bar,2,,Y,"0, 100","0,0,0,5,20,40",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,,,,,,,"0,0,0,5,20,40"
-136,Dry Gas Seal,SDV_2183_GSC,HT_SDV_2183_GSC.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,6,,X,,x,x,,,,,,,
-137,Dry Gas Seal,SDV_2183_GSO,HT_SDV_2183_GSO.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,6,,X,,x,x,,,,,,,
+75,Dry Gas Seal,TT_2190,HT_TI_2190.PV,RD COMP. SEAL LEAKAGE DE,°C,,,Y,"-40, 200","_,_,0,60,70,80",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
+76,Dry Gas Seal,TT_2191,HT_TI_2191.PV,RD COMP. SEAL LEAKAGE NDE,°C,,,Y,"-40, 200","_,_,0,60,70,80",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
+118,Dry Gas Seal,PCV_2191C,HT_PY_2191C.PV,Pressure Control Valve MP Flash Gas Compressor Skid,bar,2,,Y,"0, 100","_,_,0,5,20,40",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,,,,,,,"0,0,0,5,20,40"
+136,Dry Gas Seal,SDV_2183_GSC,HT_SDV_2183_GBC.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,6,,X,,x,x,,,,,,,
+137,Dry Gas Seal,SDV_2183_GSO,HT_SDV_2183_GBO.PV,SHUTDOWN VALVE,Status,,,Y,Y,,Y,,6,,X,,x,x,,,,,,,
 18,Gearbox,ZT_2180B,HT_ZI_2180B.PV,GEAR SHAFT 1 AXIAL DISPLACEMENT,mm,,,Y,"-1, 1","-0.8,-0.5,-0.3,0.09,0.11,0.13",Y,Vibration,,ZE-2180A/B,,,,,x,,,,,,"-0.8,-0.5,-0.3,0.09,0.11,0.13"
 41,Gearbox,TE_2175A,HT_TI_2175A.PV,GEAR SHAFT 1 JOURN. BRG. NDE,°C,,,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,,,,,,,x,,,,,"_,_,0,65,80,107"
-42,Gearbox,TE_2175B,HT_TI_2175B.PV,GEAR SHAFT 1 JOURN. BRG. NDE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
 43,Gearbox,TE_2176A,HT_TI_2176A.PV,GEAR SHAFT 1 THRUST BRG. INBOARD,°C,,11,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,TE-2176A/B,,,,,,,,,,,"_,_,0,65,80,107"
 44,Gearbox,TE_2176B,HT_TI_2176B.PV,GEAR SHAFT 1 THRUST BRG. INBOARD,°C,,11,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,TE-2176A/B,,,,,,,,,,,"_,_,0,65,80,107"
 45,Gearbox,TE_2176C,HT_TI_2176C.PV,GEAR SHAFT 1 THRUST BRG. OUTBOARD,°C,,12,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,TE-2176C/D,,,,,,x,,,,,"_,_,0,65,80,107"
 46,Gearbox,TE_2176D,HT_TI_2176D.PV,GEAR SHAFT 1 THRUST BRG. OUTBOARD,°C,,12,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,TE-2176C/D,,,,,,x,,,,,"_,_,0,65,80,107"
 47,Gearbox,TE_2177A,HT_TI_2177A.PV,GEAR SHAFT 2 JOURN. BRG. DE,°C,,,Y,"-40, 200","_,_,0,78,90,107",Y,Temperature,,,,,,,,x,,,,,"_,_,0,78,90,107"
-48,Gearbox,TE_2177B,HT_TI_2177B.PV,GEAR SHAFT 2 JOURN. BRG. DE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,x,,,,,
 64,Gearbox,TE_2187A,HT_TI_2187A.PV,GEAR SHAFT 1 JOURN. BRG. DE,°C,,,Y,"-40, 200","_,_,0,65,80,107",Y,Temperature,,,,,,,,x,,,,,"_,_,0,65,80,107"
-65,Gearbox,TE_2187B,HT_TI_2187B.PV,GEAR SHAFT 1 JOURN. BRG. DE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
-66,Gearbox,TE_2188A,HT_TI_2188A.PV,GEAR SHAFT 2 JOURN. BRG. NDE,°C,,,Y,"-40, 200","_,_,0,78,90,107",Y,Temperature,,,,,,,,x,,,,,"_,_,0,78,90,107"
-67,Gearbox,TE_2188B,HT_TI_2188B.PV,GEAR SHAFT 2 JOURN. BRG. NDE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
+66,Gearbox,TE_2188A,HT_TI_2188A.PV,GEAR SHAFT 2 JOURN. BRG. NDE,°C,,,Y,"-40, 200","_,_,0,85,95,107",Y,Temperature,,,,,,,,x,,,,,"_,_,0,78,90,107"
 79,Gearbox,VE_2183A,HT_VI_2183A.PV,GEAR SHAFT 1 JOURN. BRG. DE,μm,,,Y,"0, 200","_,_,0,32,45,64",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,32,45,64"
 80,Gearbox,VE_2183B,HT_VI_2183B.PV,GEAR SHAFT 1 JOURN. BRG. DE,μm,,,Y,"0, 200","_,_,0,45,57,64",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,45,57,64"
 83,Gearbox,VE_2187A,HT_VI_2187A.PV,GEAR SHAFT 2 JOURN. BRG. DE,μm,,,Y,"0, 200","_,_,0,27,35,38",Y,Vibration,,,,,,,x,x,,,,,"_,_,0,27,35,38"
@@ -57,59 +51,58 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
 96,Gearbox,XE_2180A,HT_XE_2180A.PV,GEAR SHAFT 1 KEYPHASOR,rpm,,,Y,,,Y,,,,,,,,,,,,,,
 97,Gearbox,XE_2180B,HT_XE_2180B.PV,GEAR SHAFT 2 KEYPHASOR,rpm,,,Y,,,Y,,,,,,,,,,,,,,
 100,Gearbox,ZT_2180A,HT_ZI_2180A.PV,GEAR SHAFT 1 AXIAL DISPLACEMENT,mm,,18,Y,"-1, 1","-0.8,-0.5,-0.3,0.09,0.11,0.13",Y,Vibration,,ZE-2180A/B,,,,,x,,,,,,"-0.8,-0.5,-0.3,0.09,0.11,0.13"
-5,Lube Oil System,LIT_2180A,HT_LI_2180A.PV,OIL RESERVOIR,%,,1,Y,"0, 100","40,50,55,65,65,65",Y,Pressure,,LIT-2180 A/B,,,x,x,,,,,,,"40,50,55,65,65,65"
-9,Lube Oil System,PDIT_2185,HT_PDI_2185.PV,OIL FILTER,bar,,,Y,"0, 2","0,0,0,0.6,0.8,1",Y,Pressure,,,,,,,,,,,,,"0,0,0,0.6,0.8,1"
-13,Lube Oil System,PM_2180A,HT_PM_2180A.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
-14,Lube Oil System,PM_2180B,HT_PM_2180B.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
-15,Lube Oil System,PM_2180C,HT_PM_2180C.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
+101,Gearbox,ZT_2180B,HT_ZI_2180B.PV,GEAR SHAFT 1 AXIAL DISPLACEMENT,mm,,18,Y,"-1, 1","-0.8,-0.5,-0.3,0.09,0.11,0.13",Y,Vibration,,ZE-2180A/B,,,,,x,,,,,,"-0.8,-0.5,-0.3,0.09,0.11,0.13"
+5,Lube Oil System,LIT_2180A,HT_LI_2180A.PV,OIL RESERVOIR,%,,,Y,"0, 100","40,50,55,65,65,65",Y,Pressure,,LIT-2180 A/B,,,x,x,,,,,,,"40,50,55,65,65,65"
+9,Lube Oil System,PDIT_2185,HT_PDI_2185.PV,OIL FILTER,bar,,,Y,"0, 2","_,_,0,0.6,0.8,1",Y,Pressure,,,,,,,,,,,,,"0,0,0,0.6,0.8,1"
+13,Lube Oil System,PM_2180A,HT_XI_2180AA.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
+14,Lube Oil System,PM_2180B,HT_XI_2180BA.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
+15,Lube Oil System,PM_2180C,HT_XI_2180CA.PV,,Status,5,,,,,,,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,x,x,,,,,,,
 16,Lube Oil System,PIT_2181,HT_PI_2181.PV,LUBE OIL LINE,bar,5,,Y,"0, 10","1.2,2.6,3.8,4.5,4.5,4.5",Y,Pressure,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2181 not increase,,,,x,,,,,"1.2,2.6,3.8,4.3,4.3,4.3"
 17,Lube Oil System,PIT_2183A,HT_PI_2183A.PV,TESTING LINE LUBE OIL PUMP,bar,5,,Y,"0, 10",,Y,Pressure,,,PM-2180 A/B/C,Pump start status (signal from Dynamo/PHD) but PIT-2183 not increase,x,y,,,,,,,
 18,Lube Oil System,PIT_2183B,HT_PI_2183B.PV,TESTING LINE EMERGENCY LUBE OIL PUMP,bar,,,Y,"0, 10",,Y,Pressure,,,,,,,,,,,,,
-23,Lube Oil System,PIT_2187,HT_PI_2187.PV,OIL HEADER,bar,,5,Y,"0, 10","1.4,1.6,1.9,2.35,2.45,2.5",Y,Pressure,,PIT-2188/2187,,,,,,x,,,,,"1.4,1.6,1.9,2.35,2.45,2.5"
+23,Lube Oil System,PIT_2187,HT_PI_2187.PV,OIL HEADER,bar,,,Y,"0, 10","1.4,1.6,1.9,2.35,2.45,2.5",Y,Pressure,,PIT-2188/2187,,,,,,x,,,,,"1.4,1.6,1.9,2.35,2.45,2.5"
 72,Lube Oil System,TSHH_2192,HT_TSHH_2192.PV,OIL RESERVOIR HEATER,°C,,,Y,,,Y,,,,,,x,x,,,,,,,
 87,Lube Oil System,VSHH_2182,HT_VSHH_2182.PV,OIL COOLER,Status,,,Y,Y,,Y,,,,,,x,x,,,,,,,
-37,Main Motor,TE_2173A,HT_TI_2173A.PV,MOTOR COOLING AIR COLD,°C,,,Y,"-40, 200","0,0,0,64,74,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,64,74,90"
-38,Main Motor,TE_2173B,HT_TI_2173B.PV,MOTOR COOLING AIR HOT,°C,,,Y,"-40, 200","0,0,0,65,74,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,64,74,90"
-39,Main Motor,TE_2174A,HT_TI_2174A.PV,MOTOR JOURN. BRG. DE,°C,,,Y,"-40, 200","0,0,0,60,74,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,60,74,90"
+37,Main Motor,TE_2173A,HT_TI_2173A.PV,MOTOR COOLING AIR COLD,°C,,,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,64,74,90"
+38,Main Motor,TE_2173B,HT_TI_2173B.PV,MOTOR COOLING AIR HOT,°C,,,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,64,74,90"
+39,Main Motor,TE_2174A,HT_TI_2174A.PV,MOTOR JOURN. BRG. DE,°C,,,Y,"-40, 200","_,_,0,70,80,90",Y,Temperature,,,,,,,,x,,,,,"0,0,0,60,74,90"
 40,Main Motor,TE_2174B,HT_TI_2174B.PV,MOTOR JOURN. BRG. DE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
 56,Main Motor,TE_2185A,HT_TI_2185A.PV,MOTOR JOURN. BRG. NDE,°C,,,Y,"-40, 200","_,_,0,60,74,90",Y,Temperature,,,,,,x,,,,,,,"_,_,0,60,74,90"
 57,Main Motor,TE_2185B,HT_TI_2185B.PV,MOTOR JOURN. BRG. NDE,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,y,,,,,,,
-58,Main Motor,TE_2186A,HT_TI_2186A.PV,MOTOR WINDINGS U,°C,,,Y,"-40, 200","_,_,0,75,90,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
+58,Main Motor,TE_2186A,HT_TI_2186A.PV,MOTOR WINDINGS U,°C,,,Y,"-40, 200","_,_,0,85,100,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
 59,Main Motor,TE_2186B,HT_TI_2186B.PV,MOTOR WINDINGS U,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
-60,Main Motor,TE_2186C,HT_TI_2186C.PV,MOTOR WINDINGS V,°C,,,Y,"-40, 200","_,_,0,75,90,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
+60,Main Motor,TE_2186C,HT_TI_2186C.PV,MOTOR WINDINGS V,°C,,,Y,"-40, 200","_,_,0,85,100,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
 61,Main Motor,TE_2186D,HT_TI_2186D.PV,MOTOR WINDINGS V,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
-62,Main Motor,TE_2186E,HT_TI_2186E.PV,MOTOR WINDINGS W,°C,,,Y,"-40, 200","_,_,0,75,90,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
+62,Main Motor,TE_2186E,HT_TI_2186E.PV,MOTOR WINDINGS W,°C,,,Y,"-40, 200","_,_,0,85,100,125",Y,Temperature,,,,,,,,x,,,,,"_,_,0,75,90,125"
 63,Main Motor,TE_2186F,HT_TI_2186F.PV,MOTOR WINDINGS W,°C,,,Y,"-40, 200",,Y,Temperature,,,,,x,x,,,,,,,
 1,Process,FIT_2180,HT_FI_2180.PV,RD COMP. SUCTION,mbar,1,,Y,"0, 1000",,Y,Pressure,,,FCV-2180/FIT-2180,FY-2180 Tăng (open) --> FI-2180 tăng,,,x,,,,,,
 10,Process,PDT_2163,HT_PDI_2163.PV,RD COMP. DISCHARGE,???,3,,Y,"0, 2",,Y,Pressure,,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,y,,,,,,,
 11,Process,PDT_2180,HT_PDI_2180.PV,RD COMP. SUCTION,mBar,,,Y,"0, 2",,Y,Pressure,,,,,,,,,,,,,
 12,Process,PDT_2181,HT_PDI_2181.PV,RD COMP. DISCHARGE,mBar,4,,Y,"0, 2",,Y,Pressure,,,"SDV-2181-GSC, SDV-2181-GSO",When HT-SDV-2181 change state close to open but PDT-2181 not decrease,x,y,,,,,,,
-33,Process,PT_2180,HT_PT_2180.PV,RD COMP. SUCTION,Bar,,10,Y,"0, 50","15,17,18,19,20,25.5",Y,Pressure,,PT/PZT-2180,,,x,y,x,,,,,,"15,17,18,19,20,25.5"
-34,Process,PT_2182,HT_PT_2182.PV,RD COMP. DISCHARGE,Bar,6,22,Y,"0, 50","40,44,47,58,61,65",Y,Pressure,,PT/PZT-2182,,BDV-2182 open but PT-2182 not zero,x,y,,,,,,,"40,44,47,58,61,65"
+33,Process,PT_2180,HT_PT_2180.PV,RD COMP. SUCTION,Bar,,,Y,"0, 50","15,17,18,19,20,25.5",Y,Pressure,,PT/PZT-2180,,,x,y,x,,,,,,"15,17,18,19,20,25.5"
+34,Process,PT_2182,HT_PT_2182.PV,RD COMP. DISCHARGE,Bar,6,22,Y,"0, 50","40,44,47,58,61,65",Y,Pressure,,PT/PZT-2182,,BDV-2182 open but PT-2182 not zero,,,,,,,,,"40,44,47,58,61,65"
 73,Process,TT_2180,HT_TI_2180.PV,RD COMP. SUCTION,°C,,,Y,"-40, 200",,Y,Temperature,,,,,,,,,,,,,
 74,Process,TT_2182,HT_TI_2182.PV,RD COMP. DISCHARGE,°C,,15,Y,"-40, 200","_,_,0,150,165,190",Y,Temperature,,TT-2182/TZT-2184,,,,,,,,,,,"_,_,0,150,165,190"
-104,Process,LZT_2170,HT_LZI_2170.PV,SUCTION SCRUBBER,%,11,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x,x,,,,,,,
-105,Process,LZT_2171,HT_LI_2171.PV,SUCTION SCRUBBER,%,7,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,Check LCV-2170 Open but LZT-2170 not decrease,x,y,,,,,,,
-106,Process,LZT_2172,HT_LZI_2172.PV,SUCTION SCRUBBER,???,,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,,x,y,,,,,,,
-107,Process,TIC_2163,HT_TIC_2163.PIDA.PV,SUCTION SCRUBBER,°C,,21,,"0, 100",,Y,Temperature,,TT-2163/TZT-2170,,,x,,,,,,,,
-108,Process,TZT_2170,HT_TI_2170.PV,SUCTION SCRUBBER,°C,,21,Y,Y,,Y,Temperature,,TT-2163/TZT-2170,,,x,y,,,,,,,
-109,Process,TZT_2184,HT_TI_2184.PV,RD COMP DISCHARGE,°C,,15,Y,Y,,Y,Temperature,,TT-2182/TZT-2184,,,x,y,,,,,,,
-110,Process,PZT_2180,HT_PZI_2180.PV,RD COMP SUCTION,°C,,10,Y,Y,,Y,Pressure,,PT/PZT-2180,,,x,y,,,,,,,
-111,Process,PZT_2182,HT_PI_2182.PV,RD COMP DISCHARGE,°C,,22,Y,"0, 50",,Y,Pressure,,PT/PZT-2182,,,,,,,,,,,
-112,Process,PZT_2160,HT_PZI_2160.PV,HT-E-2160 COOLING MEDIUM RETURN,Bar,,21,Y,Y,,Y,Pressure,,PT-2161/PZT-2160,,,x,y,,,,,,,
+104,Process,LZT_2170,HT_LZI_2170.PV,SUCTION SCRUBBER,%,11,,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x,x,,,,,,,
+105,Process,LZT_2171,HT_LI_2171.PV,SUCTION SCRUBBER,%,7,,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,,Check LCV-2170 Open but LZT-2170 not decrease,x,y,,,,,,,
+107,Process,TIC_2163,HT_TIC_2163.PIDA.PV,SUCTION SCRUBBER,°C,,21,,"0, 100",,Y,Temperature,,TT-2163/TZT-2170,,,,,,,,,,,
+108,Process,TZT_2170,HT_TI_2170.PV,SUCTION SCRUBBER,°C,,21,Y,Y,,Y,Temperature,,TT-2163/TZT-2170,,,,,,,,,,,
+109,Process,TZT_2184,HT_TI_2184.PV,RD COMP DISCHARGE,°C,,15,Y,Y,,Y,Temperature,,TT-2182/TZT-2184,,,,,,,,,,,
+110,Process,PZT_2180,HT_PZI_2180.PV,RD COMP SUCTION,°C,,,Y,Y,,Y,Pressure,,PT/PZT-2180,,,x,y,,,,,,,
+111,Process,PZT_2182,HT_PZI_2182.PV,RD COMP DISCHARGE,°C,,22,Y,"0, 50",,Y,Pressure,,PT/PZT-2182,,,,,,,,,,,
+112,Process,PZT_2160,HT_PZI_2160.PV,HT-E-2160 COOLING MEDIUM RETURN,Bar,,20,Y,Y,,Y,Pressure,,PT-2161/PZT-2160,,,,,,,,,,,
 113,Process,BDV_2182,HT_BDV_2182.PV,BLOW DOWN VALVE,Status,6,,Y,,,Y,,,,PT-2182,BDV-2182 open but PT-2182 not zero,x,x,x,,,,,,
 114,Process,FCV_3013,HT_FCV_3013.PV,Flow Control Valve 2nd Stage Separator HT-V-3010,%,,,Y,"0, 100",,Y,Pressure,,,,,x,x,,,,,,,
 116,Process,LY_2170,HT_LIC_2170.AO.READBACK.VALUE,Level Control Valve MP Flash Gas Compressor Suction Scrubber HT-V-2170,%,"7,11",,Y,"0, 100",,Y,Pressure,,,LZT-2171/LY-2170,"Check LCV-2170 Open but LZT-2170 not decrease, LZT-2170 decrease but LCV-2170 close",x,y,,,,,,,
-117,Process,LT_2170,HT_LT_2170.PV,Level Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,%,7,20,Y,"0, 100",,Y,Pressure,,LT-2170/LZT-2171/LZT-2172,LCV-2170,"Check LCV-2170 Open but LZT-2170 not decrease, LZT-2170 decrease but LCV-2170 close",x,x,,,,,,,
 119,Process,PCV_3011,HT_PCV_3011.PV,Pressure Control Valve 2nd Stage Separator HT-V-3010,%,"8,9",,Y,"0, 100",,Y,Pressure,,,"FT-3011/PCV-3011
  PT-3011/PCV-3011",PCV-3011 Open but FT-3011 not increase,x,x,,,,,,,
 120,Process,FT_3011,HT_FI_3011.DACA_1.PV,,Kg/h,8,,,,,Y,Pressure,,,FT-3011/PCV-3011,PCV-3011 Open but FT-3011 not increase,x,y,x,,,,,,
 121,Process,PDT_2170,HT_PDI_2170.DACA.PV,Pressure Differential Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,Bar,,,Y,Y,,Y,Pressure,,,,,x,y,,,,,,,
-122,Process,PT_2161,HT_PI_2161.DACA.PV,Pressure Transmitter Mp Flash Gas Compressor Inlet Cooler HT-E-2160,Bar,,21,Y,Y,,Y,Pressure,,PT-2161/PZT-2160,,,x,y,,,,,,,
+122,Process,PT_2161,HT_PI_2161.DACA.PV,Pressure Transmitter Mp Flash Gas Compressor Inlet Cooler HT-E-2160,Bar,,20,Y,Y,,Y,Pressure,,PT-2161/PZT-2160,,,,,,,,,,,
 123,Process,PT_2171,HT_PI_2171.DACA.PV,Pressure Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,Bar,,,Y,Y,,Y,Pressure,,,,,x,y,,,,,,,
-124,Process,PZT_3010,HT_PZI_3010.PV,2ND Stage Seperator,Bar,,23,,,,Y,Pressure,,PT-3011/PZT-3010,,,x,y,,,,,,,
-125,Process,PT_3011,HT_PIC_3011.DACA.PV,Pressure Transmitter 2nd Stage Separator HT-V-3010,Bar,9,23,Y,Y,,Y,Pressure,,PT-3011/PZT-3010,PT-3011/PCV-3011,PCV-3011 Open but PT-3011 not decrease,x,y,,,,,,,
+124,Process,PZT_3010,HT_PZI_3010.PV,2ND Stage Seperator,Bar,,23,,,,Y,Pressure,,PT-3011/PZT-3010,,,,,,,,,,,
+125,Process,PT_3011,HT_PIC_3011.DACA.PV,Pressure Transmitter 2nd Stage Separator HT-V-3010,Bar,9,23,Y,Y,,Y,Pressure,,PT-3011/PZT-3010,PT-3011/PCV-3011,PCV-3011 Open but PT-3011 not decrease,,,,,,,,,
 126,Process,SDV_2160_GSC,HT_SDV_2160_GSC.PV,SHUTDOWN VALVE,Status,3,,Y,Y,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,x,,,,,,,
 127,Process,SDV_2160_GSO,HT_SDV_2160_GSO.PV,SHUTDOWN VALVE,Status,3,,Y,Y,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease

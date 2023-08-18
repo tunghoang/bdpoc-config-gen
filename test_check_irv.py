@@ -98,6 +98,7 @@ end = dparser.isoparse(args.end) if args.end else datetime.now(pytz.timezone("As
 start = dparser.isoparse(args.start) if args.start else (end - timedelta(minutes=2*CHECK_IRV_PERIOD))
 
 
+'''
 if is_running('mp'):
   job(start, end, 'mp')
 else:
@@ -116,5 +117,5 @@ if is_running('mr4110'):
   job(start, end, 'mr4110')
 else:
   check_logger.info("check_irv: mr4110 is stop")
-
-#job(start, end, 'glycol')
+'''
+job(start, end, 'glycol')

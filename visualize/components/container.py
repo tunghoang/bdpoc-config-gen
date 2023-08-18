@@ -1,7 +1,7 @@
 from utils.session import sess
-from configs.constants import OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT, WET_SEALS
+from configs.constants import OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT, WET_SEALS, REMAINING_USEFUL_LIFE
 from utils.view_utils import visualize_data_by_raw_data
-from views.container import (render_inspection, render_irv_report, render_transient_report, render_overview, render_outstanding_tags, render_wet_seals)
+from views.container import (render_inspection, render_irv_report, render_transient_report, render_overview, render_outstanding_tags, render_wet_seals, render_rul)
 import streamlit as st
 #from views.container import (render_inspection, render_irv_report,
 #                             render_mp_transient_report,
@@ -27,3 +27,5 @@ class Container:
       render_transient_report(sess("current_machine"))
     elif sess("view_mode") == WET_SEALS:
       render_wet_seals()
+    elif sess("view_mode") == REMAINING_USEFUL_LIFE:
+      render_rul()

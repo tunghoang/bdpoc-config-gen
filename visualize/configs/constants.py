@@ -8,6 +8,8 @@ RAW_DATA = 1
 ROUTINE_REPORT = 2
 TRANSIENT_REPORT = 3
 WET_SEALS = 4
+REMAINING_USEFUL_LIFE = 5
+#VIBRATION_MONITORING = 6 # TCR
 
 # ENVIRONMENT VARIABLES
 CUSTOM_DATAFRAME_PREVIEW = get_env("CUSTOM_DATAFRAME_PREVIEW")
@@ -16,10 +18,61 @@ OUTSTANDING_TAG_RELEASE = get_env("OUTSTANDING_TAG_RELEASE") == "True"
 
 
 VIEW_MODES = {
-  "mp": ("Overview", "Raw Data", "MP Routine Report", "MP Transient Report"), 
-  "lip": ("Overview", "Raw Data", "LIP Routine Report", "LIP Transient Report", "Wet Seals")
+  "mp": {
+    0: "Overview", 
+    1: "Raw Data", 
+    2: "MP Routine Report", 
+    3: "MP Transient Report", 
+    5: "Remaining Useful Life"
+  }, 
+  "lip": {
+    0: "Overview", 
+    1: "Raw Data", 
+    2: "LIP Routine Report", 
+    3: "LIP Transient Report", 
+    4: "Wet Seals"
+  },
+  "mr4100": {
+    0: "Overview", 
+    1: "Raw Data", 
+    2: "MR4100 Routine Report", 
+    3: "MR4100 Transient Report",
+    #6: "Vibration Monitoring"
+  },
+  "mr4110": {
+    0: "Overview", 
+    1: "Raw Data", 
+    2: "MR4110 Routine Report", 
+    3: "MR4110 Transient Report", 
+    #6: "Vibration Monitoring"
+  },
+  "glycol": {
+    0: "Overview",
+    1: "Raw Data",
+    2: "Glycol Routine Report"
+  }
 }
-MACHINES = ["mp", "lip"]
+#VIEW_MODES = {
+#  "mp": ("Overview", "Raw Data", "MP Routine Report", "MP Transient Report", "", "Remaining Useful Life"), 
+#  "lip": ("Overview", "Raw Data", "LIP Routine Report", "LIP Transient Report", "Wet Seals"),
+#  "mr4100": ("Overview", "Raw Data", "MR4100 Routine Report", "MR4100 Transient Report", "", "", "Vibration Monitoring"),
+#  "mr4110": ("Overview", "Raw Data", "MR4110 Routine Report", "MR4110 Transient Report", "", "", "Vibration Monitoring")
+#}
+TAG_FILES = {
+  "mp": "assets/files/tags.yaml", 
+  "lip": "assets/files/lip-tags.yaml",
+  "mr4100": "assets/files/mr4100-tags.yaml",
+  "mr4110": "assets/files/mr4110-tags.yaml",
+  "glycol": "assets/files/glycol-tags.yaml"
+}
+TAGSPEC_FILES = {
+  "mp": "assets/files/tag-specs.yaml", 
+  "lip": "assets/files/lip-tag-specs.yaml",
+  "mr4100": "assets/files/mr4100-tag-specs.yaml",
+  "mr4110": "assets/files/mr4110-tag-specs.yaml",
+  "glycol": "assets/files/glycol-tag-specs.yaml"
+}
+MACHINES = ["mp", "lip", "mr4100", "mr4110", "glycol"]
 SECOND = 60
 # DEFAULT CHART STYLE
 # LINE_SHAPE = 'hv'
@@ -117,6 +170,13 @@ LABELS = ("LOW", "HIGH")
 
 RUNNING_INDICATORS = {
   'mp': "HT_KM_2180.AND_RUNNING.OUT",
-  'lip': "HT_KM_2110.AND_RUNNING.OUT"
+  'lip': "HT_KM_2110.AND_RUNNING.OUT",
+  "mr4100": "HT_KM_4100.AND_RUNNING.OUT",
+  "mr4110": "HT_KM_4110.AND_RUNNING.OUT"
 }
 
+RUL_WINDING_TEMP = {
+  "HT_TI_2186A.PV": 'assets/datasets/winding-temperature/HT_TI_2186A.PV.csv',
+  "HT_TI_2186C.PV": 'assets/datasets/winding-temperature/HT_TI_2186C.PV.csv',
+  "HT_TI_2186E.PV": 'assets/datasets/winding-temperature/HT_TI_2186E.PV.csv'
+}

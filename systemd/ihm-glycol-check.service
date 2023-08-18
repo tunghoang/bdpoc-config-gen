@@ -1,0 +1,12 @@
+[Unit]
+Description=Instrument Health Monitoring GLYCOL Check service
+
+[Service]
+User=jupyter-admin
+Environment=CHECK_MACHINE=glycol.log
+WorkingDirectory=/home/jupyter-admin/bdpoc-datahub
+ExecStart=/home/jupyter-admin/bdpoc-datahub/.datahub/bin/python check_schedule.py -m GLYCOL
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

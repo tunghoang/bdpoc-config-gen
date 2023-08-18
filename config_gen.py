@@ -27,7 +27,7 @@ def csv_to_array_full_objects(fpath: string) -> list:
     if row_index == 0:
       data_headings = list()
       for heading in row:
-        fixed_heading = heading.lower().replace(" ", "_").replace("-", "").replace("\n", "_")
+        fixed_heading = heading.lower().replace(" ", "_").replace("-", "").replace("\n", "_").replace(".", "")
         data_headings.append(fixed_heading)
     else:
       content = dict()

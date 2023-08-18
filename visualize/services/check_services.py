@@ -18,7 +18,9 @@ def do_roc_check(table, devices):
 '''
 
 def do_deviation_check(table, deviation_checks_detail, devices):
+  print(deviation_checks_detail)
   deviation_checks = deviation_check(table, deviation_checks_detail, devices)
+  print(deviation_checks)
   for point in check_gen("deviation_check", deviation_checks):
     InfluxWriter().setBucket(CHECK_BUCKET).write(point)
     #write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)

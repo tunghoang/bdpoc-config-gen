@@ -16,7 +16,7 @@ from influxdb_client.client.warnings import MissingPivotFunction
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
 #from configs.query import Query
 
-from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG)
+from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG, TAG_FILES)
 from visualize.configs.influx_client import query_api, write_api
 from visualize.configs.logger import check_logger
 
@@ -33,7 +33,9 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--machine")
 args = parser.parse_args()
-__tagFileName = "assets/files/tags.yaml" if args.machine == "MP" else 'assets/files/lip-tags.yaml'
+#__tagFileName = "assets/files/tags.yaml" if args.machine == "MP" else 'assets/files/lip-tags.yaml'
+__tagFileName = TAG_FILES[args.machine.lower()]
+
 
 control_logic_checks, deviation_checks, devices = load_tag_config(__tagFileName)
 
@@ -45,32 +47,34 @@ def process(table, interpolated_table):
   #do_overange_check(interpolated_table, tags, devices)
   #do_irv_check(interpolated_table, devices, tags)
   do_roc_check(interpolated_table)
-  '''
   do_deviation_check(interpolated_table, deviation_checks, devices)
-  do_frozen_check(interpolated_table, devices)'''
+  #do_frozen_check(interpolated_table, devices)
 def processParallel(table, interpolated_table):
-  if args.machine == "MP":
+  if args.machine != "LIP":
     t1 = Thread(target=do_nan_check, args=(table, tags))
   t2 = Thread(target=do_overange_check, args=(interpolated_table, tags, devices))
   #t3 = Thread(target=do_irv_check, args=(interpolated_table, devices, tags))
-  #t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks, devices))
+  if args.machine in ('MP', ):
+    t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks, devices))
   t5 = Thread(target=do_roc_check, args=(interpolated_table, ))
   #t6 = Thread(target=do_frozen_check, args=(interpolated_table, devices))
 
-  if args.machine == "MP":
+  if args.machine != "LIP":
     t1.start()
 
   t2.start()
   #t3.start()
-  #t4.start()
+  if args.machine in ('MP', ):
+    t4.start()
   t5.start()
   #t6.start()
 
-  if args.machine == "MP":
+  if args.machine != "LIP":
     t1.join()
   t2.join()
   #t3.join()
-  #t4.join()
+  if args.machine in ('MP', ):
+    t4.join()
   t5.join()
   #t6.join()
   write_api.write(MONITORING_BUCKET, ORG, {"measurement": "check_harvest", "fields": {"rate": 1.0}})

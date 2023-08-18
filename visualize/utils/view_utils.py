@@ -1,7 +1,7 @@
 from configs.constants import DATE_NOW, TIME_STRINGS
 from configs.module_loader import *
 from utils.draw_chart import (draw_bar_chart_by_data_frame, draw_line_chart_by_data_frame)
-from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_transient_periods, query_raw_data, get_raw_data, query_roc_tags)
+from utils.influx_utils import (check_status, collector_status, query_check_all, query_irv_tags, query_transient_periods, query_raw_data, get_raw_data, query_roc_tags, get_rul_tags)
 from utils.session import apply, sess, update_session
 from utils.tag_utils import load_tag_specs
 from dateutil import parser as dparser
@@ -99,6 +99,11 @@ def load_roc_tags():
     time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
     apply(data=query_roc_tags(time), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
 
+def load_rul_data():
+  with st.spinner("Loading RUL data ..."):
+    start = dparser.isoparse(f"{sess('start_date')}T{sess('start_time')}+07:00")
+    end = dparser.isoparse(f"{sess('end_date')}T{sess('end_time')}+07:00")
+    apply(data=get_rul_tags(start, end), harvest_rate=collector_status(), server_time=DATE_NOW().strftime("%Y-%m-%d %H:%M:%S"))
 
 def visualize_data_by_raw_data():
   if sess("data") is not None and not sess("data").empty:

@@ -86,7 +86,7 @@ def intepret(flush_count, dropLevel, seal="LP"):
         "Description": "Lube Oil seal leak", 
         "dropLevel": dropLevel,
         "flush_count": flush_count
-      }], start, end, testing=True)
+      }], start, end, testing=False)
     else:
       # PreAlarm
       check_logger.info("Prealarm");

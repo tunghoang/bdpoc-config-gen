@@ -1,1 +1,1 @@
-[ALERT.CRITICAL.{{device | upper}}] PDM Critical Alert Notification
+[{{DEVICE_INFO.get(device, device.upper())}}] PDM Critical Alert

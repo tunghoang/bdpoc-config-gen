@@ -4,103 +4,103 @@ No.,Group,TAG NO.,PHD Tag,MEASURING POINT,Unit,"CONTROL LOGIC CHECK
  Number","CROSS REF. (DEVIATION CHECK)
  Tagname","CONTROL LOGIC CHECK
 Number","CONTROL LOGIC CHECK
- Tagname",Remark (Điều kiện bình thường),Not now,Not now,MP Startup,Critical
-1,Process,PDIT 2120,HT_PDI_2120.PV,Compressor 1 Suction Strainer DP,mbard,,,Y,,"_,_,0,15,25,50",Y,0-100mbarg,,,,,5,,,,,,
-2,Process,PT 2120,HT_PI_2120.PV,Compressor 1 Suction Pressure,barg,,,Y,,,Y,0-1.5 barg,,,,,5,,,,,,
-3,Process,TT 2121,HT_TI_2121.PV,Compressor 1 Suction Temperature,0C,,,Y,,,Y,0-250 oC,,,,,,,,,,,
-4,Process,PT 2123,HT_PI_2123.PV,Compressor 1 Discharge Pressure,barg,,,Y,,,Y,0-10 barg,,,,,,,,,,X,
-5,Process,TT 2123,HT_TI_2123.PV,Compressor 1 Discharge Temperature,0C,,,Y,,,Y,0-250 oC,,,,,,,,,,,
-6,Process,PDIT 2150,HT_PDI_2150.PV,Compressor 2 Suction Strainer DP,mbard,,,Y,,"_,_,0,15,25,50",Y,0-150mbarg,,,,,,,,,,,
-7,Process,PT 2150,HT_PI_2150.PV,Compressor 2 Suction Pressure,barg,,,Y,,,Y,0 -10 barg,,,,,,,,,,,
-8,Process,TT 2151,HT_TI_2151.PV,Compressor 2 Suction Temperature,0C,,,Y,,,Y,0 - 100 °C ,,,,,,,,,,,
-9,Process,PT 2153,HT_PI_2153.PV,Compressor 2 Discharge Pressure,barg,,,Y,,,Y,0-25 barg,,,6,PT-2153/PZT-2153,4,BDV-2151 open but PI-2153 does not come to zero,,,,,
-10,Process,PZT 2153,HT_PZI_2153.PV,Compressor 2 Discharge Pressure,,,,,,,,0-25 barg,,,6,PT-2153/PZT-2153,,,,,,X,
-11,Process,TT 2153,HT_TI_2153.PV,Compressor 2 Discharge Temperature,0C,,,Y,,,Y,0 - 200 °C ,,,,,,,,,,,
-12,Process,LZT-2141,HT_LZI_2141.PV,LEVEL TRANSMITTER,%,,,,,,Y,0-100%,,,7,LT-2140/LZT-2141,6,,,,,,
-13,Motor,TT 2112B,HT_TI_2112B.PV,Motor Journal Bearing DE Temperatura,0C,,,Y,,,Y,0 - 150 °C,,,,,,,,,,X,x
-14,Motor,TE 2111E,HT_TI_2111E.PV,Motor Windings W Temperature,0C,,,Y,,,Y,0-200oC,,,,,,,,,,,x
-15,Motor,TE 2111C,HT_TI_2111C.PV,Motor Windings V Temperature,0C,,,,,,Y,0-200oC,,,,,,,,,,,X
-16,Motor,TE 2111A,HT_TI_2111A.PV,Motor Windings U Temperature,0C,,,,,,Y,0-200oC,,,,,,,,,,,X
-17,Motor,TT 2112A,HT_TI_2112A.PV,Motor Journal Bearing NDE Temperatura,0C,,,,,,Y,0 - 150 °C,,,,,,,,,,X,X
-18,Motor,VT 2110A,HT_VI_2110A.PV,Motor Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-19,Motor,VT 2110B,HT_VI_2110B.PV,Motor Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-20,Motor,VT 2111A,HT_VI_2111A.PV,Motor Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-21,Motor,VT 2111B,HT_VI_2111B.PV,Motor Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-22,Gearbox,VT 2112A,HT_VI_2112A.PV,Gear Shaft 1 Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-23,Gearbox,VT 2112B,HT_VI_2112B.PV,Gear Shaft 1 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,80,110,140",Y,0-150μm,,,,,,,,,,X,X
-24,Gearbox,TE 2136,HT_TI_2136.PV,Gear Shaft 1 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,60,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-25,Gearbox,VT 2113A,HT_VI_2113A.PV,Gear Shaft 2 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-26,Gearbox,VT 2113B,HT_VI_2113B.PV,Gear Shaft 2 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-27,Gearbox,TE 2118,HT_TI_2118.PV,Gear Shaft 2 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-28,Gearbox,VT 2114A,HT_VI_2114A.PV,Gear Shaft 2 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-29,Gearbox,VT 2114B,HT_VI_2114B.PV,Gear Shaft 2 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-30,Gearbox,TE 2119,HT_TI_2119.PV,Gear Shaft 2 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-31,Gearbox,TE 2139,HT_TI_2139.PV,Gear Shaft 1 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-32,Gearbox,ZT 2115A,HT_ZI_2115A.PV,Gear Shaft 1 Thrust BRG. Outboard Vibration,mm,,,Y,,"-0.5,-0.3,-0.2,0.14,0.17,0.2",Y,-1 to 1mm,,,,,,,,,,X,X
-33,Gearbox,TE 2135,HT_TI_2135.PV,Gear Shaft 1 Thrust BRG. Outboard Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-34,Gearbox,TE 2137,HT_TI_2137.PV,Gear Shaft 3 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-35,Gearbox,VT 2116A,HT_VI_2116A.PV,Gear Shaft 3 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-36,Gearbox,VT 2116B,HT_VI_2116B.PV,Gear Shaft 3 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-37,Gearbox,TE 2138,HT_TI_2138.PV,Gear Shaft 3 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X
-38,Gearbox,VT 2117A,HT_VI_2117A.PV,Gear Shaft 3 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-39,Gearbox,VT 2117B,HT_VI_2117B.PV,Gear Shaft 3 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X
-40,Gearbox,VT 2115A,HT_VI_2115A.PV,Gear Shaft 1 Journal Bearing NDE Vibration,µm,,,Y,,"_,_,0,50,64,70",Y,0-150μm,,,,,,,,,,X,X
-41,Gearbox,VT 2115B,HT_VI_2115B.PV,Gear Shaft 1 Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X
-42,Compressor,TE 2126,HT_TI_2126.PV,Comppressor 1 Male Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,76,86,90",Y,0 - 150 °C,,,,,,,,,,X,X
-44,Compressor,VT 2122A,HT_VI_2122A.PV,Comppressor 1 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X
-45,Compressor,VT 2122B,HT_VI_2122B.PV,Comppressor 1 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X
-46,Compressor,TE 2128,HT_TI_2128.PV,Comppressor 1 Male Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-47,Compressor,ZT 2121,HT_ZI_2121.PV,Comppressor 1 Female Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.11,-0.08,0.08,0.11,0.2",Y,-1 to 1mm,,,,,,,,,,X,X
-48,Compressor,TE 2120,HT_TI_2120.PV,Comppressor 1 Female Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-49,Compressor,TE 2122,HT_TI_2122.PV,Comppressor 1 Female Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_,0,71,82,90",Y,0 - 150 °C,,,,,,,,,,X,X
-50,Compressor,VT 2120A,HT_VI_2120A.PV,Comppressor 1 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X
-51,Compressor,VT 2120B,HT_VI_2120B.PV,Comppressor 1 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,11,23,52",Y,0-150μm,,,,,,,,,,X,X
-52,Compressor,VT 2123A,HT_VI_2123A.PV,Comppressor 1 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,41,52",Y,0-150μm,,,,,,,,,,X,X
-53,Compressor,VT 2123B,HT_VI_2123B.PV,Comppressor 1 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,41,52",Y,0-150μm,,,,,,,,,,X,X
-54,Compressor,TE 2129,HT_TI_2129.PV,Comppressor 1 Male Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,72,83,90",Y,0 - 150 °C,,,,,,,,,,X,X
-55,Compressor,TE 2124,HT_TI_2124.PV,Comppressor 1 Female Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,68,79,90",Y,0 - 150 °C,,,,,,,,,,X,X
-56,Compressor,VT 2121A,HT_VI_2121A.PV,Comppressor 1 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,27,38,52",Y,0-150μm,,,,,,,,,,X,X
-57,Compressor,VT 2121B,HT_VI_2121B.PV,Comppressor 1 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,27,38,52",Y,0-150μm,,,,,,,,,,X,X
-58,Compressor,ZT 2150,HT_ZI_2150.PV,Comppressor 2 Male Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.09,-0.07,0.1,0.13,0.2",Y,-1 to 1mm,,,,,,,,,,X,X
-59,Compressor,TE 2156,HT_TI_2156.PV,Comppressor 2 Male Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,70,81,90",Y,0 - 150 °C,,,,,,,,,,X,X
-60,Compressor,VT 2152A,HT_VI_2152A.PV,Comppressor 2 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X
-61,Compressor,VT 2152B,HT_VI_2152B.PV,Comppressor 2 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X
-62,Compressor,TE 2157,HT_TI_2157.PV,Comppressor 2 Male Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-63,Compressor,ZT 2151,HT_ZI_2151.PV,Comppressor 2 Female Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.09,-0.07,0.1,0.13,0.2",Y,-1 to 1mm,,,,,,,,,,X,X
-64,Compressor,TE 2150,HT_TI_2150.PV,Comppressor 2 Female Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-65,Compressor,VT 2150A,HT_VI_2150A.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X
-66,Compressor,VT 2150B,HT_VI_2150B.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X
-67,Compressor,TE 2152,HT_TI_2152.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-68,Compressor,VT 2153B,HT_VI_2153B.PV,Comppressor 2 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X
-69,Compressor,VT 2153A,HT_VI_2153A.PV,Comppressor 2 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X
-70,Compressor,TE 2158,HT_TI_2158.PV,Comppressor 2 Male Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X
-71,Compressor,VT 2151A,HT_VI_2151A.PV,Comppressor 2 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X
-72,Compressor,VT 2151B,HT_VI_2151B.PV,Comppressor 2 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X
-73,Compressor,TE 2154,HT_TI_2154.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,0C,,,Y,,"_,_,0,70,81,90",Y,0 - 150 °C,,,,,,,,,,X,X
-74,Lube/Seal oil,PDI 2110,HT_PDI_2110.PV,Lube Oil Filter DP,bard,,,Y,,"_,_,0,0.6,0.8,1",Y,0 - 2 barg,,,,,,,,,,,
-75,Lube/Seal oil,TT 2116,HT_TI_2116.PV,Lube Oil Filter Downstream Temperature,0C,,,Y,,"30,35,38,49,52,55",Y,0 - 100 °C ,,,,,,,,,,,
-76,Lube/Seal oil,PT 2113,HT_PI_2113.PV,Lube Simulation Line Pressure,barg,,,Y,,,Y,0 -20 barg,,,,,1,"Pump start status (signal from Dynamo/PHD) but PIT-2113, PIT-2118, PZT-2119 not increase",,,,,
-77,Lube/Seal oil,PDZT 2117,HT_PDI_2117.PV,Compressor 1 Seal Oil Pressure Differentíal,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,X
-78,Lube/Seal oil,PDT 2115,HT_PDI_2115.PV,Compressor 1 Seal Oil  Control Pressure Differentíal,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,
-79,Lube/Seal oil,PDZT 2116,HT_PDI_2116.PV,Compressor 2 Seal Oil Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,7,9.5",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,X
-80,Lube/Seal oil,PDT 2114,HT_PDI_2114.PV,Compressor 2 Seal Oil  Control Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,7,9.5",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,
-81,Lube/Seal oil,PDC 2114,HT_PDI_2114.PV,Comp 2 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,
-82,Lube/Seal oil,PDC 2115,HT_PDI_2115.PV,Comp 1 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,
-83,Lube/Seal oil,PT 2118,HT_PI_2118.PV,Lube Oil Header Pressure,barg,,,Y,,"1,1.2,1.6,3,3.5,4",Y,0 - 6 barg,,,5,PT-2118/PZT-2119,1,,,,,,
-84,Lube/Seal oil,PZT 2119,HT_PI_2119.PV,Lube Oil Header Pressure,barg,,,Y,,"1,1.2,1.6,3,3.5,4",Y,0 - 6 barg,,,5,PT-2118/PZT-2119,1,,,,,,
-85,Lube/Seal oil,LI 2110,HT_LI_2110.PV,Lube Oil Tank Level,%,,,Y,,"40,45,48,75,86,96",Y,"0, 100",,,,,,,,,,,
-86,Lube/Seal oil,LT 2121,HT_LI_2121.PV,Seal oil level Comp 1,%,,,Y,,,Y,"0, 100",,,3,LT 2121/LZT-2122,,,,,,,
-87,Lube/Seal oil,LZT 2122,HT_LI_2122.PV,Seal oil level Comp 1,%,,,Y,,,Y,"0, 100",,,3,LT 2121/LZT-2122,2,LCV-2122 open but LI-2121 & LI-2122 not descrease ,,,,,X
-88,Lube/Seal oil,LT 2151,HT_LI_2151.PV,Seal oil level Comp 2,%,,,,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,
-89,Lube/Seal oil,LZT 2152,HT_LZI_2152.PV,Seal oil level Comp 2,%,,,Y,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,X
-91,Other,HT_SDV_2120,HT_SDV_2120.PV,Suction Shutdown Valve,Status,,,,,,,,,1,,,,,,,,,
-94,Other,HT_SDV_2122,HT_SDV_2122.PV,Recycle Shutdown Valve,Status,,,,,,,,,2,,,,,,,,,
-96,Other,HT_BDV_2151,HT_BDV_2151.PV,Blow down valve,Status,,,Y,,,Y,,,4,,,4,BDV-2151 open but PI-2153 does not come to zero,,,,,
-98,Other,HT_SDV_2150,HT_SDV_2150.PV,Discharge Shutdown Valve,Status,,,Y,,,Y,,,3,,,,,,,,,
-100,Other,SDV_2152_GSO,HT_SDV_2152_GSO.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,
-101,Other,SDV_2152_GSC,HT_SDV_2152_GSC.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,
-102,Other,SDV_2123_GSO,HT_SDV_2123_GSO.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,
-103,Other,SDV_2123_GSC,HT_SDV_2123_GSC.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,
-104,Other,HT_SDV_2140,HT_SDV_2140.DEVCTLA.PV,SHUTDOWN VALVE,Status,,,,,,,,,7,,,,,,,,,
-106,Other,SDV_2121_GSO,HT_SDV_2121_GSO.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,
-107,Other,SDV_2121_GSC,HT_SDV_2121_GSC.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,
+ Tagname",Remark (Điều kiện bình thường),Not now,Not now,MP Startup,Critical,Disabled
+1,Process,PDIT 2120,HT_PDI_2120.PV,Compressor 1 Suction Strainer DP,mbard,,,Y,,"_,_,0,15,25,50",Y,0-100mbarg,,,,,5,,,,,,,
+2,Process,PT 2120,HT_PI_2120.PV,Compressor 1 Suction Pressure,barg,,,Y,,,Y,0-1.5 barg,,,,,5,,,,,,,
+3,Process,TT 2121,HT_TI_2121.PV,Compressor 1 Suction Temperature,0C,,,Y,,,Y,0-250 oC,,,,,,,,,,,,
+4,Process,PT 2123,HT_PI_2123.PV,Compressor 1 Discharge Pressure,barg,,,Y,,,Y,0-10 barg,,,,,,,,,,X,,
+5,Process,TT 2123,HT_TI_2123.PV,Compressor 1 Discharge Temperature,0C,,,Y,,,Y,0-250 oC,,,,,,,,,,,,
+6,Process,PDIT 2150,HT_PDI_2150.PV,Compressor 2 Suction Strainer DP,mbard,,,Y,,"_,_,0,15,25,50",Y,0-150mbarg,,,,,,,,,,,,
+7,Process,PT 2150,HT_PI_2150.PV,Compressor 2 Suction Pressure,barg,,,Y,,,Y,0 -10 barg,,,,,,,,,,,,
+8,Process,TT 2151,HT_TI_2151.PV,Compressor 2 Suction Temperature,0C,,,Y,,,Y,0 - 100 °C ,,,,,,,,,,,,
+9,Process,PT 2153,HT_PI_2153.PV,Compressor 2 Discharge Pressure,barg,,,Y,,,Y,0-25 barg,,,6,PT-2153/PZT-2153,4,BDV-2151 open but PI-2153 does not come to zero,,,,,,
+10,Process,PZT 2153,HT_PZI_2153.PV,Compressor 2 Discharge Pressure,,,,,,,,0-25 barg,,,6,PT-2153/PZT-2153,,,,,,X,,
+11,Process,TT 2153,HT_TI_2153.PV,Compressor 2 Discharge Temperature,0C,,,Y,,,Y,0 - 200 °C ,,,,,,,,,,,,
+12,Process,LZT-2141,HT_LZI_2141.PV,LEVEL TRANSMITTER,%,,,,,,Y,0-100%,,,,LT-2140/LZT-2141,6,,,,,,,
+13,Motor,TT 2112B,HT_TI_2112B.PV,Motor Journal Bearing DE Temperatura,0C,,,Y,,,Y,0 - 150 °C,,,,,,,,,,X,x,
+14,Motor,TE 2111E,HT_TI_2111E.PV,Motor Windings W Temperature,0C,,,Y,,,Y,0-200oC,,,8,,,,,,,,x,
+15,Motor,TE 2111C,HT_TI_2111C.PV,Motor Windings V Temperature,0C,,,,,,Y,0-200oC,,,8,,,,,,,,X,
+16,Motor,TE 2111A,HT_TI_2111A.PV,Motor Windings U Temperature,0C,,,,,,Y,0-200oC,,,8,,,,,,,,X,
+17,Motor,TT 2112A,HT_TI_2112A.PV,Motor Journal Bearing NDE Temperatura,0C,,,,,,Y,0 - 150 °C,,,,,,,,,,X,X,
+18,Motor,VT 2110A,HT_VI_2110A.PV,Motor Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+19,Motor,VT 2110B,HT_VI_2110B.PV,Motor Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+20,Motor,VT 2111A,HT_VI_2111A.PV,Motor Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+21,Motor,VT 2111B,HT_VI_2111B.PV,Motor Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+22,Gearbox,VT 2112A,HT_VI_2112A.PV,Gear Shaft 1 Journal Bearing DE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+23,Gearbox,VT 2112B,HT_VI_2112B.PV,Gear Shaft 1 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,80,110,140",Y,0-150μm,,,,,,,,,,X,X,
+24,Gearbox,TE 2136,HT_TI_2136.PV,Gear Shaft 1 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,60,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+25,Gearbox,VT 2113A,HT_VI_2113A.PV,Gear Shaft 2 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+26,Gearbox,VT 2113B,HT_VI_2113B.PV,Gear Shaft 2 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+27,Gearbox,TE 2118,HT_TI_2118.PV,Gear Shaft 2 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+28,Gearbox,VT 2114A,HT_VI_2114A.PV,Gear Shaft 2 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+29,Gearbox,VT 2114B,HT_VI_2114B.PV,Gear Shaft 2 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+30,Gearbox,TE 2119,HT_TI_2119.PV,Gear Shaft 2 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+31,Gearbox,TE 2139,HT_TI_2139.PV,Gear Shaft 1 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+32,Gearbox,ZT 2115A,HT_ZI_2115A.PV,Gear Shaft 1 Thrust BRG. Outboard Vibration,mm,,,Y,,"-0.5,-0.3,-0.2,0.14,0.17,0.2",Y,-1 to 1mm,,,,,,,,,,X,X,
+33,Gearbox,TE 2135,HT_TI_2135.PV,Gear Shaft 1 Thrust BRG. Outboard Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+34,Gearbox,TE 2137,HT_TI_2137.PV,Gear Shaft 3 Journal Bearing NDE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+35,Gearbox,VT 2116A,HT_VI_2116A.PV,Gear Shaft 3 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+36,Gearbox,VT 2116B,HT_VI_2116B.PV,Gear Shaft 3 Journal Bearing NDE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+37,Gearbox,TE 2138,HT_TI_2138.PV,Gear Shaft 3 Journal Bearing DE Temperature,0C,,,Y,,"_,_0,65,75,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+38,Gearbox,VT 2117A,HT_VI_2117A.PV,Gear Shaft 3 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+39,Gearbox,VT 2117B,HT_VI_2117B.PV,Gear Shaft 3 Journal Bearing DE Vibration,µm,,,Y,,"_,_0,15,25,40",Y,0-150μm,,,,,,,,,,X,X,
+40,Gearbox,VT 2115A,HT_VI_2115A.PV,Gear Shaft 1 Journal Bearing NDE Vibration,µm,,,Y,,"_,_,0,50,64,70",Y,0-150μm,,,,,,,,,,X,X,
+41,Gearbox,VT 2115B,HT_VI_2115B.PV,Gear Shaft 1 Journal Bearing NDE Vibration,µm,,,Y,,,Y,0-150μm,,,,,,,,,,X,X,
+42,Compressor,TE 2126,HT_TI_2126.PV,Comppressor 1 Male Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,76,86,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+44,Compressor,VT 2122A,HT_VI_2122A.PV,Comppressor 1 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X,
+45,Compressor,VT 2122B,HT_VI_2122B.PV,Comppressor 1 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X,
+46,Compressor,TE 2128,HT_TI_2128.PV,Comppressor 1 Male Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+47,Compressor,ZT 2121,HT_ZI_2121.PV,Comppressor 1 Female Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.11,-0.08,0.08,0.11,0.2",Y,-1 to 1mm,,,,,,,,,,X,X,
+48,Compressor,TE 2120,HT_TI_2120.PV,Comppressor 1 Female Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+49,Compressor,TE 2122,HT_TI_2122.PV,Comppressor 1 Female Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_,0,71,82,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+50,Compressor,VT 2120A,HT_VI_2120A.PV,Comppressor 1 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,52",Y,0-150μm,,,,,,,,,,X,X,
+51,Compressor,VT 2120B,HT_VI_2120B.PV,Comppressor 1 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,11,23,52",Y,0-150μm,,,,,,,,,,X,X,
+52,Compressor,VT 2123A,HT_VI_2123A.PV,Comppressor 1 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,41,52",Y,0-150μm,,,,,,,,,,X,X,
+53,Compressor,VT 2123B,HT_VI_2123B.PV,Comppressor 1 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,41,52",Y,0-150μm,,,,,,,,,,X,X,
+54,Compressor,TE 2129,HT_TI_2129.PV,Comppressor 1 Male Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,72,83,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+55,Compressor,TE 2124,HT_TI_2124.PV,Comppressor 1 Female Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,68,79,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+56,Compressor,VT 2121A,HT_VI_2121A.PV,Comppressor 1 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,40,52",Y,0-150μm,,,,,,,,,,X,X,
+57,Compressor,VT 2121B,HT_VI_2121B.PV,Comppressor 1 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,30,40,52",Y,0-150μm,,,,,,,,,,X,X,
+58,Compressor,ZT 2150,HT_ZI_2150.PV,Comppressor 2 Male Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.09,-0.07,0.1,0.13,0.2",Y,-1 to 1mm,,,,,,,,,,X,X,
+59,Compressor,TE 2156,HT_TI_2156.PV,Comppressor 2 Male Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,70,81,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+60,Compressor,VT 2152A,HT_VI_2152A.PV,Comppressor 2 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X,
+61,Compressor,VT 2152B,HT_VI_2152B.PV,Comppressor 2 Male Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X,
+62,Compressor,TE 2157,HT_TI_2157.PV,Comppressor 2 Male Rotor Journal Bearing DS Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+63,Compressor,ZT 2151,HT_ZI_2151.PV,Comppressor 2 Female Rotor Axial Displacement,mm,,,Y,,"-0.2,-0.09,-0.07,0.1,0.13,0.2",Y,-1 to 1mm,,,,,,,,,,X,X,
+64,Compressor,TE 2150,HT_TI_2150.PV,Comppressor 2 Female Rotor Thrust Bearing Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+65,Compressor,VT 2150A,HT_VI_2150A.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X,
+66,Compressor,VT 2150B,HT_VI_2150B.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,µm,,,Y,,"_,_,0,10,22,44",Y,0-150μm,,,,,,,,,,X,X,
+67,Compressor,TE 2152,HT_TI_2152.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+68,Compressor,VT 2153B,HT_VI_2153B.PV,Comppressor 2 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X,
+69,Compressor,VT 2153A,HT_VI_2153A.PV,Comppressor 2 Male Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X,
+70,Compressor,TE 2158,HT_TI_2158.PV,Comppressor 2 Male Rotor Journal Bearing SS Temperature ,0C,,,Y,,"_,_,0,65,76,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+71,Compressor,VT 2151A,HT_VI_2151A.PV,Comppressor 2 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X,
+72,Compressor,VT 2151B,HT_VI_2151B.PV,Comppressor 2 Female Rotor Journal Bearing SS Vibration,µm,,,Y,,"_,_,0,15,25,44",Y,0-150μm,,,,,,,,,,X,X,
+73,Compressor,TE 2154,HT_TI_2154.PV,Comppressor 2 Female Rotor Journal Bearing DS Vibration,0C,,,Y,,"_,_,0,70,81,90",Y,0 - 150 °C,,,,,,,,,,X,X,
+74,Lube/Seal oil,PDI 2110,HT_PDI_2110.PV,Lube Oil Filter DP,bard,,,Y,,"_,_,0,0.6,0.8,1",Y,0 - 2 barg,,,,,,,,,,,,
+75,Lube/Seal oil,TT 2116,HT_TI_2116.PV,Lube Oil Filter Downstream Temperature,0C,,,Y,,"30,35,38,49,52,55",Y,0 - 100 °C ,,,,,,,,,,,,
+76,Lube/Seal oil,PT 2113,HT_PI_2113.PV,Lube Simulation Line Pressure,barg,,,Y,,"9.7,10,10.5,13,_,_",Y,0 -20 barg,,,,,1,"Pump start status (signal from Dynamo/PHD) but PIT-2113, PIT-2118, PZT-2119 not increase",,,,,,
+77,Lube/Seal oil,PDZT 2117,HT_PDI_2117.PV,Compressor 1 Seal Oil Pressure Differentíal,barg,,,Y,,"2,2.2,2.4,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,X,X
+78,Lube/Seal oil,PDT 2115,HT_PDI_2115.PV,Compressor 1 Seal Oil  Control Pressure Differentíal,barg,,,Y,,"2,2.2,2.5,3,3.5,4",Y,0 -10 barg,,,1,PDZT 2117/PZT-2115,,,,,,,,
+79,Lube/Seal oil,PDZT 2116,HT_PDI_2116.PV,Compressor 2 Seal Oil Pressure Differential,barg,,,Y,,"2,2.2,2.4,3,_,_",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,X,X
+80,Lube/Seal oil,PDT 2114,HT_PDI_2114.PV,Compressor 2 Seal Oil  Control Pressure Differential,barg,,,Y,,"2,2.2,2.5,3,7,9.5",Y,0 -10 barg,,,2,PDZT 2116/PDT 2114,,,,,,,,
+81,Lube/Seal oil,PDC 2114,HT_PDI_2114.PV,Comp 2 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,,
+82,Lube/Seal oil,PDC 2115,HT_PDI_2115.PV,Comp 1 seal oil control,%,,,,,,Y,"0, 100",,,,,,,,,,,,
+83,Lube/Seal oil,PT 2118,HT_PI_2118.PV,Lube Oil Header Pressure,barg,,,Y,,"1,1.2,1.6,3,3.5,4",Y,0 - 6 barg,,,5,PT-2118/PZT-2119,1,,,,,,,
+84,Lube/Seal oil,PZT 2119,HT_PI_2119.PV,Lube Oil Header Pressure,barg,,,Y,,"1,1.2,1.6,3.3,_,_",Y,0 - 6 barg,,,5,PT-2118/PZT-2119,1,,,,,,,
+85,Lube/Seal oil,LI 2110,HT_LI_2110.PV,Lube Oil Tank Level,%,,,Y,,"40,45,48,75,86,96",Y,"0, 100",,,,,,,,,,,,
+86,Lube/Seal oil,LT 2121,HT_LI_2121.PV,Seal oil level Comp 1,%,,,Y,,,Y,"0, 100",,,3,LT 2121/LZT-2122,,,,,,,,
+87,Lube/Seal oil,LZT 2122,HT_LI_2122.PV,Seal oil level Comp 1,%,,,Y,,,Y,"0, 100",,,3,LT 2121/LZT-2122,2,LCV-2122 open but LI-2121 & LI-2122 not descrease ,,,,,X,
+88,Lube/Seal oil,LT 2151,HT_LI_2151.PV,Seal oil level Comp 2,%,,,,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,,
+89,Lube/Seal oil,LZT 2152,HT_LZI_2152.PV,Seal oil level Comp 2,%,,,Y,,,Y,"0, 100",,,4,LT-2151/LZT-2152,3,LCV-2151 open but LI-2151 & LI-2152 not descrease ,,,,,X,
+91,Other,HT_SDV_2120,HT_SDV_2120.PV,Suction Shutdown Valve,Status,,,,,,,,,1,,,,,,,,,,
+94,Other,HT_SDV_2122,HT_SDV_2122.PV,Recycle Shutdown Valve,Status,,,,,,,,,2,,,,,,,,,,
+96,Other,HT_BDV_2151,HT_BDV_2151.PV,Blow down valve,Status,,,Y,,,Y,,,4,,,4,BDV-2151 open but PI-2153 does not come to zero,,,,,,
+98,Other,HT_SDV_2150,HT_SDV_2150.PV,Discharge Shutdown Valve,Status,,,Y,,,Y,,,3,,,,,,,,,,
+100,Other,SDV_2152_GSO,HT_SDV_2152_GSO.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,,
+101,Other,SDV_2152_GSC,HT_SDV_2152_GSC.PV,COMP.2  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,5,,,,,,,,,,
+102,Other,SDV_2123_GSO,HT_SDV_2123_GSO.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,,
+103,Other,SDV_2123_GSC,HT_SDV_2123_GSC.PV,COMP.1  SEAL OIL SEPARATOR SHUTOFF VALVE,Status,,,,,,,,,6,,,,,,,,,,
+104,Other,HT_SDV_2140,HT_SDV_2140.DEVCTLA.PV,SHUTDOWN VALVE,Status,,,,,,,,,7,,,,,,,,,,
+106,Other,SDV_2121_GSO,HT_SDV_2121_GSO.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,,
+107,Other,SDV_2121_GSC,HT_SDV_2121_GSC.PV,SHUTDOWN VALVE,Status,,,,,,,,,8,,,,,,,,,,

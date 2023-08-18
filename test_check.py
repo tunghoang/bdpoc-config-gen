@@ -16,67 +16,90 @@ from influxdb_client.client.warnings import MissingPivotFunction
 sys.path.append(path.join(path.dirname(__file__), "visualize"))
 #from configs.query import Query
 
-from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG, MINIMUM_RATIO_NAN_ALLOW)
+from visualize.configs.constants import (BUCKET, CHECK_PERIOD, MONITORING_BUCKET, ORG, TAG_FILES)
 from visualize.configs.influx_client import query_api, write_api
 from visualize.configs.logger import check_logger
 
+from visualize.checks.nan_check import do_nan_check
 from visualize.checks.overange_check import do_overange_check
 from visualize.checks.roc_check import do_roc_check
 
 from visualize.services.check_services import (do_deviation_check, do_irv_check)
 from visualize.utils.tag_utils import load_tag_config
-from utils.check_utils import check_gen
 from influx import Influx
 
-start = dparser.isoparse("2023-04-10T21:34:00+07:00")
-end = dparser.isoparse("2023-04-10T21:44:00+07:00")
-instance = Influx().setStart(start).setStop(end).setRate('1s').addFields(["HT_PDI_2183.PV"])
-table = instance.setDebug(True).setInterpolation(False).asPivotDataFrame()
-table["HT_PDI_2183.PV"] = None
-print(table)
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-m", "--machine")
+args = parser.parse_args()
+#__tagFileName = "assets/files/tags.yaml" if args.machine == "MP" else 'assets/files/lip-tags.yaml'
+__tagFileName = TAG_FILES[args.machine.lower()]
 
 
-def __find_nan(df, tag):
-  warnings.filterwarnings("ignore")
-  df['idx'] = df.index
-  last = df.index[-1]
-  print(df.index[-1])
-  input("kk")
+control_logic_checks, deviation_checks, devices = load_tag_config(__tagFileName)
+
+tags = [tag["tag_number"] for d in devices for tag in d["tags"]]
+warnings.simplefilter("ignore", MissingPivotFunction)
+
+def process(table, interpolated_table):
+  #do_nan_check(table, tags)
+  #do_overange_check(interpolated_table, tags, devices)
+  #do_irv_check(interpolated_table, devices, tags)
+  do_roc_check(interpolated_table)
+  do_deviation_check(interpolated_table, deviation_checks, devices)
+  #do_frozen_check(interpolated_table, devices)
+def processParallel(table, interpolated_table):
+  if args.machine != "LIP":
+    t1 = Thread(target=do_nan_check, args=(table, tags))
+  t2 = Thread(target=do_overange_check, args=(interpolated_table, tags, devices))
+  #t3 = Thread(target=do_irv_check, args=(interpolated_table, devices, tags))
+  if args.machine in ('MP', ):
+    t4 = Thread(target=do_deviation_check, args=(interpolated_table, deviation_checks, devices))
+  t5 = Thread(target=do_roc_check, args=(interpolated_table, ))
+  #t6 = Thread(target=do_frozen_check, args=(interpolated_table, devices))
+
+  if args.machine != "LIP":
+    t1.start()
+
+  t2.start()
+  #t3.start()
+  if args.machine in ('MP', ):
+    t4.start()
+  t5.start()
+  #t6.start()
+
+  if args.machine != "LIP":
+    t1.join()
+  t2.join()
+  #t3.join()
+  if args.machine in ('MP', ):
+    t4.join()
+  t5.join()
+  #t6.join()
+  write_api.write(MONITORING_BUCKET, ORG, {"measurement": "check_harvest", "fields": {"rate": 1.0}})
+  check_logger.info("All Done")
   
-  df['mark'] = df[tag].isnull().astype(int).groupby(df[tag].notnull().astype(int).cumsum()).cumsum()
-  df1 = df[df['mark'] <= 1]
-  df1['width'] = df1['idx'].shift(-1) - df1['idx']
-  lastRow = df1.tail(1).idx.values[0]
-  print(lastRow)
-  input("pause")
-  df1.at[lastRow, 'width'] = last - df1.loc[lastRow, 'idx'] 
-  print(df1)
-
-  threshold = (2 * CHECK_PERIOD * 60 * MINIMUM_RATIO_NAN_ALLOW)
-  print(threshold)
-  results = df1[ ( df1['mark'] == 1 ) & ( df1['width'] >= threshold )]
-  if not results.empty:
-    results.drop(labels=['idx', 'mark', 'width'], axis=1, inplace=True)
-    results.fillna(1, inplace=True)
-    results.set_index("_time", inplace=True)
-    return results
-  return None
+def job():
+  check_logger.info("Querying ...")
   
-def __check_nan(table):
-  nan_check_results = []
+  instance = Influx().from_now(2 * CHECK_PERIOD).addFields(tags)
+  table = instance.setInterpolation(False).setRate('1s').asPivotDataFrame()
+  interpolated_table = instance.setInterpolation(True).setRate('1s').asPivotDataFrame()
+  check_logger.info("Query done")
+  processParallel(table, interpolated_table)
+  
+def job1(startTime, stopTime):
+  instance = Influx().setStart(startTime).setStop(stopTime).addFields(tags)
+  table = instance.setInterpolation(False).asPivotDataFrame()
+  interpolated_table = instance.setInterpolation(True).setRate('1s').asPivotDataFrame()
+  
+  check_logger.info("Query done")
+  process(table, interpolated_table)
 
-  tag_results = __find_nan(table[["HT_PDI_2183.PV", "_time"]], "HT_PDI_2183.PV")
-  if tag_results is not None:
-    nan_check_results.append(tag_results)
-  if len(nan_check_results) > 0:
-    return pd.concat(nan_check_results, axis=1, join="outer")
-  return pd.DataFrame()
+#schedule.every(CHECK_PERIOD).minutes.do(job)
 
-def do_nan_check(table):
-  nan_checks = __check_nan(table)
-  print(nan_checks)
-  count = len(nan_checks.index)
-  for point in check_gen(lambda x:"nan_check", nan_checks):
-    print(point)
-
-do_nan_check(table)
+#while True:
+#  schedule.run_pending()
+#  time.sleep(200. / 1000)
+job()
