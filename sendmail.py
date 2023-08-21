@@ -41,7 +41,7 @@ def urgentMail(urgents, start, end, device="mp", tagDict={}, testing=False):
   sendMail = SendMail(template_dir="emails/")
   sendMail.formatAndSend(email_targets('urgent', device=device, testing=testing), 'urgent', events=urgents, start=start, end=end, device=device, tagDict=tagDict, DEVICE_INFO=DEVICE_INFO)
 
-def wetGasSealMail(seals, start, end, tagDict={}, testing=False):
+def wetGasSealMail(seals, start, end, tagDict={}, device="lip", testing=False):
   sendMail = SendMail(template_dir="emails/")
   sendMail.formatAndSend(email_targets('wetseals', device=device, testing=testing), 'wetseals', seals=seals, start=start, end=end, tagDict=tagDict, DEVICE_INFO=DEVICE_INFO)
 
