@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, MP_EVENTS_BUCKET, ORG, PIVOT, SECOND, RUNNING_INDICATORS, TAGSPEC_FILES, RUL_WINDING_TEMP)
+from configs.constants import (BUCKET, CHECK_BUCKET, CHECK_MONITORING_PERIOD, CHECK_PERIOD, CHECKS_LIST, MONITORING_AGG_WINDOW, MONITORING_BUCKET, VIBRATION_TAGS, MONITORING_FIELD, MONITORING_MEASUREMENT, MONITORING_PERIOD, MP_EVENTS_BUCKET, ORG, PIVOT, SECOND, RUNNING_INDICATORS, TAGSPEC_FILES, RUL_WINDING_TEMP)
 from configs.influx_client import query_api
 from configs.module_loader import *
 from configs.query import Query
@@ -108,7 +108,7 @@ def query_transient_periods(start,end, device="mp"):
   df = inst.asDataFrame()
   if (df.empty):
     return df
-  df._value = df._value.apply(lambda x: 1 if x == "ON" else 0)
+  df._value = df._value.apply(lambda x: 1 if x == "ON" or x == "Run" else 0)
   shift1 = df._value.shift()
   df._value = df._value - shift1
   df1 = df[df._value.notnull() & df._value != 0]
@@ -259,7 +259,25 @@ def query_check_all(start, end):
   table = inst.asDataFrame()
   table.to_csv(f'/tmp/query.{sess("current_machine")}.csv')
   return table
-  
+ 
+def query_check_seals(start, end):
+  fields = ["IP_Seal", "LP_Seal"]
+  check_logger.info("^+++++++++++++++++++^")
+  check_logger.info(fields)
+  inst = Influx(measurement=None).setBucket(CHECK_BUCKET).addFields(fields).setDebug(True).setRate(None).setStart(start).setStop(end)
+  check_logger.info(inst.getQuery())
+  table = inst.asDataFrame()
+  table.to_csv(f'/tmp/query.{sess("current_machine")}.csv')
+  return table
+   
+def query_check_vibration(start, end):
+  inst = Influx(measurement='vibration_check').setBucket(CHECK_BUCKET).addFields(
+    VIBRATION_TAGS[sess("current_machine")]
+  ).setDebug(True).setRate(None).setStart(start).setStop(end)
+  check_logger.info(inst.getQuery())
+  table = inst.asDataFrame()
+  return table
+
 def dataframe_to_dictionary(df, measurement):
   df["_time"] = to_datetime(df['_time'], errors='coerce').astype(np.int64)
   lines = [{"measurement": f"{measurement}", "tags": {"device": row["_measurement"]}, "fields": {row["_field"]: float(row["_value"])}, "time": row["_time"]} for _, row in df.iterrows() if row["_value"] != 0 and not math.isnan(row["_value"])]

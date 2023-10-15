@@ -65,6 +65,20 @@ def parse_irv_levels(irv_string, tagInfo, verbose=False):
       tagInfo['high2'] = "NA"
       tagInfo['high3'] = "NA"
 
+def parse_ranges(ranges_string, tagInfo, verbose=False):
+  if ranges_string is None or len(ranges_string) == 0:
+    tagInfo['min'] = -999999
+    tagInfo['max'] = 999999
+  else:
+    tokens = [ x for x in ranges_string.split(',') ]
+    if verbose:
+      print(tokens)
+    if len(tokens) == 2:
+      tagInfo['min'] = myfloat(tokens[0])
+      tagInfo['max'] = myfloat(tokens[1])
+    else:
+      tagInfo['min'] = -999999
+      tagInfo['max'] = 999999
 
 parser = argparse.ArgumentParser(prog='Parse tag-specs',
                     description='parse tag list into tag-specs',
@@ -93,6 +107,7 @@ for tag in tags:
     'disabled': True if tag['disabled'].lower() == "x" else False
   }
   parse_irv_levels(tag['instrument_range_validation'], tagInfo)
+  parse_ranges(tag['value_range'], tagInfo)
   cleanTags[tag['phd_tag']] = tagInfo
 
 with open(outputFile, 'w') as f:

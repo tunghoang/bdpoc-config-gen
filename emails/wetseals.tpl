@@ -7,7 +7,7 @@ Alert Description:
     - Check: Wet gas seal check
     - Tags: 
 {%- for seal in seals %}
-        {{ seals.Field }} : flush count per 24h is {{seal.flush_count}}, and tank level decreased by {{seal.dropLevel}}
+        {{ seal.Field }} : flush count per 24h is {{seal.flush_count}}, and tank level decreased by {{seal.dropLevel}}
 {% endfor %}
 Date and Time of Alert: 
     - From: {{start}}

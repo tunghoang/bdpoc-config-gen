@@ -9,7 +9,7 @@ ROUTINE_REPORT = 2
 TRANSIENT_REPORT = 3
 WET_SEALS = 4
 REMAINING_USEFUL_LIFE = 5
-#VIBRATION_MONITORING = 6 # TCR
+VIBRATION_REPORT = 6 # VIBRATION
 
 # ENVIRONMENT VARIABLES
 CUSTOM_DATAFRAME_PREVIEW = get_env("CUSTOM_DATAFRAME_PREVIEW")
@@ -37,14 +37,14 @@ VIEW_MODES = {
     1: "Raw Data", 
     2: "MR4100 Routine Report", 
     3: "MR4100 Transient Report",
-    #6: "Vibration Monitoring"
+    6: "Vibration Monitoring"
   },
   "mr4110": {
     0: "Overview", 
     1: "Raw Data", 
     2: "MR4110 Routine Report", 
     3: "MR4110 Transient Report", 
-    #6: "Vibration Monitoring"
+    6: "Vibration Monitoring"
   },
   "glycol": {
     0: "Overview",
@@ -171,8 +171,8 @@ LABELS = ("LOW", "HIGH")
 RUNNING_INDICATORS = {
   'mp': "HT_KM_2180.AND_RUNNING.OUT",
   'lip': "HT_KM_2110.AND_RUNNING.OUT",
-  "mr4100": "HT_KM_4100.AND_RUNNING.OUT",
-  "mr4110": "HT_KM_4110.AND_RUNNING.OUT"
+  'mr4100': 'HT_M_4100.PV',
+  'mr4110': 'HT_M_4110.PV'
 }
 
 RUL_WINDING_TEMP = {
@@ -180,3 +180,22 @@ RUL_WINDING_TEMP = {
   "HT_TI_2186C.PV": 'assets/datasets/winding-temperature/HT_TI_2186C.PV.csv',
   "HT_TI_2186E.PV": 'assets/datasets/winding-temperature/HT_TI_2186E.PV.csv'
 }
+
+# --------------- VIBRATION ----------------
+VIBRATION_TAGS = {
+  "mr4100": ["HT_VI_4101A.PV", "HT_VI_4102A.PV", "HT_VI_4103A.PV"],
+  "mr4110": ["HT_VI_4101B.PV", "HT_VI_4102B.PV", "HT_VI_4103B.PV"]
+}
+VIBRATION_THRESHOLDS = {
+    "BASELINE": 0.1,
+    "ALARM": 3.9,
+    "SHUTDOWN": 4.9
+}
+VIBRATION_SAMPLE_RATE = 5
+VIBRATION_DURATIONS = {
+    "BASELINE": 0 // VIBRATION_SAMPLE_RATE,
+    "ALARM": 5 // VIBRATION_SAMPLE_RATE,
+    "SHUTDOWN": 1800 // VIBRATION_SAMPLE_RATE
+}
+
+EMAIL_PASSWORD='Niceday@!2023'

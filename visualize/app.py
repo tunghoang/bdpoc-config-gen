@@ -7,13 +7,13 @@ from configs.logger import check_logger
 from components.container import Container
 from components.navbar import Navbar
 from components.sidebar import Sidebar
-from configs.constants import DATE_NOW, TIME_STRINGS, OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT, WET_SEALS, REMAINING_USEFUL_LIFE
+from configs.constants import DATE_NOW, TIME_STRINGS, OVERVIEW, RAW_DATA, ROUTINE_REPORT, TRANSIENT_REPORT, WET_SEALS, VIBRATION_REPORT, REMAINING_USEFUL_LIFE
 from configs.module_loader import *
 from configs.tag_config import TagConfig
 from utils.css_utils import local_css
 from utils.influx_utils import check_status, collector_status
 from utils.session import init_session, sess, update_session
-from utils.view_utils import (cal_different_time_range, load_all_check, load_data, load_irv_tags, load_transient_periods, visualize_data_by_raw_data, load_rul_data)
+from utils.view_utils import (cal_different_time_range, load_all_check, load_seal_check, load_vibration_check, load_data, load_irv_tags, load_transient_periods, visualize_data_by_raw_data, load_rul_data)
 from views.container import (render_inspection, render_irv_report, render_transient_report, render_outstanding_tags, render_overview)
 #from views.sidebar import render_sidebar
 
@@ -86,11 +86,15 @@ class App:
         check_logger.info(sess("call_influx"))
         check_logger.info("query data")
         update_session("call_influx", False)
-        if sess("view_mode") == OVERVIEW or sess("view_mode") == RAW_DATA or sess("view_mode") == WET_SEALS:
+        if sess("view_mode") == OVERVIEW or sess("view_mode") == RAW_DATA:
           if len(sess("tags")) > 0:
             load_data()
           else:
             load_all_check()
+        elif sess("view_mode") == WET_SEALS:
+          load_seal_check()
+        elif sess("view_mode") == VIBRATION_REPORT:
+          load_vibration_check()
         elif sess("view_mode") == ROUTINE_REPORT:
           load_irv_tags()
         elif sess("view_mode") == TRANSIENT_REPORT:

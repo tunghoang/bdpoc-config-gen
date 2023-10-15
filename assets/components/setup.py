@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="custom_components",
-    version="0.1.25",
+    version="0.1.26",
     author="",
     author_email="",
     description="",

@@ -48,6 +48,23 @@ const filterTable = (table, condition) => {
 	return Table.new(filteredData);
 };
 
+function toIsoString(date) {
+  let tzo = 7,
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+          return (num < 10 ? '0' : '') + num;
+      };
+
+  return date.getFullYear() +
+      '-' + pad(date.getMonth() + 1) +
+      '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) +
+      ':' + pad(date.getMinutes()) +
+      ':' + pad(date.getSeconds()) +
+      dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+      ':' + pad(Math.abs(tzo) % 60);
+}
+
 function App({ args }) {
 	useEffect(() => {
 		Streamlit.setFrameHeight();
@@ -89,7 +106,7 @@ function App({ args }) {
 	let timeArray = [...data.table.getColumnAt(0)];
 	let typeArray = [...data.table.getColumnAt(3)];
 	let combinedArray = timeArray.map(
-		(item, idx) => `${new Date(item).toISOString()} (${typeArray[idx]})`
+		(item, idx) => `${toIsoString(new Date(item))} (${typeArray[idx]})`
 	);
 	const stopStartEventList = [...new Set(combinedArray)];
 	const alertTimeOptions = [...new Set(timeArray)];

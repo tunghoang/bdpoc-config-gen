@@ -18,11 +18,11 @@ parser.add_argument("-e", "--end")
 args = parser.parse_args()
 
 end = dparser.isoparse(args.end) if args.end else datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
-start = dparser.isoparse(args.start) if args.start else (end - timedelta(minutes=3*CHECK_IRV_PERIOD))
+start = dparser.isoparse(args.start) if args.start else (end - timedelta(minutes=6*CHECK_IRV_PERIOD))
 
 def job(start, end, device='mp'):
-  check_logger.info(f"Start: {start} - End: {end}: {device.upper()} Check transient condition runs")
   runIndicator = runningIndicator(device)
+  check_logger.info(f"Start: {start} - End: {end}: {device.upper()} Check transient condition runs {runIndicator}")
   df = Influx().setDebug(True).setStart(start).setStop(end).addField(runIndicator).setRate(None).asDataFrame()
   l = len(df.index)
   print(l)
@@ -45,13 +45,19 @@ def job(start, end, device='mp'):
   if len(df.index) < 2:
     return
 
-  df['_value1'] = df['_value'].apply(lambda x: 0 if x == 'OFF' else 1)
+  df['_value1'] = df['_value'].apply(lambda x: 0 if x == 'OFF' or x == "Stop" else 1)
   df['_value_shifted'] = df['_value1'].shift()
   df['_change'] = df._value1 - df._value_shifted
   df_event = df[df['_value_shifted'].notnull() & df['_change'] != 0]
 
   if df_event._time.apply(lambda t: t.to_pydatetime() > start).any():
-    transientMail(df_event._value.iloc[0], start, end, device=device)
+    event_time = df_event._time.apply(
+      lambda t: t.to_pydatetime().astimezone(pytz.timezone("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M:%S")
+    )
+    transientMail(
+        df_event._value.iloc[0], start, end, device=device, 
+        event_time=event_time.iloc
+    )
   else:
     check_logger.info("No stop start")
 '''

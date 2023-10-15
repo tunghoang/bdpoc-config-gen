@@ -13,7 +13,7 @@ __NAN_CHECK_NAME = ["nan_check", "nan_check"]
 __ROC_CHECK_NAME = ["rate_of_change_check", "roc_check"]
 __FROZEN_CHECK_NAME = ["frozen_check_(5_min_configurable)", "frozen_check"]
 __TRAVELLING_CHECK_NAME = ["travelling_check", "travelling_check"]
-__DEVIATION_CHECK_NAME = ["cross_ref.__(deviation_check)__number", "deviation_check"]
+__DEVIATION_CHECK_NAME = ["cross_ref_(deviation_check)_number", "deviation_check"]
 __CONTROL_LOGIC_CHECK_NAME = ["control_logic_check__number", "control_logic_check"]
 __DESCRIPTION = ["measuring_point", "description"]
 __MP_STARTUP = ["mp_startup", "mp_startup"]
@@ -74,18 +74,8 @@ def process_nan_check(tagObject, tagInfor):
 
 
 def process_overange_check(tagObject, tagInfor):
-  if __OVERANGE_CHECK_NAME[0] in tagObject:
-    params = tagInfor[__OVERANGE_CHECK_NAME[0]].split(",")
-    if len(params) != 2:
-      return
-    paramsHash = {}
-    for idx, param in enumerate(params):
-      if param == "_":
-        paramsHash[__OVERANGE_CHECK_PARAM_NAMES[idx]] = None
-      else:
-        paramsHash[__OVERANGE_CHECK_PARAM_NAMES[idx]] = float(param)
-    tagObject[__OVERANGE_CHECK_NAME[1]] = paramsHash
-
+  if tagInfor[__OVERANGE_CHECK_NAME[0]] == "Y":
+    tagObject[__OVERANGE_CHECK_NAME[1]] = True
 
 def process_irv_check(tagObject, tagInfor):
   if __IRV_CHECK_NAME[0] in tagObject:

@@ -17,16 +17,14 @@ def do_roc_check(table, devices):
   check_logger.info("roc_checking done")
 '''
 
-def do_deviation_check(table, deviation_checks_detail, devices):
+def do_deviation_check(table, deviation_checks_detail, devices, tagDict):
   print(deviation_checks_detail)
-  deviation_checks = deviation_check(table, deviation_checks_detail, devices)
-  print(deviation_checks)
-  for point in check_gen("deviation_check", deviation_checks):
-    InfluxWriter().setBucket(CHECK_BUCKET).write(point)
-    #write_api.write(bucket=CHECK_BUCKET, record=point, org=ORG)
-    check_logger.info("deviation_checking 1 point")
-  check_logger.info("deviation_checking done")
+  points = deviation_check(table, deviation_checks_detail, devices, tagDict)
+  print("POINTS", points)
 
+  if len(points) > 0:
+    InfluxWriter().setBucket(CHECK_BUCKET).write(points)
+  check_logger.info("deviation_checking done")
 
 def do_irv_check(table, devices, tags):
   irv_checks = irv_check(table, devices, tags)

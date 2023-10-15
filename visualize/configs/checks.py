@@ -94,22 +94,29 @@ def irv_check(df: pd.DataFrame, devices: List[dict], tags: list = []) -> pd.Data
   return res
 
 
-def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[dict]):
-  deviation_checks_with_data = pd.DataFrame()
+def deviation_check(table: pd.DataFrame, deviation_checks: dict, devices: List[dict], tagDict):
+  points = []
+  if table.empty:
+    return points
+  print(table.columns)
+  checkTime = table["_time"][0].to_pydatetime()
   for key, tags in deviation_checks.items():
     # CHECK IF DEVIATION CHECK AVAILABLE
     if len(tags) == AVAILABLE_DEVIATION and pd.Series(tags).isin(table.columns).all():
-      max, min = find_low_high_oc_by_devices(devices, tags[0])
-      if max is not None and min is not None:
-        values = abs(table[tags[0]] - table[tags[1]]) / (max - min)
-        for idx, value in enumerate(values):
-          if value > DEVIATION_CHECK_VALUE:
-            _tags = {"max": max, "min": min}
-            for idx, tag in enumerate(tags):
-              _tags[f"tag_{idx}"] = tag
-            deviation_checks_with_data = pd.concat([pd.DataFrame({"_measurement": "deviation_checks", key: value, **_tags, "_time": DATE_NOW()}, index=[table.index[-1]]), deviation_checks_with_data], join="outer")
-  return deviation_checks_with_data
-
+      #maxVal = max(table[tags[0]].max(), table[tags[1]].max())
+      print(tagDict[tags[0]])
+      maxVal = tagDict[tags[0]]['max'] - tagDict[tags[0]]['min']
+      percentDeviation = abs(table[tags[0]] - table[tags[1]]).max() / maxVal 
+      print(maxVal, percentDeviation, tags, DEVIATION_CHECK_VALUE)
+      if percentDeviation > DEVIATION_CHECK_VALUE:
+        _tags = {"": max, "min": min}
+        for idx, tag in enumerate(tags):
+          _tags[f"tag_{idx}"] = tag
+        points.append({"measurement": "deviation_check", "time": checkTime.isoformat(), "fields": {
+          tags[0]: percentDeviation,
+          tags[1]: percentDeviation
+        }})
+  return points
 '''
 def roc_check(table: pd.DataFrame, devices: List[dict]):
   res = copy.deepcopy(table)

@@ -6,6 +6,7 @@ Alert Type: [STOP/START]
 Alert Description: 
     - Check: Transient check
     - Event: {{action}}
+    - Time: {{event_time[0]}}
 Date and Time of Alert: 
     - From: {{start}}
     - To: {{end}}

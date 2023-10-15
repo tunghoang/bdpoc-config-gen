@@ -42,7 +42,13 @@ def draw_line_chart_by_data_frame(data, height=700, title="RAW DATA"):
     range_y=range_y
   )
   chart.update_layout(hovermode="x unified")
-  csv_all = data.to_csv().encode('utf-8')
+
+  csv_all = pd.pivot_table(data, 
+    index=[
+      "_time" 
+    ], values="_value", columns="_field"
+  ).to_csv().encode('utf-8')
+
   col1, col2 = st.columns([5, 1])
   col1.subheader(title)
   col2.download_button("Download CSV", csv_all, 'all-raw.csv', 'text/csv', key="csv_all")
@@ -92,6 +98,43 @@ def draw_wet_seal_chart(data: pd.DataFrame, height=700, title="WET SEALS"):
     color="_measurement",
     color_discrete_map={"Alarm": "#FF0000", "PreAlarm": "#FFA500"},
     hover_data={"dischargeCount": ':.1f', "dropLevel":":.1f"},
+    height=height
+  )
+  
+  chart1.update_layout(xaxis={'side': 'top'}, yaxis={'side': 'left'})
+
+  csv_all = data.to_csv().encode('utf-8')
+
+  col1, col2 = st.columns([5, 1])
+  col1.subheader(title)
+  col2.download_button("Download CSV", csv_all, 'all-alerts.csv', 'text/csv', key="csv_all")
+
+  st.plotly_chart(chart1, use_container_width=True)
+
+def draw_vibration_chart(data: pd.DataFrame, height=700, title="VIBRATION Report"):
+  if data is None:
+    return
+  if data.empty:
+    raise Exception('No data')
+    #return
+  range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
+
+  labels = {
+    "_time": "Check At", 
+    "_field": "Tag Name",
+    "_value": "Vibration",
+    "type": "Severity", 
+    "dischargeCount": "Drain count"
+  }
+
+  chart1 = px.scatter(
+    data, 
+    x="_time", 
+    y="_field", 
+    labels=labels, 
+    color="type",
+    color_discrete_map={"CRITICAL": "#FF0000", "ALARM": "#FFA500"},
+    hover_data={"_value": ':.1f'},
     height=height
   )
   

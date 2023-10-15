@@ -19,7 +19,7 @@ from visualize.configs.constants import (BUCKET, CHECK_BUCKET, CHECK_PERIOD, MON
 from visualize.configs.logger import check_logger
 
 from influx import Influx, InfluxWriter
-from sendmail import wetGasSealMail
+from sendmail import sms_query, wetGasSealMail
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -81,12 +81,14 @@ def intepret(flush_count, dropLevel, seal="LP"):
         "fields": {f"{seal}_Seal": 1},
         "tags": {"dropLevel": dropLevel, "dischargeCount": flush_count}
       })
-      wetGasSealMail([{
+      seals = [{
         "Field": f"{seal}_Seal", 
         "Description": "Lube Oil seal leak", 
         "dropLevel": dropLevel,
         "flush_count": flush_count
-      }], start, end, testing=False)
+      }]
+      filtered_seals = sms_query(seals, "wetseal", end)
+      wetGasSealMail(filtered_seals, start, end)
     else:
       # PreAlarm
       check_logger.info("Prealarm");

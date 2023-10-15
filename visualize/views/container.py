@@ -15,7 +15,7 @@ from custom_components.st_custom_selector import st_custom_selector
 
 from configs.influx_client import query_api
 from configs.query import Query
-from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table, draw_barchart, draw_linechart ,draw_wet_seal_chart)
+from utils.draw_chart import (draw_chart_by_check_data, draw_chart_by_raw_data, draw_table, draw_barchart, draw_linechart ,draw_wet_seal_chart, draw_vibration_chart)
 from utils.influx_utils import query_irv_transient_tags
 from utils.session import sess, update_session
 from utils.tag_utils import load_tag_specs
@@ -194,7 +194,6 @@ def render_transient_report(device='mp'):
       all_df.reset_index(inplace=True, drop=True)
       all_df['minmax'] = all_df.index.map(lambda i: 'min' if i % 2 == 0 else 'max')
       all_df['info'] = all_df["alert_type"].astype(str) + " (" + all_df["minmax"].astype(str) + ")"
-      labels = {"startTime": "Time", "_value": "Value", "minmax": "Legend", "_field": "Tag", "alert_type": "Type"}
 
       _dummy, filtered_df = st_custom_selector(key=999, data=all_df)
       if filtered_df is None:
@@ -213,6 +212,7 @@ def render_transient_report(device='mp'):
         #height = 13 * 150 if device == 'mp' else 14 * 150
         check_logger.info(filtered_df['_field'].unique())
         height = len(filtered_df._field.unique()) * 200
+        labels = {"startTime": "Time", "_value": "Value", "minmax": "Legend", "_field": "Tag", "alert_type": "Type"}
         draw_barchart(filtered_df,
                       x='startTime',
                       y='_value',
@@ -259,6 +259,10 @@ def render_outstanding_tags(container):
   filename = tagSpecFile(device)
   tagDict = load_tag_specs(filename)
   df = sess("data")
+  if df.empty:
+    st.markdown("No data found")
+    return
+  check_logger.info(df.columns)
   df = df[df._field.isin(tagDict.keys())]
   df = df.drop_duplicates(subset=['_measurement', '_field'], keep='last')[['_field', '_measurement', '_time']]
   df = df.pivot(index='_field', columns='_measurement')
@@ -325,12 +329,18 @@ def getRange(data):
 
 def render_inspection():
   df = sess("data")
-  df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', "_value", '_measurement', "type"]]
-  st.write(df)
+  df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', '_measurement', "type"]]
+  df1 = df.rename(columns={
+    "_time": "Check Time",
+    "_field": "Tag",
+    "_measurement": "Check",
+    "type": "Type"
+  })
+  st.write(df1)
   for check in sess("_selected_checks"):
-    df1 = df[df['_measurement'] == check]
+    df2 = df1[df1['Check'] == check]
     st.markdown(f"#### _{check}_")
-    st.write(df1)
+    st.write(df2)
   raw_data = Influx().addField(sess("_selected_tag")).setStart(parser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00')).setStop(parser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')).asDataFrame()
   #time_range_settings = TIME_STRINGS[sess('view_mode')]
   #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
@@ -358,3 +368,10 @@ def render_rul():
     df1["RUL (years)"] = ruls
     df1["RUL (days)"] = ruls * 365
     st.write(df1)
+
+def render_vibration():
+  df = sess("data")
+  if (df is None or df.empty ):
+    st.write("No Vibration (VIBRATION) alarms")
+    return
+  draw_vibration_chart(df, title=f'Vibration monitoring {sess("current_machine").upper()}')

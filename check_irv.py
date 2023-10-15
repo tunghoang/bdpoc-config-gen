@@ -19,7 +19,7 @@ from influx import Influx, InfluxWriter
 from visualize.configs.logger import check_logger
 from visualize.utils.common import isNumber
 
-from sendmail import urgentMail, criticalMail, dailyMail
+from sendmail import sms_query, urgentMail, criticalMail, dailyMail
 
 from check_commons import is_running
 
@@ -82,12 +82,12 @@ union(tables: [data |> min() , data |> max() ])
   check_logger.info(f"prealarmssssssss {prealarms}")
   check_logger.info(f"lowwwwwwwwwwwwww {lowprealarms}")
   if len(criticals) > 0:
-    criticalMail(criticals, start, end, device=device, tagDict=tagDict, testing=(device in ('mr4100', 'mr4110', 'glycol')))
-    #criticalMail(criticals, start, end, device=device, testing=True)
+    filtered_criticals = sms_query(criticals, "critical", end)
+    criticalMail(filtered_criticals, start, end, device=device, tagDict=tagDict, testing=(device in ('mr4100', 'mr4110', 'glycol')))
     saveToInflux(criticals, lambda r: "LLL" if r["Min"] < r["LLL"] else "HHH")
   if len(urgents) > 0:
-    urgentMail(urgents, start, end, device=device, tagDict=tagDict, testing=(device in ('mr4100', 'mr4110', 'glycol')))
-    #urgentMail(urgents, start, end, device=device, testing=True)
+    filtered_urgents = sms_query(urgents, "urgent", end)
+    urgentMail(filtered_urgents, start, end, device=device, tagDict=tagDict, testing=(device in ('mr4100', 'mr4110', 'glycol')))
     saveToInflux(urgents, lambda r: "LLL" if r["Min"] < r["LLL"] else "HHH")
   if len(prealarms) > 0:
     saveToInflux(prealarms, lambda r: "LL" if r["Min"] < r["LL"] else "HH")
@@ -96,7 +96,6 @@ union(tables: [data |> min() , data |> max() ])
 
 end = dparser.isoparse(args.end) if args.end else datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
 start = dparser.isoparse(args.start) if args.start else (end - timedelta(minutes=2*CHECK_IRV_PERIOD))
-
 
 if is_running('mp'):
   job(start, end, 'mp')
@@ -107,6 +106,7 @@ if is_running('lip'):
   job(start, end, 'lip')
 else:
   check_logger.info("check_irv: lip is stop")
+
 if is_running('mr4100'):
   job(start, end, 'mr4100')
 else:
@@ -117,4 +117,5 @@ if is_running('mr4110'):
 else:
   check_logger.info("check_irv: mr4110 is stop")
 
+job(start, end, "glycol")
 #job(start, end, 'glycol')
