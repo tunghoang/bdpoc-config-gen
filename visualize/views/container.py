@@ -328,6 +328,9 @@ def getRange(data):
 
 
 def render_inspection():
+  filename = tagSpecFile(sess("current_machine"))
+  check_logger.info(filename)
+  tag_dict = load_tag_specs(filename)
   df = sess("data")
   df = df[(df["_field"] == sess("_selected_tag"))][['_time', '_field', '_measurement', "type"]]
   df1 = df.rename(columns={
@@ -339,6 +342,13 @@ def render_inspection():
   st.write(df1)
   for check in sess("_selected_checks"):
     df2 = df1[df1['Check'] == check]
+    if check == 'irv_check':
+      df2['LLL'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('low3'))
+      df2['LL'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('low2'))
+      df2['L'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('low'))
+      df2['H'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('high'))
+      df2['HH'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('high2'))
+      df2['HHH'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('high3'))
     st.markdown(f"#### _{check}_")
     st.write(df2)
   raw_data = Influx().addField(sess("_selected_tag")).setStart(parser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00')).setStop(parser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')).asDataFrame()
