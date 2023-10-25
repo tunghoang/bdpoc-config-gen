@@ -339,7 +339,7 @@ def render_inspection():
     "_measurement": "Check",
     "type": "Type"
   })
-  st.write(df1)
+  st.write(df1.reset_index(drop=True))
   for check in sess("_selected_checks"):
     df2 = df1[df1['Check'] == check]
     if check == 'irv_check':
@@ -350,8 +350,8 @@ def render_inspection():
       df2['HH'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('high2'))
       df2['HHH'] = df2['Tag'].apply(lambda x: tag_dict.get(x, {}).get('high3'))
     st.markdown(f"#### _{check}_")
-    st.write(df2)
-  raw_data = Influx().addField(sess("_selected_tag")).setStart(parser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00')).setStop(parser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')).asDataFrame()
+    st.write(df2.reset_index(drop=True))
+  raw_data = Influx().addField(sess("_selected_tag")).setStart(parser.isoparse(f'{sess("start_date")}T{sess("start_time")}+07:00')).setStop(parser.isoparse(f'{sess("end_date")}T{sess("end_time")}+07:00')).setRate(None).asDataFrame()
   #time_range_settings = TIME_STRINGS[sess('view_mode')]
   #time = f"{int(sess('difference_time_range'))}s" if sess("time_range") == 0 else time_range_settings[sess('time_range')]
   #startStr, stopStr = getRange(sess("data"))

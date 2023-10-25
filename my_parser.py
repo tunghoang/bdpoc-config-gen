@@ -104,19 +104,10 @@ def process_frozen_check(tagObject, tagInfor):
 
 
 def process_deviation_check(tagObject, tagInfor):
-  print(tagInfor)
   if __DEVIATION_CHECK_NAME[0] in tagObject:
     if tagInfor[__DEVIATION_CHECK_NAME[0]] == "":
       return
     tagObject[__DEVIATION_CHECK_NAME[1]] = tagInfor[__DEVIATION_CHECK_NAME[0]]
-
-
-def process_control_logic_check(tagObject, tagInfor):
-  if __CONTROL_LOGIC_CHECK_NAME[0] in tagObject:
-    if tagInfor[__CONTROL_LOGIC_CHECK_NAME[0]] == "":
-      return
-    tagObject[__CONTROL_LOGIC_CHECK_NAME[1]] = tagInfor[__CONTROL_LOGIC_CHECK_NAME[0]]
-
 
 def process_mp_startup(tagObject, tagInfor):
   if __MP_STARTUP[0] in tagObject:
@@ -138,7 +129,6 @@ def add_tag_info(tags, tagInfor):
   process_roc_check(tagObject, tagInfor)
   process_frozen_check(tagObject, tagInfor)
   process_deviation_check(tagObject, tagInfor)
-  process_control_logic_check(tagObject, tagInfor)
   process_description(tagObject, tagInfor)
   process_mp_startup(tagObject, tagInfor)
   return tags[tagName]
@@ -170,40 +160,42 @@ def add_deviation_check_members(deviation_checks, row):
     deviation_checks[row[__DEVIATION_CHECK_NAME[0]]].append(row["phd_tag"])
 
 
-def add_control_logic_check_members(control_logic_checks, row):
-  if row[__CONTROL_LOGIC_CHECK_NAME[0]] in control_logic_checks:
-    control_logic_checks[row[__CONTROL_LOGIC_CHECK_NAME[0]]].append(row["phd_tag"])
-
-
-def add_control_logic_checks(control_logic_checks, name):
-  if name not in control_logic_checks and name != "":
-    control_logic_checks[name] = []
+def add_control_logic_check_members(control_logic_checks, bursty, row):
+  if row[__CONTROL_LOGIC_CHECK_NAME[0]] != "":
+    if row["bursty"] == "":
+      control_logic_checks.append(row["phd_tag"])
+    else:
+      bursty.append(row["phd_tag"])
 
 
 def main():
   data, output_file_name = itemgetter("data", "output_file_name")(init())
   devices = {}
   deviation_checks = {}
-  control_logic_checks = {}
+  control_logic_checks = []
+  bursty_control_logic_checks = []
   for row in data:
     # PARSE DATA AND POPULATE INTO devices
     deviceTags = add_device_tags(devices, row["group"])
     add_tag_info(deviceTags, row)
     # ADD name of deviation_checks
     add_deviation_checks(deviation_checks, row[__DEVIATION_CHECK_NAME[0]])
-    # ADD name of control_logic_checks
-    add_control_logic_checks(control_logic_checks, row[__CONTROL_LOGIC_CHECK_NAME[0]])
 
   for row in data:
     # ADD members for each deviation_checks
     add_deviation_check_members(deviation_checks, row)
     # ADD members for each control_logic_checks
-    add_control_logic_check_members(control_logic_checks, row)
+    add_control_logic_check_members(control_logic_checks, bursty_control_logic_checks, row)
 
   # NOW , WE DUMP devices
   outputObj = transform(devices)
   with open(output_file_name, "w") as output_file:
-    yaml.dump({"devices": outputObj, "deviation_checks": deviation_checks, "control_logic_checks": control_logic_checks}, output_file)
+    yaml.dump({
+      "devices": outputObj, 
+      "deviation_checks": deviation_checks, 
+      "control_logic_checks": control_logic_checks,
+      "bursty_control_logic_checks": bursty_control_logic_checks
+    }, output_file)
 
 
 if __name__ == '__main__':

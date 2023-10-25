@@ -21,6 +21,8 @@ from visualize.utils.common import isNumber
 from sendmail import urgentMail, criticalMail, dailyMail
 from visualize.utils.tag_utils import load_tag_specs
 
+from check_commons import is_running
+
 end = datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
 start = end - timedelta(hours=24)
 df = Influx().setDebug(True).setBucket(CHECK_BUCKET).from_now(24 * 60).setRate(None).asDataFrame()
@@ -37,6 +39,34 @@ all_nan = {}
 all_overange = {}
 all_roc = {}
 all_irv = {}
+
+def job(df, tagDict, device, start, end):
+  #global all_nan, all_overange, all_roc, all_irv
+  if not is_running(device):
+    check_logger.info(f"{device} is not running!!!")
+    return;
+  mpdf = df[df._field.isin(tagDict.keys())]
+
+  nan = mpdf[mpdf._measurement == "nan_check"]._field.unique()
+  overange = mpdf[mpdf._measurement == "overange_check"]._field.unique()
+  roc = mpdf[mpdf._measurement == "roc_check"]._field.unique()
+  irv = mpdf[mpdf._measurement == "irv_check"]._field.unique()
+
+  #device = "mp"
+  #all_nan[device] = nan
+  #all_overange[device] = overange
+  #all_roc[device] = roc
+  #all_irv[device] = irv
+  testing = device in ('glycol',)
+  check_logger.info(f"Send daily mail for {device} !!!")
+  dailyMail(nan=nan, overange=overange, roc=roc, irv=irv, tagDict=tagDict, device=device, start=start, end=end, testing=testing)
+
+job(df, mpTagDict, 'mp', start, end)  
+job(df, lipTagDict, 'lip', start, end)  
+job(df, mr4100TagDict, 'mr4100', start, end)  
+job(df, mr4110TagDict, 'mr4110', start, end)  
+job(df, glycolTagDict, 'glycol', start, end)  
+'''
 # MP -----------
 mpdf = df[df._field.isin(mpTagDict.keys())]
 
@@ -110,15 +140,5 @@ all_nan[device] = nan
 all_overange[device] = overange
 all_roc[device] = roc
 all_irv[device] = irv
-dailyMail(nan=nan, overange=overange, roc=roc, irv=irv, tagDict=glycolTagDict, device=device, start=start, end=end)
-
-
-#tagDict = {}
-#tagDict.update(mpTagDict)
-#tagDict.update(lipTagDict)
-#tagDict.update(mr4100TagDict)
-#tagDict.update(mr4110TagDict)
-#dailyMail(devices=("mp", "lip", "mr4100", "mr4110"), 
-#  nan=all_nan, overange=all_overange, roc=all_roc, irv=all_irv, 
-#  tagDict=tagDict, 
-#  start=start, end=end)
+dailyMail(nan=nan, overange=overange, roc=roc, irv=irv, tagDict=glycolTagDict, device=device, start=start, end=end, testing=True)
+'''
