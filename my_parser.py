@@ -184,8 +184,8 @@ def main():
   for row in data:
     # ADD members for each deviation_checks
     add_deviation_check_members(deviation_checks, row)
-    # ADD members for each control_logic_checks
-    add_control_logic_check_members(control_logic_checks, bursty_control_logic_checks, row)
+    ## ADD members for each control_logic_checks
+    #add_control_logic_check_members(control_logic_checks, bursty_control_logic_checks, row)
 
   # NOW , WE DUMP devices
   outputObj = transform(devices)

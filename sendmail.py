@@ -7,6 +7,8 @@ from visualize.configs.bdpoc_info import DEVICE_INFO
 from visualize.configs.constants import EMAIL_PASSWORD
 EMAIL_DB_FILE = "./state/email.db"
 
+TEST_EMAILS = ['tung.hoang@gmail.com', 'trungnt@biendongpoc.vn', 'tuancs@biendongpoc.vn']
+
 ADDITIONAL = "additional@biendongpoc.vn"
 RES='res@biendongpoc.vn'
 REE='ree@biendongpoc.vn'
@@ -305,7 +307,7 @@ def sms_query(events, severity, sent_date):
 
 def email_targets(email_type, device = 'MP', testing=False):
   if testing:
-    return ['tung.hoang@gmail.com', 'trungnt@biendongpoc.vn']
+    return TEST_EMAILS
   return EMAIL_TARGETS[device.lower()][email_type]
 '''
   targets = []
@@ -361,7 +363,7 @@ def dailyMail(nan=[], overange=[], roc=[], irv=[], tagDict={}, device="mp", star
 
 def datasourceMail(failed_sources, checkTime, testing=False):
   sendMail = SendMail(template_dir="emails/", password=EMAIL_PASSWORD)
-  sendMail.formatAndSend(['tung.hoang@gmail.com', 'cuonglv@biendongpoc.vn', 'trungnt@biendongpoc.vn', 'trungtn@biendongpoc.vn'], "datasource", sources=failed_sources, start=checkTime, DEVICE_INFO=DEVICE_INFO)
+  sendMail.formatAndSend(['tung.hoang@gmail.com', 'cuonglv@biendongpoc.vn', 'trungnt@biendongpoc.vn', 'trungtn@biendongpoc.vn', 'tuancs@biendongpoc.vn'], "datasource", sources=failed_sources, start=checkTime, DEVICE_INFO=DEVICE_INFO)
 
 def vibrationMail(events, tagDict={}, device="mr4100", testing=False):
   sendMail = SendMail(template_dir="emails/", password=EMAIL_PASSWORD)
