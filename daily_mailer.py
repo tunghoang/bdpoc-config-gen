@@ -27,6 +27,8 @@ end = datetime.now(pytz.timezone("Asia/Ho_Chi_Minh"))
 start = end - timedelta(hours=24)
 df = Influx().setDebug(True).setBucket(CHECK_BUCKET).from_now(24 * 60).setRate(None).asDataFrame()
 
+print(df)
+
 mpTagDict = load_tag_specs('assets/files/tag-specs.yaml')
 lipTagDict = load_tag_specs('assets/files/lip-tag-specs.yaml')
 mr4100TagDict = load_tag_specs('assets/files/mr4100-tag-specs.yaml')

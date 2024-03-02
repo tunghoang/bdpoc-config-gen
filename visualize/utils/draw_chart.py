@@ -157,9 +157,12 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
     #return
   
   if "type" in data.columns:
-    data["type"] = data.type.fillna("N/A")
+    data["type"] = data.type.fillna(data['_measurement'])
   else:
-    data["type"] = "N/A"
+    #data["type"] = "N/A"
+    data["type"] = data['_measurement']
+
+  
   range_x = [pd.to_datetime(data["_start"], errors='coerce').tolist()[0], pd.to_datetime(data["_stop"], errors='coerce').tolist()[0]]
 
   hover_data={
@@ -225,14 +228,21 @@ def draw_chart_by_check_data(data: pd.DataFrame, height=700, title="ALERT OVERVI
   
   chart1.update_layout(xaxis={'side': 'top'}, yaxis={'side': 'left'})
 
+  pivot_table = pd.pivot_table(data[['_field', '_measurement', '_value', 'type']], values="_value", columns=['_measurement', "type"], index="_field", aggfunc='count')
   csv_all = data.to_csv().encode('utf-8')
+  csv_pivot = pivot_table.to_csv().encode('utf-8')
 
-  col1, col2 = st.columns([5, 1])
+  col1, col2, col3 = st.columns([5, 1, 1])
   col1.subheader(title)
-  col2.download_button("Download CSV", csv_all, 'all-alerts.csv', 'text/csv', key="csv_all")
+  col2.download_button("All", csv_all, 'all-alerts.csv', 'text/csv', key="csv_all")
+  col3.download_button("Pivoted", csv_pivot, 'alert-count.csv', 'text/csv', key="csv_pivot")
 
-  st.plotly_chart(chart1, use_container_width=True)
-
+  overview_tab, summary_tab = st.tabs(["Overview", "Summary"])
+  
+  with overview_tab:
+    st.plotly_chart(chart1, use_container_width=True)
+  with summary_tab:
+    st.write(pivot_table)
 
 def draw_chart_by_raw_data(data: pd.DataFrame, height=700, title="RAW DATA", connected=False):
   if data is None:

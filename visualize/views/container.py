@@ -339,6 +339,9 @@ def render_inspection():
     "_measurement": "Check",
     "type": "Type"
   })
+  descriptionCol = df1['Tag'].apply(lambda x: tag_dict.get(x, {}).get('description'))
+  df1.insert(2, "Description", descriptionCol)
+
   st.write(df1.reset_index(drop=True))
   for check in sess("_selected_checks"):
     df2 = df1[df1['Check'] == check]
@@ -364,7 +367,7 @@ def render_inspection():
   #raw_data["_stop"] = raw_data["_stop"].dt.tz_convert(pytz.timezone("Asia/Ho_Chi_Minh"))
 
   if (raw_data is not None) and (not raw_data.empty):
-    draw_chart_by_raw_data(raw_data, height=450, title=sess("_selected_tag"), connected=True)
+    draw_chart_by_raw_data(raw_data, height=450, title=f'HHHH - {sess("_selected_tag")}', connected=True)
 
 def render_rul():
   df = sess("data")

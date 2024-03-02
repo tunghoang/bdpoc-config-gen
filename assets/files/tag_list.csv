@@ -33,8 +33,8 @@ Number",NaN Check,Overange Check,Instrument Range Validation,value range,Frozen 
 75,Dry Gas Seal,TT_2190,HT_TI_2190.PV,RD COMP. SEAL LEAKAGE DE,°C,,,Y,,"_,_,0,60,70,80","-40,200",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
 76,Dry Gas Seal,TT_2191,HT_TI_2191.PV,RD COMP. SEAL LEAKAGE NDE,°C,,,Y,,"_,_,0,60,70,80","-40,200",Y,Temperature,,,,,,,,x,,,,,"_,_,0,50,65,80"
 118,Dry Gas Seal,PCV_2191C,HT_PY_2191C.PV,Pressure Control Valve MP Flash Gas Compressor Skid,bar,2,,Y,,"_,_,0,5,20,40","0,100",Y,Pressure,,,PCV-2191C/FIT-2190/FIT-2191,PY-2191C Tăng --> FIT-2191 tăng,,,,,,,,,"0,0,0,5,20,40"
-136,Dry Gas Seal,SDV_2183_GSC,HT_SDV_2183_GBC.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,6,,X,,x,x,,,,,,,
-137,Dry Gas Seal,SDV_2183_GSO,HT_SDV_2183_GBO.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,6,,X,,x,x,,,,,,,
+136,Dry Gas Seal,SDV_2183_GSC,HT_GBC_2183.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,6,,X,,x,x,,,,,,,
+137,Dry Gas Seal,SDV_2183_GSO,HT_GBO_2183.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,6,,X,,x,x,,,,,,,
 18,Gearbox,ZT_2180B,HT_ZI_2180B.PV,GEAR SHAFT 1 AXIAL DISPLACEMENT,mm,,,Y,,"-0.8,-0.5,-0.3,0.09,0.11,0.13","-1,1",Y,Vibration,,ZE-2180A/B,,,,,x,,,,,,"-0.8,-0.5,-0.3,0.09,0.11,0.13"
 41,Gearbox,TE_2175A,HT_TI_2175A.PV,GEAR SHAFT 1 JOURN. BRG. NDE,°C,,,Y,,"_,_,0,65,80,107","-40,200",Y,Temperature,,,,,,,,x,,,,,"_,_,0,65,80,107"
 43,Gearbox,TE_2176A,HT_TI_2176A.PV,GEAR SHAFT 1 THRUST BRG. INBOARD,°C,,11,Y,,"_,_,0,65,80,107","-40,200",Y,Temperature,,TE-2176A/B,,,,,,,,,,,"_,_,0,65,80,107"
@@ -93,9 +93,9 @@ Number",NaN Check,Overange Check,Instrument Range Validation,value range,Frozen 
 111,Process,PZT_2182,HT_PZI_2182.PV,RD COMP DISCHARGE,°C,,22,Y,,,"0,50",Y,Pressure,,PT/PZT-2182,,,,,,,,,,,
 112,Process,PZT_2160,HT_PZI_2160.PV,HT-E-2160 COOLING MEDIUM RETURN,Bar,,20,Y,,,,Y,Pressure,,PT-2161/PZT-2160,,,,,,,,,,,
 113,Process,BDV_2182,HT_BDV_2182.PV,BLOW DOWN VALVE,Status,6,,Y,,,,Y,,,,PT-2182,BDV-2182 open but PT-2182 not zero,x,x,x,,,,,,
-114,Process,FCV_3013,HT_FCV_3013.PV,Flow Control Valve 2nd Stage Separator HT-V-3010,%,,,Y,,,"0,100",Y,Pressure,,,,,x,x,,,,,,,
+114,Process,PCV_3011B,HT_PIC_3011B.PIDA.PV,Flow Control Valve 2nd Stage Separator HT-V-3010,%,,,Y,,,"0,100",Y,Pressure,,,,,x,x,,,,,,,
 116,Process,LY_2170,HT_LIC_2170.AO.READBACK.VALUE,Level Control Valve MP Flash Gas Compressor Suction Scrubber HT-V-2170,%,"7,11",,Y,,,"0,100",Y,Pressure,,,LZT-2171/LY-2170,"Check LCV-2170 Open but LZT-2170 not decrease, LZT-2170 decrease but LCV-2170 close",x,y,,,,,,,
-119,Process,PCV_3011,HT_PCV_3011.PV,Pressure Control Valve 2nd Stage Separator HT-V-3010,%,"8,9",,Y,,,"0,100",Y,Pressure,,,"FT-3011/PCV-3011
+119,Process,PCV_3011,HT_PIC_3011.PIDA.PV,Pressure Control Valve 2nd Stage Separator HT-V-3010,%,"8,9",,Y,,,"0,100",Y,Pressure,,,"FT-3011/PCV-3011
  PT-3011/PCV-3011",PCV-3011 Open but FT-3011 not increase,x,x,,,,,,,
 120,Process,FT_3011,HT_FI_3011.DACA_1.PV,,Kg/h,8,,,,,,Y,Pressure,,,FT-3011/PCV-3011,PCV-3011 Open but FT-3011 not increase,x,y,x,,,,,,
 121,Process,PDT_2170,HT_PDI_2170.DACA.PV,Pressure Differential Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,Bar,,,Y,,,,Y,Pressure,,,,,x,y,,,,,,,
@@ -103,19 +103,17 @@ Number",NaN Check,Overange Check,Instrument Range Validation,value range,Frozen 
 123,Process,PT_2171,HT_PI_2171.DACA.PV,Pressure Transmitter MP Flash Gas Compressor Suction Scrubber HT-V-2170,Bar,,,Y,,,,Y,Pressure,,,,,x,y,,,,,,,
 124,Process,PZT_3010,HT_PZI_3010.PV,2ND Stage Seperator,Bar,,23,,,,,Y,Pressure,,PT-3011/PZT-3010,,,,,,,,,,,
 125,Process,PT_3011,HT_PIC_3011.DACA.PV,Pressure Transmitter 2nd Stage Separator HT-V-3010,Bar,9,23,Y,,,,Y,Pressure,,PT-3011/PZT-3010,PT-3011/PCV-3011,PCV-3011 Open but PT-3011 not decrease,,,,,,,,,
-126,Process,SDV_2160_GSC,HT_SDV_2160_GSC.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
+126,Process,SDV_2160_GSC,HT_GBC_2160.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,x,,,,,,,
-127,Process,SDV_2160_GSO,HT_SDV_2160_GSO.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
+127,Process,SDV_2160_GSO,HT_GBO_2160.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,1,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",,x,,,,,,,
-128,Process,SDV_2161_GSC,HT_SDV_2161_GSC.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,2,,X,,x,x,,,,,,,
-129,Process,SDV_2161_GSO,HT_SDV_2161_GSO.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,2,,X,,x,x,,,,,,,
-130,Process,SDV_2162_GSC,HT_SDV_2162_GSC.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,3,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
+128,Process,SDV_2161,HT_SDV_2161.DEVCTLA.PV,SHUTDOWN VALVE,Status,,,Y,,,,Y,,2,,X,,x,x,,,,,,,
+130,Process,SDV_2162_GSC,HT_GBC_2162.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,3,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,x,,,,,,,
-131,Process,SDV_2162_GSO,HT_SDV_2162_GSO.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,3,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
+131,Process,SDV_2162_GSO,HT_GBO_2162.PV,SHUTDOWN VALVE,Status,3,,Y,,,,Y,,3,,PDT-2163/SDV-2160/SDV-2162,"HT-SDV-2162 change state close to open but PDT-2163 not decrease
  HT-SDV-2160 Open, PDT-2163 must be around zero",x,x,,,,,,,
-132,Process,SDV_2170_GSC,HT_SDV_2170_GSC.PV,SHUTDOWN VALVE,Status,11,,Y,,,,Y,,4,,LZT-2171/SDV-2170/LZT-2170,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x,x,,,,,,,
-133,Process,SDV_2170_GSO,HT_SDV_2170_GSO.PV,SHUTDOWN VALVE,Status,11,,Y,,,,Y,,4,,LZT-2171/SDV-2170/LZT-2170,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x,x,,,,,,,
-134,Process,SDV_2181_GSC,HT_SDV_2181_GSC.PV,SHUTDOWN VALVE,Status,4,,Y,,,,Y,,5,,PDT-2181/SDV-2181,When HT-SDV-2181 change state close to open but PDT-2181 not decrease,x,x,,,,,,,
-135,Process,SDV_2181_GSO,HT_SDV_2181_GSO.PV,SHUTDOWN VALVE,Status,4,,Y,,,,Y,,5,,PDT-2181/SDV-2181,When HT-SDV-2181 change state close to open but PDT-2181 not decrease,x,x,,,,,,,
-138,Process,TCV_2163,HT_TCV_2163.PV,Temperature Control Valve,%,10,,Y,,,,Y,Temperature,,,TT-2163/TCV-2163,TCV-2163 Open but TT-2163 not decrease,x,x,,,,,,,
+132,Process,SDV_2170_GSC,HT_SDV_2170.DEVCTLA.PV,SHUTDOWN VALVE,Status,11,,Y,,,,Y,,4,,LZT-2171/SDV-2170/LZT-2170,"SDV-2170 Close, LCV-2170 Open but LZT-2171 Decrease -> valve passing",x,x,,,,,,,
+134,Process,SDV_2181_GSC,HT_GBC_2181.PV,SHUTDOWN VALVE,Status,4,,Y,,,,Y,,5,,PDT-2181/SDV-2181,When HT-SDV-2181 change state close to open but PDT-2181 not decrease,x,x,,,,,,,
+135,Process,SDV_2181_GSO,HT_GBO_2181.PV,SHUTDOWN VALVE,Status,4,,Y,,,,Y,,5,,PDT-2181/SDV-2181,When HT-SDV-2181 change state close to open but PDT-2181 not decrease,x,x,,,,,,,
+138,Process,TCV_2163,HT_TIC_2163.PIDA.PV,Temperature Control Valve,%,10,,Y,,,,Y,Temperature,,,TT-2163/TCV-2163,TCV-2163 Open but TT-2163 not decrease,x,x,,,,,,,
 139,Process,TT_2160,HT_TI_2160.DACA.PV,Temperature Transmitter Mp Flash Gas Compressor Inlet Cooler,oC,,,Y,,,,Y,Temperature,,,,,x,y,,,,,,,
